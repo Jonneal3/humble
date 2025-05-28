@@ -1,7 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { Camera } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  
+  // Hide footer on overview page
+  if (pathname === '/overview') {
+    return null;
+  }
+
   return (
     <footer className="border-t py-12 md:py-16">
       <div className="container px-4 md:px-6">

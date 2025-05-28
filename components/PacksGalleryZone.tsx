@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/lib/hooks";
 import axios from "axios";
 import Link from "next/link";
 import { Progress } from "./ui/progress";

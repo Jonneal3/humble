@@ -1,7 +1,7 @@
+"use client";
+
 import { AvatarIcon } from "@radix-ui/react-icons";
 import { Camera } from "lucide-react"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,35 +13,27 @@ import {
 import Link from "next/link";
 import { Button } from "./ui/button";
 import React from "react";
-import { Database } from "@/types/supabase";
-import ClientSideCredits from "./realtime/ClientSideCredits";
 import { ThemeToggle } from "./homepage/theme-toggle";
-
-export const dynamic = "force-dynamic";
+import { useRouter } from "next/navigation";
+import ClientSideCredits from "./realtime/ClientSideCredits";
 
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
 const packsIsEnabled = process.env.NEXT_PUBLIC_TUNE_TYPE === "packs";
-export const revalidate = 0;
 
-export default async function Navbar() {
-  const supabase = createServerComponentClient<Database>({ cookies });
+interface NavbarProps {
+  user: any;
+  credits: any;
+}
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { data: credits } = await supabase
-    .from("credits")
-    .select("*")
-    .eq("user_id", user?.id ?? "")
-    .single();
+export default function Navbar({ user, credits }: NavbarProps) {
+  const router = useRouter();
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl">
           <Camera className="h-5 w-5 text-primary" />
-          <span>Headshots AI</span>
+          <span>Humble</span>
         </Link>
         
         {user && (
@@ -67,10 +59,10 @@ export default async function Navbar() {
           
           {!user && (
             <>
-              <Link href="/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors">
+              <Link href="/auth/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors">
                 Login
               </Link>
-              <Link href="/login">
+              <Link href="/auth/login">
                 <Button>Create headshots</Button>
               </Link>
             </>
