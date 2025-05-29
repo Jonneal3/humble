@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Raleway:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,25 +28,55 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 5% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 221.2 83.2% 53.3%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Sleek dark mode enhancements */
+  .dark {
+    color-scheme: dark;
+  }
+
+  .dark *::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .dark *::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+
+  .dark *::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+    border-radius: 4px;
+  }
+
+  .dark *::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent-foreground));
   }
 }
 
@@ -65,8 +96,37 @@
   .pricing-feature {
     @apply flex items-center gap-2 text-sm;
   }
+
+  /* Enhanced dark mode cards */
+  .dark .pricing-card {
+    @apply shadow-lg shadow-black/20 backdrop-blur-sm;
+  }
+
+  .dark .pricing-card:hover {
+    @apply shadow-xl shadow-black/30 scale-[1.02];
+  }
+
+  /* Sleek glass effects for dark mode */
+  .dark .bg-card {
+    @apply backdrop-blur-sm bg-card/80 border-white/10;
+  }
+
+  .dark .bg-popover {
+    @apply backdrop-blur-md bg-popover/90 border-white/20;
+  }
 }
 
 .sentence-case:first-letter {
   text-transform: uppercase;
+}
+
+/* Custom scrollbar hide utility */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+  }
 }

@@ -1,438 +1,351 @@
-export type WidgetStyle = "modern" | "minimal" | "classic";
-export type ShadowSize = "none" | "small" | "medium" | "large";
-export type BorderStyle = "solid" | "dashed" | "dotted" | "gradient" | "none";
+// Streamlined Design Types - Minimal and Essential Only
+export type LayoutMode = "left-right" | "prompt-top" | "prompt-bottom";
+export type BorderStyle = "solid" | "dashed" | "dotted" | "none";
+export type ShadowStyle = "none" | "subtle" | "medium" | "large" | "glow";
+export type TextAlign = "left" | "center" | "right";
 
+// Core Design Interface - Much Simpler and Focused
 export interface DesignSettings {
-  // Instance Information
-  name?: string;
-  description?: string;
-  
-  // Business Template Settings
-  business_type?: string;
-  template_style?: string;
-  color_scheme?: string;
-  
-  // Brand Settings
-  logo_url?: string;
-  brand_name?: string;
-  brand_color?: string;
-  brand_font?: string;
-  
-  // Layout Settings
-  widget_width?: number;
-  widget_height?: number;
-  widget_style?: WidgetStyle;
-  padding?: number;
-  gap?: number;
-  
-  // Border Settings
-  border_radius?: number;
-  border_width?: number;
-  border_color?: string;
-  border_style?: BorderStyle;
-  border_gradient?: string;
-  
-  // Background Settings
+  // ===========================================
+  // OVERALL STYLE SETTINGS
+  // ===========================================
   background_color?: string;
   background_gradient?: string;
   background_image?: string;
-  background_blur?: number;
-  background_opacity?: number;
+  container_padding?: number;
+  border_radius?: number;
+  shadow_style?: ShadowStyle;
   
-  // Text Settings
-  text_color?: string;
-  text_size?: number;
-  text_weight?: number;
-  text_font?: string;
-  text_shadow?: string;
+  // ===========================================
+  // HEADER SECTION
+  // ===========================================
+  header_enabled?: boolean;
+  header_alignment?: TextAlign; // left, center, right
   
-  // Input Settings
-  input_background?: string;
-  input_text?: string;
-  input_border?: string;
-  input_radius?: number;
-  input_padding?: number;
-  input_shadow?: string;
-  input_focus_ring?: string;
+  // Logo Settings
+  logo_enabled?: boolean;
+  logo_url?: string;
+  logo_height?: number;
+  logo_border_width?: number;
+  logo_border_color?: string;
+  logo_border_radius?: number;
   
-  // Button Settings
-  button_background?: string;
-  button_text?: string;
-  button_border?: string;
-  button_radius?: number;
-  button_padding?: number;
-  button_shadow?: string;
-  button_hover_scale?: number;
-  button_hover_glow?: string;
+  // Brand Name Settings
+  brand_name?: string;
+  brand_name_enabled?: boolean;
+  brand_name_color?: string;
+  brand_name_font_family?: string;
+  brand_name_font_size?: number;
   
-  // Upload Area Settings
-  upload_background?: string;
-  upload_text?: string;
-  upload_border?: string;
-  upload_radius?: number;
-  upload_padding?: number;
-  upload_icon_color?: string;
-  upload_hover_effect?: string;
+  // ===========================================
+  // TITLE/CTA SECTION
+  // ===========================================
+  title_enabled?: boolean;
+  title_text?: string;
+  title_color?: string;
+  title_font_size?: number;
+  cta_text?: string;
+  cta_enabled?: boolean;
   
-  // Prompt Settings
-  prompt_border?: string;
-  prompt_radius?: number;
-  prompt_padding?: number;
+  // ===========================================
+  // LAYOUT CONFIGURATION
+  // ===========================================
+  layout_mode?: LayoutMode;
+  prompt_section_width?: number; // Percentage for left-right layout
+  
+  // ===========================================
+  // IFRAME SETTINGS (when layout_mode is 'iframe')
+  // ===========================================
+  iframe_width?: string; // e.g., "100%", "800px"
+  iframe_height?: string; // e.g., "600px", "100vh"
+  iframe_border?: boolean;
+  iframe_border_width?: number;
+  iframe_border_color?: string;
+  iframe_border_radius?: number;
+  iframe_shadow?: ShadowStyle;
+  iframe_loading?: "lazy" | "eager";
+  iframe_sandbox?: string; // e.g., "allow-scripts allow-same-origin allow-forms"
+  iframe_referrerpolicy?: string;
+  iframe_allowtransparency?: boolean;
+  iframe_scrolling?: "auto" | "yes" | "no";
+  
+  // ===========================================
+  // IMAGE UPLOADER SECTION
+  // ===========================================
+  uploader_enabled?: boolean;
+  uploader_max_images?: number; // Maximum number of reference images (1-6)
+  uploader_background_color?: string;
+  uploader_border_style?: BorderStyle;
+  uploader_border_color?: string;
+  uploader_border_width?: number;
+  uploader_border_radius?: number;
+  uploader_text_color?: string;
+  uploader_font_family?: string;
+  uploader_font_size?: number;
+  uploader_icon_style?: string; // For upload folder/icon design
+  
+  // ===========================================
+  // PROMPT SECTION
+  // ===========================================
+  prompt_background_color?: string;
+  prompt_border_style?: BorderStyle;
+  prompt_border_color?: string;
+  prompt_border_width?: number;
+  prompt_border_radius?: number;
+  prompt_text_color?: string;
+  prompt_font_family?: string;
+  prompt_font_size?: number;
   prompt_placeholder_color?: string;
-  prompt_focus_ring?: string;
   
-  // Sidebar Settings
-  sidebar_text?: string;
-  sidebar_border?: string;
-  sidebar_background?: string;
-  sidebar_width?: number;
+  // Suggestion Buttons
+  suggestions_enabled?: boolean;
+  suggestions_count?: number;
+  suggestion_background_color?: string;
+  suggestion_text_color?: string;
+  suggestion_border_style?: BorderStyle;
+  suggestion_border_color?: string;
+  suggestion_border_width?: number;
+  suggestion_border_radius?: number;
+  suggestion_font_family?: string;
+  suggestion_font_size?: number;
+  suggestion_shadow_style?: ShadowStyle;
+  suggestion_arrow_icon?: boolean;
   
-  // Effects
-  shadow?: ShadowSize;
-  shadow_color?: string;
-  glow_effect?: string;
-  hover_effects?: string;
-  transition_speed?: number;
+  // ===========================================
+  // IMAGE GALLERY SECTION
+  // ===========================================
+  gallery_background_color?: string;
+  gallery_border_style?: BorderStyle;
+  gallery_border_color?: string;
+  gallery_border_width?: number;
+  gallery_border_radius?: number;
+  gallery_spacing?: number;
+  gallery_columns?: number;
+  gallery_max_images?: number;
+  gallery_shadow_style?: ShadowStyle;
   
-  // Behavior
-  auto_resize?: boolean;
-  lazy_load?: boolean;
-  scroll_to_top?: boolean;
-  responsive?: boolean;
-  allow_fullscreen?: boolean;
+  // Gallery Overlay Settings
+  overlay_enabled?: boolean;
+  overlay_download_enabled?: boolean;
+  overlay_reference_enabled?: boolean;
+  overlay_background_color?: string;
+  overlay_icon_color?: string;
   
-  // Advanced
-  sandbox?: string;
-  loading?: string;
-  referrer_policy?: string;
-  allow_transparency?: boolean;
-  show_header?: boolean;
-  custom_css?: string;
+  // ===========================================
+  // RESPONSIVE SETTINGS
+  // ===========================================
+  mobile_layout_mode?: LayoutMode;
+  mobile_gallery_columns?: number;
+  mobile_font_scale?: number;
 }
 
-// Style presets for different widget styles
+// Default settings - much cleaner
+export const defaultDesignSettings: DesignSettings = {
+  // Overall Style
+  background_color: "#ffffff",
+  background_gradient: "",
+  background_image: "",
+  container_padding: 24,
+  border_radius: 12,
+  shadow_style: "medium",
+  
+  // Header
+  header_enabled: true,
+  header_alignment: "center",
+  logo_enabled: false,
+  logo_url: "",
+  logo_height: 48,
+  logo_border_width: 0,
+  logo_border_color: "#e5e7eb",
+  logo_border_radius: 4,
+  brand_name: "AI Studio",
+  brand_name_enabled: true,
+  brand_name_color: "#1f2937",
+  brand_name_font_family: "Inter",
+  brand_name_font_size: 28,
+  
+  // Title/CTA
+  title_enabled: false,
+  title_text: "Create Amazing AI Images",
+  title_color: "#374151",
+  title_font_size: 20,
+  cta_text: "Get started by uploading a reference image or entering a prompt",
+  cta_enabled: false,
+  
+  // Layout
+  layout_mode: "prompt-top",
+  prompt_section_width: 40,
+  
+  // Iframe Settings
+  iframe_width: "100%",
+  iframe_height: "600px",
+  iframe_border: true,
+  iframe_border_width: 1,
+  iframe_border_color: "#e5e7eb",
+  iframe_border_radius: 12,
+  iframe_shadow: "medium",
+  iframe_loading: "lazy",
+  iframe_sandbox: "allow-scripts allow-same-origin allow-forms",
+  iframe_referrerpolicy: "no-referrer-when-downgrade",
+  iframe_allowtransparency: true,
+  iframe_scrolling: "auto",
+  
+  // Image Uploader
+  uploader_enabled: true,
+  uploader_max_images: 3,
+  uploader_background_color: "#f8fafc",
+  uploader_border_style: "dashed",
+  uploader_border_color: "#cbd5e1",
+  uploader_border_width: 2,
+  uploader_border_radius: 12,
+  uploader_text_color: "#64748b",
+  uploader_font_family: "Inter",
+  uploader_font_size: 14,
+  uploader_icon_style: "folder",
+  
+  // Prompt Section
+  prompt_background_color: "#f9fafb",
+  prompt_border_style: "solid",
+  prompt_border_color: "#e5e7eb",
+  prompt_border_width: 1,
+  prompt_border_radius: 12,
+  prompt_text_color: "#374151",
+  prompt_font_family: "Inter",
+  prompt_font_size: 16,
+  prompt_placeholder_color: "#9ca3af",
+  
+  // Suggestion Buttons
+  suggestions_enabled: true,
+  suggestions_count: 3,
+  suggestion_background_color: "#ffffff",
+  suggestion_text_color: "#374151",
+  suggestion_border_style: "solid",
+  suggestion_border_color: "#e5e7eb",
+  suggestion_border_width: 1,
+  suggestion_border_radius: 8,
+  suggestion_font_family: "Inter",
+  suggestion_font_size: 12,
+  suggestion_shadow_style: "subtle",
+  suggestion_arrow_icon: true,
+  
+  // Image Gallery
+  gallery_background_color: "transparent",
+  gallery_border_style: "none",
+  gallery_border_color: "#e5e7eb",
+  gallery_border_width: 0,
+  gallery_border_radius: 12,
+  gallery_spacing: 16,
+  gallery_columns: 2,
+  gallery_max_images: 4,
+  gallery_shadow_style: "medium",
+  
+  // Gallery Overlay
+  overlay_enabled: true,
+  overlay_download_enabled: true,
+  overlay_reference_enabled: true,
+  overlay_background_color: "rgba(0, 0, 0, 0.5)",
+  overlay_icon_color: "#ffffff",
+  
+  // Responsive
+  mobile_layout_mode: "prompt-top",
+  mobile_gallery_columns: 1,
+  mobile_font_scale: 0.9,
+};
+
+// Color Presets - Simplified
+export interface ColorPreset {
+  name: string;
+  background_color: string;
+  prompt_background_color: string;
+  prompt_text_color: string;
+  suggestion_background_color: string;
+  brand_name_color: string;
+  accent_color: string;
+}
+
+export const colorPresets: ColorPreset[] = [
+  {
+    name: "Modern Light",
+    background_color: "#ffffff",
+    prompt_background_color: "#f9fafb",
+    prompt_text_color: "#374151",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#1f2937",
+    accent_color: "#6366f1"
+  },
+  {
+    name: "Dark Mode",
+    background_color: "#1a1a1a",
+    prompt_background_color: "#2d2d2d",
+    prompt_text_color: "#ffffff",
+    suggestion_background_color: "#2d2d2d",
+    brand_name_color: "#ffffff",
+    accent_color: "#3b82f6"
+  },
+  {
+    name: "Ocean Blue",
+    background_color: "#f0f9ff",
+    prompt_background_color: "#e0f2fe",
+    prompt_text_color: "#075985",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#075985",
+    accent_color: "#0ea5e9"
+  },
+  {
+    name: "Forest Green",
+    background_color: "#f0fdf4",
+    prompt_background_color: "#dcfce7",
+    prompt_text_color: "#064e3b",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#064e3b",
+    accent_color: "#22c55e"
+  },
+  {
+    name: "Sunset Orange",
+    background_color: "#fff7ed",
+    prompt_background_color: "#ffedd5",
+    prompt_text_color: "#7c2d12",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#7c2d12",
+    accent_color: "#f97316"
+  },
+  {
+    name: "Purple Magic",
+    background_color: "#faf5ff",
+    prompt_background_color: "#f3e8ff",
+    prompt_text_color: "#6b21a8",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#6b21a8",
+    accent_color: "#a855f7"
+  }
+];
+
+// Font options
+export const fontOptions = [
+  { value: "Inter", label: "Inter" },
+  { value: "Poppins", label: "Poppins" },
+  { value: "Montserrat", label: "Montserrat" },
+  { value: "Playfair Display", label: "Playfair Display" },
+  { value: "Roboto", label: "Roboto" },
+  { value: "Open Sans", label: "Open Sans" },
+];
+
+// Legacy compatibility - keeping minimal backwards compatibility
+export type WidgetStyle = "modern" | "minimal" | "classic";
 export const stylePresets: Record<WidgetStyle, Partial<DesignSettings>> = {
   modern: {
     border_radius: 12,
-    border_width: 1,
-    border_color: "#e5e7eb",
-    shadow: "medium",
-    padding: 20,
+    shadow_style: "medium",
+    container_padding: 24,
   },
   minimal: {
-    border_radius: 4,
-    border_width: 0,
-    border_color: "transparent",
-    shadow: "none",
-    padding: 12,
+    border_radius: 8,
+    shadow_style: "subtle",
+    container_padding: 16,
   },
   classic: {
     border_radius: 0,
-    border_width: 2,
-    border_color: "#000000",
-    shadow: "none",
-    padding: 16,
-  }
-};
-
-export const defaultDesignSettings: DesignSettings = {
-  // Instance Information
-  name: "",
-  description: "",
-  
-  // Business Template Settings
-  business_type: "",
-  template_style: "",
-  color_scheme: "brand",
-  
-  // Brand Settings
-  logo_url: undefined,
-  brand_name: "",
-  brand_color: '#000000',
-  brand_font: 'Inter',
-  
-  // Layout Settings
-  widget_width: 100,
-  widget_height: 600,
-  widget_style: 'modern',
-  padding: 16,
-  border_radius: 8,
-  border_width: 1,
-  border_color: '#e2e8f0',
-  background_color: '#ffffff',
-  shadow: 'medium',
-  
-  // Behavior
-  auto_resize: true,
-  lazy_load: false,
-  scroll_to_top: true,
-  responsive: true,
-  allow_fullscreen: true,
-  
-  // Advanced
-  sandbox: 'allow-scripts allow-same-origin allow-forms',
-  loading: 'lazy',
-  referrer_policy: 'no-referrer-when-downgrade',
-  allow_transparency: true,
-  show_header: true,
-};
-
-export type DesignPreset = {
-  background_color: string;
-  text_color: string;
-  input_background: string;
-  input_text: string;
-  input_border: string;
-  button_background: string;
-  button_text: string;
-  button_border: string;
-  prompt_border: string;
-  upload_background: string;
-  upload_text: string;
-  upload_border: string;
-  sidebar_text: string;
-  sidebar_border: string;
-};
-
-export const designPresets: Record<string, DesignPreset> = {
-  'modern-dark': {
-    background_color: '#1a1a1a',
-    text_color: '#ffffff',
-    input_background: '#2d2d2d',
-    input_text: '#ffffff',
-    input_border: '#404040',
-    button_background: '#3b82f6',
-    button_text: '#ffffff',
-    button_border: '#2563eb',
-    prompt_border: '#404040',
-    upload_background: '#2d2d2d',
-    upload_text: '#ffffff',
-    upload_border: '#404040',
-    sidebar_text: '#a3a3a3',
-    sidebar_border: '#404040'
-  },
-  'minimal-light': {
-    background_color: '#ffffff',
-    text_color: '#000000',
-    input_background: '#f9fafb',
-    input_text: '#1f2937',
-    input_border: '#e5e7eb',
-    button_background: '#f3f4f6',
-    button_text: '#1f2937',
-    button_border: '#e5e7eb',
-    prompt_border: '#e5e7eb',
-    upload_background: '#f9fafb',
-    upload_text: '#4b5563',
-    upload_border: '#e5e7eb',
-    sidebar_text: '#6b7280',
-    sidebar_border: '#e5e7eb'
-  },
-  'nature-inspired': {
-    background_color: '#f0fdf4',
-    text_color: '#064e3b',
-    input_background: '#dcfce7',
-    input_text: '#064e3b',
-    input_border: '#86efac',
-    button_background: '#22c55e',
-    button_text: '#ffffff',
-    button_border: '#16a34a',
-    prompt_border: '#86efac',
-    upload_background: '#dcfce7',
-    upload_text: '#064e3b',
-    upload_border: '#86efac',
-    sidebar_text: '#15803d',
-    sidebar_border: '#86efac'
-  },
-  'ocean-theme': {
-    background_color: '#f0f9ff',
-    text_color: '#075985',
-    input_background: '#e0f2fe',
-    input_text: '#075985',
-    input_border: '#7dd3fc',
-    button_background: '#0ea5e9',
-    button_text: '#ffffff',
-    button_border: '#0284c7',
-    prompt_border: '#7dd3fc',
-    upload_background: '#e0f2fe',
-    upload_text: '#075985',
-    upload_border: '#7dd3fc',
-    sidebar_text: '#0369a1',
-    sidebar_border: '#7dd3fc'
-  },
-  'sunset-vibes': {
-    background_color: '#fff7ed',
-    text_color: '#7c2d12',
-    input_background: '#ffedd5',
-    input_text: '#7c2d12',
-    input_border: '#fdba74',
-    button_background: '#f97316',
-    button_text: '#ffffff',
-    button_border: '#ea580c',
-    prompt_border: '#fdba74',
-    upload_background: '#ffedd5',
-    upload_text: '#7c2d12',
-    upload_border: '#fdba74',
-    sidebar_text: '#9a3412',
-    sidebar_border: '#fdba74'
-  },
-  'midnight-purple': {
-    background_color: '#1e1b4b',
-    text_color: '#e9d5ff',
-    input_background: '#312e81',
-    input_text: '#e9d5ff',
-    input_border: '#6d28d9',
-    button_background: '#8b5cf6',
-    button_text: '#ffffff',
-    button_border: '#7c3aed',
-    prompt_border: '#6d28d9',
-    upload_background: '#312e81',
-    upload_text: '#e9d5ff',
-    upload_border: '#6d28d9',
-    sidebar_text: '#c4b5fd',
-    sidebar_border: '#6d28d9'
-  },
-  'forest-mist': {
-    background_color: '#f0fdf4',
-    text_color: '#064e3b',
-    input_background: '#dcfce7',
-    input_text: '#064e3b',
-    input_border: '#86efac',
-    button_background: '#22c55e',
-    button_text: '#ffffff',
-    button_border: '#16a34a',
-    prompt_border: '#86efac',
-    upload_background: '#dcfce7',
-    upload_text: '#064e3b',
-    upload_border: '#86efac',
-    sidebar_text: '#15803d',
-    sidebar_border: '#86efac'
-  },
-  'desert-sand': {
-    background_color: '#fef3c7',
-    text_color: '#78350f',
-    input_background: '#fde68a',
-    input_text: '#78350f',
-    input_border: '#fbbf24',
-    button_background: '#d97706',
-    button_text: '#ffffff',
-    button_border: '#b45309',
-    prompt_border: '#fbbf24',
-    upload_background: '#fde68a',
-    upload_text: '#78350f',
-    upload_border: '#fbbf24',
-    sidebar_text: '#92400e',
-    sidebar_border: '#fbbf24'
-  },
-  'nordic-frost': {
-    background_color: '#f8fafc',
-    text_color: '#0f172a',
-    input_background: '#f1f5f9',
-    input_text: '#0f172a',
-    input_border: '#cbd5e1',
-    button_background: '#64748b',
-    button_text: '#ffffff',
-    button_border: '#475569',
-    prompt_border: '#cbd5e1',
-    upload_background: '#f1f5f9',
-    upload_text: '#0f172a',
-    upload_border: '#cbd5e1',
-    sidebar_text: '#334155',
-    sidebar_border: '#cbd5e1'
-  },
-  'cherry-blossom': {
-    background_color: '#fdf2f8',
-    text_color: '#831843',
-    input_background: '#fce7f3',
-    input_text: '#831843',
-    input_border: '#f9a8d4',
-    button_background: '#ec4899',
-    button_text: '#ffffff',
-    button_border: '#db2777',
-    prompt_border: '#f9a8d4',
-    upload_background: '#fce7f3',
-    upload_text: '#831843',
-    upload_border: '#f9a8d4',
-    sidebar_text: '#be185d',
-    sidebar_border: '#f9a8d4'
-  },
-  'cyberpunk': {
-    background_color: '#0f172a',
-    text_color: '#38bdf8',
-    input_background: '#1e293b',
-    input_text: '#38bdf8',
-    input_border: '#0ea5e9',
-    button_background: '#f472b6',
-    button_text: '#ffffff',
-    button_border: '#ec4899',
-    prompt_border: '#0ea5e9',
-    upload_background: '#1e293b',
-    upload_text: '#38bdf8',
-    upload_border: '#0ea5e9',
-    sidebar_text: '#7dd3fc',
-    sidebar_border: '#0ea5e9'
-  },
-  'lavender-dreams': {
-    background_color: '#faf5ff',
-    text_color: '#6b21a8',
-    input_background: '#f3e8ff',
-    input_text: '#6b21a8',
-    input_border: '#d8b4fe',
-    button_background: '#a855f7',
-    button_text: '#ffffff',
-    button_border: '#9333ea',
-    prompt_border: '#d8b4fe',
-    upload_background: '#f3e8ff',
-    upload_text: '#6b21a8',
-    upload_border: '#d8b4fe',
-    sidebar_text: '#7e22ce',
-    sidebar_border: '#d8b4fe'
-  },
-  'autumn-breeze': {
-    background_color: '#fff7ed',
-    text_color: '#7c2d12',
-    input_background: '#ffedd5',
-    input_text: '#7c2d12',
-    input_border: '#fdba74',
-    button_background: '#f97316',
-    button_text: '#ffffff',
-    button_border: '#ea580c',
-    prompt_border: '#fdba74',
-    upload_background: '#ffedd5',
-    upload_text: '#7c2d12',
-    upload_border: '#fdba74',
-    sidebar_text: '#9a3412',
-    sidebar_border: '#fdba74'
-  },
-  'midnight-ocean': {
-    background_color: '#0f172a',
-    text_color: '#e0f2fe',
-    input_background: '#1e293b',
-    input_text: '#e0f2fe',
-    input_border: '#0ea5e9',
-    button_background: '#0284c7',
-    button_text: '#ffffff',
-    button_border: '#0369a1',
-    prompt_border: '#0ea5e9',
-    upload_background: '#1e293b',
-    upload_text: '#e0f2fe',
-    upload_border: '#0ea5e9',
-    sidebar_text: '#7dd3fc',
-    sidebar_border: '#0ea5e9'
-  },
-  'sage-garden': {
-    background_color: '#f0fdf4',
-    text_color: '#064e3b',
-    input_background: '#dcfce7',
-    input_text: '#064e3b',
-    input_border: '#86efac',
-    button_background: '#22c55e',
-    button_text: '#ffffff',
-    button_border: '#16a34a',
-    prompt_border: '#86efac',
-    upload_background: '#dcfce7',
-    upload_text: '#064e3b',
-    upload_border: '#86efac',
-    sidebar_text: '#15803d',
-    sidebar_border: '#86efac'
+    shadow_style: "none",
+    container_padding: 20,
   }
 }; 

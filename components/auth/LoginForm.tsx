@@ -76,7 +76,7 @@ export default function LoginForm() {
       if (data?.session) {
         console.log('Login successful, session:', data.session)
         // Force a hard refresh to ensure all auth state is updated
-        window.location.href = '/overview'
+        window.location.href = '/designer-instances'
       } else {
         console.error('No session after successful login')
         toast({

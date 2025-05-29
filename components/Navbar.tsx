@@ -14,7 +14,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import React from "react";
 import { ThemeToggle } from "./homepage/theme-toggle";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import ClientSideCredits from "./realtime/ClientSideCredits";
 
 const stripeIsConfigured = process.env.NEXT_PUBLIC_STRIPE_IS_ENABLED === "true";
@@ -27,42 +27,48 @@ interface NavbarProps {
 
 export default function Navbar({ user, credits }: NavbarProps) {
   const router = useRouter();
-
+  const pathname = usePathname();
+  
+  // Check if we're on a design page to use compact layout
+  const isDesignPage = pathname?.includes('/design/');
+  
   return (
-    <header className="sticky top-0 z-[100] w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-          <Camera className="h-5 w-5 text-primary" />
+    <header className="sticky top-0 z-[100] w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:bg-background/80 dark:backdrop-blur-xl dark:border-border">
+      <div className={`container flex ${isDesignPage ? 'h-10' : 'h-16'} items-center justify-between`}>
+        <Link 
+          href="/designer-instances" 
+          className={`flex items-center gap-2 font-bold ${isDesignPage ? 'text-base' : 'text-xl'} text-foreground`}
+          prefetch={true}
+        >
+          <Camera className={`${isDesignPage ? 'h-4 w-4' : 'h-5 w-5'} text-primary`} />
           <span>Humble</span>
         </Link>
         
-        {user && (
+        {user && !isDesignPage && (
           <nav className="hidden md:flex gap-6">
-            <Link href="/overview" className="text-sm font-medium hover:text-primary transition-colors">
-              Home
+            <Link 
+              href="/designer-instances" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+              prefetch={true}
+            >
+              Designers
             </Link>
-            {packsIsEnabled && (
-              <Link href="/overview/packs" className="text-sm font-medium hover:text-primary transition-colors">
-                Packs
-              </Link>
-            )}
-            {stripeIsConfigured && (
-              <Link href="/get-credits" className="text-sm font-medium hover:text-primary transition-colors">
-                Get Credits
-              </Link>
-            )}
           </nav>
         )}
 
         <div className="flex items-center gap-4">
-          <ThemeToggle />
+          {!isDesignPage && <ThemeToggle />}
           
           {!user && (
             <>
-              <Link href="/auth/login" className="hidden sm:block text-sm font-medium hover:text-primary transition-colors">
+              <Link 
+                href="/auth/login" 
+                className="hidden sm:block text-sm font-medium text-foreground hover:text-primary transition-colors"
+                prefetch={true}
+              >
                 Login
               </Link>
-              <Link href="/auth/login">
+              <Link href="/auth/login" prefetch={true}>
                 <Button>Create headshots</Button>
               </Link>
             </>
@@ -70,24 +76,37 @@ export default function Navbar({ user, credits }: NavbarProps) {
 
           {user && (
             <div className="flex items-center gap-4">
-              {stripeIsConfigured && (
+              {stripeIsConfigured && !isDesignPage && (
                 <ClientSideCredits creditsRow={credits ? credits : null} />
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-                    <AvatarIcon className="h-6 w-6 text-primary" />
+                  <Button variant="ghost" size="icon" className={`${isDesignPage ? 'h-6 w-6' : 'h-8 w-8'} p-0`}>
+                    <AvatarIcon className={`${isDesignPage ? 'h-4 w-4' : 'h-6 w-6'} text-primary`} />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 z-[101]">
+                <DropdownMenuContent className="w-56 z-[101] bg-popover border-border">
                   <DropdownMenuLabel className="text-primary text-center overflow-hidden text-ellipsis">
                     {user.email}
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-border" />
+                  {isDesignPage && (
+                    <>
+                      <Link href="/designer-instances">
+                        <Button
+                          className="w-full text-left text-foreground justify-start"
+                          variant="ghost"
+                        >
+                          ← Back to Designers
+                        </Button>
+                      </Link>
+                      <DropdownMenuSeparator className="bg-border" />
+                    </>
+                  )}
                   <form action="/auth/sign-out" method="post">
                     <Button
                       type="submit"
-                      className="w-full text-left"
+                      className="w-full text-left text-foreground"
                       variant="ghost"
                     >
                       Log out

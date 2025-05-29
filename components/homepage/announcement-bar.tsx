@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { X } from "lucide-react"
 import { motion } from "motion/react"
 
@@ -9,8 +10,12 @@ const message = process.env.NEXT_PUBLIC_ANNOUNCEMENT_MESSAGE
 
 export default function AnnouncementBar() {
   const [isVisible, setIsVisible] = useState(true)
+  const pathname = usePathname()
+  
+  // Hide on design pages to save space
+  const isDesignPage = pathname?.includes('/design/')
 
-  if (!isEnabled || !isVisible) return null
+  if (!isEnabled || !isVisible || isDesignPage) return null
 
   return (
     <motion.div

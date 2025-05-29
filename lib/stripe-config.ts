@@ -1,5 +1,8 @@
 import { StripeMode } from "./hooks/useStripeMode";
 
+// Re-export the StripeMode type for use in other files
+export type { StripeMode };
+
 // Test mode price IDs
 const TEST_PRICE_IDS = {
   one: "price_test_1",

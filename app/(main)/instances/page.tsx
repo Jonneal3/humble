@@ -1,53 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Plus } from "lucide-react";
-
-interface Instance {
-  id: string;
-  name: string;
-  description: string;
-  created_at: string;
-}
+import { useInstances } from "@/contexts/InstancesContext";
 
 export default function InstancesPage() {
-  const [instances, setInstances] = useState<Instance[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { instances, loading } = useInstances();
   const router = useRouter();
-  const supabase = createClientComponentClient();
-
-  useEffect(() => {
-    const loadInstances = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/login');
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('instances')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading instances:', error);
-        return;
-      }
-
-      setInstances(data || []);
-      setLoading(false);
-    };
-
-    loadInstances();
-  }, [supabase, router]);
 
   return (
     <div className="container max-w-6xl mx-auto py-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Your Instances</h1>
+        <h1 className="text-3xl font-bold text-foreground">Your Instances</h1>
         <Button onClick={() => router.push('/instances/new')}>
           <Plus className="w-4 h-4 mr-2" />
           New Instance
@@ -55,10 +20,10 @@ export default function InstancesPage() {
       </div>
 
       {loading ? (
-        <div className="text-center py-8">Loading instances...</div>
+        <div className="text-center py-8 text-muted-foreground">Loading instances...</div>
       ) : instances.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-lg text-gray-500 mb-4">You haven't created any instances yet.</p>
+          <p className="text-lg text-muted-foreground mb-4">You haven't created any instances yet.</p>
           <Button onClick={() => router.push('/instances/new')}>
             Create Your First Instance
           </Button>
@@ -68,11 +33,11 @@ export default function InstancesPage() {
           {instances.map((instance) => (
             <div
               key={instance.id}
-              className="border rounded-lg p-6 hover:shadow-lg transition-shadow"
+              className="border border-border rounded-lg p-6 hover:shadow-lg transition-shadow bg-card"
             >
-              <h2 className="text-xl font-semibold mb-2">{instance.name}</h2>
+              <h2 className="text-xl font-semibold mb-2 text-foreground">{instance.name}</h2>
               {instance.description && (
-                <p className="text-gray-500 mb-4">{instance.description}</p>
+                <p className="text-muted-foreground mb-4">{instance.description}</p>
               )}
               <div className="flex justify-end gap-2">
                 <Button

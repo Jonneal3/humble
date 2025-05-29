@@ -1,16 +1,19 @@
 import * as React from "react"
 
-type ToastActionElement = React.ReactElement
+import type {
+  ToastActionElement,
+  ToastProps,
+} from "@/components/ui/toast"
 
-export type ToastProps = React.HTMLAttributes<HTMLDivElement> & {
-  title?: string
-  description?: string
+type ToasterToast = ToastProps & {
+  id: string
+  title?: React.ReactNode
+  description?: React.ReactNode
   action?: ToastActionElement
-  variant?: "default" | "destructive"
 }
 
 type State = {
-  toasts: ToastProps[]
+  toasts: ToasterToast[]
 }
 
 const initialState: State = {
@@ -21,14 +24,14 @@ const listeners: Array<(state: State) => void> = []
 
 let memoryState: State = initialState
 
-function dispatch(action: { type: "ADD_TOAST" | "DISMISS_TOAST"; toast?: ToastProps; toastId?: string }) {
+function dispatch(action: { type: "ADD_TOAST" | "DISMISS_TOAST"; toast?: ToasterToast; toastId?: string }) {
   memoryState = reducer(memoryState, action)
   listeners.forEach((listener) => {
     listener(memoryState)
   })
 }
 
-function reducer(state: State, action: { type: "ADD_TOAST" | "DISMISS_TOAST"; toast?: ToastProps; toastId?: string }): State {
+function reducer(state: State, action: { type: "ADD_TOAST" | "DISMISS_TOAST"; toast?: ToasterToast; toastId?: string }): State {
   switch (action.type) {
     case "ADD_TOAST":
       return {
@@ -43,13 +46,19 @@ function reducer(state: State, action: { type: "ADD_TOAST" | "DISMISS_TOAST"; to
   }
 }
 
-function toast({ ...props }: ToastProps) {
+type Toast = Omit<ToasterToast, "id">
+
+function toast({ ...props }: Toast) {
   const id = Math.random().toString(36).substring(2, 9)
   dispatch({
     type: "ADD_TOAST",
     toast: {
       ...props,
       id,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) dispatch({ type: "DISMISS_TOAST", toastId: id })
+      },
     },
   })
   return id
@@ -73,4 +82,6 @@ export function useToast() {
     toast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   }
-} 
+}
+
+export { type ToasterToast, type ToastProps, type ToastActionElement } 

@@ -5,7 +5,7 @@ import { Database } from './types/supabase'
 
 // Routes that require authentication
 const PROTECTED_ROUTES = [
-  '/overview',
+  '/designer-instances',
   '/design',
   '/instances',
   '/get-credits',
@@ -28,7 +28,7 @@ export async function middleware(req: NextRequest) {
 
   // If user is signed in and trying to access login page
   if (session && req.nextUrl.pathname.startsWith('/auth/login')) {
-    return NextResponse.redirect(new URL('/overview', req.url))
+    return NextResponse.redirect(new URL('/designer-instances', req.url))
   }
 
   return res

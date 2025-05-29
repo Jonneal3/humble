@@ -23,7 +23,7 @@ type ModelsTableProps = {
 export default async function ModelsTable({ models }: ModelsTableProps) {
   const router = useRouter();
   const handleRedirect = (id: number) => {
-    router.push(`/overview/models/${id}`);
+    router.push(`/designer-instances/models/${id}`);
   };
 
   return (

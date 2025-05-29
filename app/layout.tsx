@@ -35,20 +35,22 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AnnouncementBar />
-          <Suspense
-            fallback={
-              <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                <div className="container h-16" />
-              </div>
-            }
-          >
-            <NavbarWrapper />
-          </Suspense>
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <div className="min-h-screen bg-background dark:bg-gradient-to-br dark:from-background dark:via-background dark:to-slate-900/20">
+            <AnnouncementBar />
+            <Suspense
+              fallback={
+                <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:bg-background/80 dark:backdrop-blur-xl">
+                  <div className="container h-16" />
+                </div>
+              }
+            >
+              <NavbarWrapper />
+            </Suspense>
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
           <Toaster />
           <Analytics />
         </ThemeProvider>
