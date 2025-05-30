@@ -119,10 +119,13 @@ export interface DesignSettings {
   gallery_border_color?: string;
   gallery_border_width?: number;
   gallery_border_radius?: number;
+  gallery_image_border_radius?: number;
+  gallery_border_enabled?: boolean;
   gallery_spacing?: number;
   gallery_columns?: number;
   gallery_max_images?: number;
   gallery_shadow_style?: ShadowStyle;
+  gallery_scrolling_enabled?: boolean;
   
   // Gallery Overlay Settings
   overlay_enabled?: boolean;
@@ -230,14 +233,17 @@ export const defaultDesignSettings: DesignSettings = {
   
   // Image Gallery
   gallery_background_color: "transparent",
-  gallery_border_style: "none",
+  gallery_border_style: "solid",
   gallery_border_color: "#e5e7eb",
   gallery_border_width: 0,
   gallery_border_radius: 12,
+  gallery_image_border_radius: 8,
+  gallery_border_enabled: false,
   gallery_spacing: 16,
   gallery_columns: 2,
   gallery_max_images: 4,
   gallery_shadow_style: "medium",
+  gallery_scrolling_enabled: false,
   
   // Gallery Overlay
   overlay_enabled: true,
@@ -252,20 +258,79 @@ export const defaultDesignSettings: DesignSettings = {
   mobile_font_scale: 0.9,
 };
 
-// Color Presets - Simplified
-export interface ColorPreset {
+// Theme Presets - Comprehensive Design Themes
+export interface DesignTheme {
   name: string;
+  description?: string;
+  
+  // Core Colors (required)
   background_color: string;
   prompt_background_color: string;
   prompt_text_color: string;
   suggestion_background_color: string;
   brand_name_color: string;
   accent_color: string;
+  
+  // Overall Style (optional - will use defaults if not specified)
+  border_radius?: number;
+  shadow_style?: ShadowStyle;
+  container_padding?: number;
+  
+  // Gallery Settings (optional)
+  gallery_background_color?: string;
+  gallery_border_radius?: number;
+  gallery_image_border_radius?: number;
+  gallery_shadow_style?: ShadowStyle;
+  gallery_spacing?: number;
+  gallery_border_enabled?: boolean;
+  gallery_border_width?: number;
+  gallery_border_color?: string;
+  
+  // Uploader Settings (optional)
+  uploader_background_color?: string;
+  uploader_border_radius?: number;
+  uploader_border_color?: string;
+  
+  // Suggestion Settings (optional)
+  suggestion_border_radius?: number;
+  suggestion_shadow_style?: ShadowStyle;
+  suggestion_border_color?: string;
+  
+  // Prompt Settings (optional)
+  prompt_border_radius?: number;
+  prompt_border_color?: string;
 }
 
-export const colorPresets: ColorPreset[] = [
+// Helper function to get complete theme with defaults
+export const getCompleteTheme = (theme: DesignTheme) => ({
+  ...theme,
+  description: theme.description ?? "",
+  border_radius: theme.border_radius ?? 12,
+  shadow_style: theme.shadow_style ?? "medium",
+  container_padding: theme.container_padding ?? 24,
+  gallery_background_color: theme.gallery_background_color ?? "transparent",
+  gallery_border_radius: theme.gallery_border_radius ?? 12,
+  gallery_image_border_radius: theme.gallery_image_border_radius ?? 8,
+  gallery_shadow_style: theme.gallery_shadow_style ?? "medium",
+  gallery_spacing: theme.gallery_spacing ?? 16,
+  gallery_border_enabled: theme.gallery_border_enabled ?? false,
+  gallery_border_width: theme.gallery_border_width ?? 0,
+  gallery_border_color: theme.gallery_border_color ?? "#e5e7eb",
+  uploader_background_color: theme.uploader_background_color ?? "#f8fafc",
+  uploader_border_radius: theme.uploader_border_radius ?? 12,
+  uploader_border_color: theme.uploader_border_color ?? "#cbd5e1",
+  suggestion_border_radius: theme.suggestion_border_radius ?? 8,
+  suggestion_shadow_style: theme.suggestion_shadow_style ?? "subtle",
+  suggestion_border_color: theme.suggestion_border_color ?? "#e5e7eb",
+  prompt_border_radius: theme.prompt_border_radius ?? 12,
+  prompt_border_color: theme.prompt_border_color ?? "#e5e7eb"
+});
+
+export const designThemes: DesignTheme[] = [
+  // Light Themes
   {
     name: "Modern Light",
+    description: "Clean and minimal",
     background_color: "#ffffff",
     prompt_background_color: "#f9fafb",
     prompt_text_color: "#374151",
@@ -274,49 +339,220 @@ export const colorPresets: ColorPreset[] = [
     accent_color: "#6366f1"
   },
   {
-    name: "Dark Mode",
-    background_color: "#1a1a1a",
-    prompt_background_color: "#2d2d2d",
-    prompt_text_color: "#ffffff",
-    suggestion_background_color: "#2d2d2d",
+    name: "Soft Pearl",
+    description: "Elegant warm whites",
+    background_color: "#fefefe",
+    prompt_background_color: "#f8f9fa",
+    prompt_text_color: "#495057",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#212529",
+    accent_color: "#868e96",
+    
+    // Custom styling for elegant look
+    border_radius: 16,
+    shadow_style: "subtle",
+    container_padding: 32,
+    gallery_spacing: 20,
+    gallery_image_border_radius: 12
+  },
+  {
+    name: "Arctic White",
+    description: "Pure and crisp",
+    background_color: "#ffffff",
+    prompt_background_color: "#f8fafc",
+    prompt_text_color: "#334155",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#0f172a",
+    accent_color: "#0ea5e9",
+    
+    // Sharp, modern styling
+    border_radius: 8,
+    shadow_style: "large",
+    container_padding: 20,
+    gallery_spacing: 12,
+    gallery_border_enabled: true,
+    gallery_border_width: 1,
+    gallery_border_color: "#e2e8f0"
+  },
+  {
+    name: "Cream Dream",
+    description: "Warm cream tones",
+    background_color: "#fefcf3",
+    prompt_background_color: "#f9f6ed",
+    prompt_text_color: "#654321",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#3c2414",
+    accent_color: "#d97706"
+  },
+
+  // Dark Themes
+  {
+    name: "Midnight",
+    description: "Deep dark elegance",
+    background_color: "#0f0f0f",
+    prompt_background_color: "#1a1a1a",
+    prompt_text_color: "#e5e5e5",
+    suggestion_background_color: "#262626",
     brand_name_color: "#ffffff",
     accent_color: "#3b82f6"
   },
   {
-    name: "Ocean Blue",
+    name: "Dark Professional",
+    description: "Professional dark mode",
+    background_color: "#1e1e1e",
+    prompt_background_color: "#2d2d2d",
+    prompt_text_color: "#ffffff",
+    suggestion_background_color: "#3c3c3c",
+    brand_name_color: "#ffffff",
+    accent_color: "#6366f1"
+  },
+  {
+    name: "Carbon Black",
+    description: "Sleek carbon fiber",
+    background_color: "#111111",
+    prompt_background_color: "#1f1f1f",
+    prompt_text_color: "#d4d4d8",
+    suggestion_background_color: "#27272a",
+    brand_name_color: "#fafafa",
+    accent_color: "#a855f7"
+  },
+  {
+    name: "Space Gray",
+    description: "Modern space theme",
+    background_color: "#18181b",
+    prompt_background_color: "#27272a",
+    prompt_text_color: "#e4e4e7",
+    suggestion_background_color: "#3f3f46",
+    brand_name_color: "#f4f4f5",
+    accent_color: "#06b6d4"
+  },
+
+  // Blue Themes
+  {
+    name: "Ocean Breeze",
+    description: "Calming ocean blues",
     background_color: "#f0f9ff",
     prompt_background_color: "#e0f2fe",
     prompt_text_color: "#075985",
     suggestion_background_color: "#ffffff",
-    brand_name_color: "#075985",
+    brand_name_color: "#0c4a6e",
     accent_color: "#0ea5e9"
   },
   {
-    name: "Forest Green",
+    name: "Sky Blue",
+    description: "Fresh sky colors",
+    background_color: "#f0f8ff",
+    prompt_background_color: "#dbeafe",
+    prompt_text_color: "#1e40af",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#1e3a8a",
+    accent_color: "#3b82f6"
+  },
+  {
+    name: "Deep Navy",
+    description: "Professional navy",
+    background_color: "#1e293b",
+    prompt_background_color: "#334155",
+    prompt_text_color: "#e2e8f0",
+    suggestion_background_color: "#475569",
+    brand_name_color: "#f1f5f9",
+    accent_color: "#38bdf8"
+  },
+
+  // Green Themes
+  {
+    name: "Forest Fresh",
+    description: "Natural forest greens",
     background_color: "#f0fdf4",
     prompt_background_color: "#dcfce7",
     prompt_text_color: "#064e3b",
     suggestion_background_color: "#ffffff",
-    brand_name_color: "#064e3b",
+    brand_name_color: "#022c22",
     accent_color: "#22c55e"
   },
   {
-    name: "Sunset Orange",
+    name: "Mint Cool",
+    description: "Cool mint vibes",
+    background_color: "#f0fdfa",
+    prompt_background_color: "#ccfbf1",
+    prompt_text_color: "#0f766e",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#134e4a",
+    accent_color: "#14b8a6"
+  },
+  {
+    name: "Sage Wisdom",
+    description: "Sophisticated sage",
+    background_color: "#f6f7f6",
+    prompt_background_color: "#e8f2e8",
+    prompt_text_color: "#2d4a2d",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#1a2f1a",
+    accent_color: "#4ade80"
+  },
+
+  // Warm Themes
+  {
+    name: "Sunset Glow",
+    description: "Warm sunset oranges",
     background_color: "#fff7ed",
     prompt_background_color: "#ffedd5",
     prompt_text_color: "#7c2d12",
     suggestion_background_color: "#ffffff",
-    brand_name_color: "#7c2d12",
+    brand_name_color: "#431407",
     accent_color: "#f97316"
   },
   {
+    name: "Golden Hour",
+    description: "Rich golden tones",
+    background_color: "#fffbeb",
+    prompt_background_color: "#fef3c7",
+    prompt_text_color: "#92400e",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#451a03",
+    accent_color: "#f59e0b"
+  },
+  {
+    name: "Coral Reef",
+    description: "Vibrant coral accents",
+    background_color: "#fff5f5",
+    prompt_background_color: "#fed7d7",
+    prompt_text_color: "#c53030",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#742a2a",
+    accent_color: "#f56565"
+  },
+
+  // Purple & Pink Themes
+  {
     name: "Purple Magic",
+    description: "Mystical purple hues",
     background_color: "#faf5ff",
     prompt_background_color: "#f3e8ff",
     prompt_text_color: "#6b21a8",
     suggestion_background_color: "#ffffff",
-    brand_name_color: "#6b21a8",
+    brand_name_color: "#4c1d95",
     accent_color: "#a855f7"
+  },
+  {
+    name: "Rose Garden",
+    description: "Elegant rose tones",
+    background_color: "#fdf2f8",
+    prompt_background_color: "#fce7f3",
+    prompt_text_color: "#be185d",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#831843",
+    accent_color: "#ec4899"
+  },
+  {
+    name: "Lavender Dreams",
+    description: "Soft lavender beauty",
+    background_color: "#faf5ff",
+    prompt_background_color: "#ede9fe",
+    prompt_text_color: "#7c3aed",
+    suggestion_background_color: "#ffffff",
+    brand_name_color: "#5b21b6",
+    accent_color: "#8b5cf6"
   }
 ];
 

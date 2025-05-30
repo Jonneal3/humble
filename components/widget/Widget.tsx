@@ -422,6 +422,7 @@ export function Widget({ instanceId, controlsOnly = false, designConfig, classNa
                 <ImagePreview
                   images={generatedImages}
                   isLoading={isLoading}
+                  config={config}
                   customStyles={{
                     backgroundColor: config.gallery_background_color || 'transparent',
                     borderRadius: `${config.gallery_border_radius || 8}px`,
@@ -581,6 +582,7 @@ export function Widget({ instanceId, controlsOnly = false, designConfig, classNa
                 <ImagePreview
                   images={generatedImages}
                   isLoading={isLoading}
+                  config={config}
                   customStyles={{
                     backgroundColor: config.gallery_background_color || 'transparent',
                     borderRadius: `${config.gallery_border_radius || 12}px`,
@@ -724,6 +726,7 @@ export function Widget({ instanceId, controlsOnly = false, designConfig, classNa
               <ImagePreview
                 images={generatedImages}
                 isLoading={isLoading}
+                config={config}
                 customStyles={{
                   backgroundColor: config.gallery_background_color || 'transparent',
                   borderRadius: `${config.gallery_border_radius || 8}px`,
@@ -742,6 +745,7 @@ export function Widget({ instanceId, controlsOnly = false, designConfig, classNa
               <ImagePreview
                 images={generatedImages}
                 isLoading={isLoading}
+                config={config}
                 customStyles={{
                   backgroundColor: config.gallery_background_color || 'transparent',
                   borderRadius: `${config.gallery_border_radius || 16}px`,
@@ -1007,6 +1011,7 @@ export function Widget({ instanceId, controlsOnly = false, designConfig, classNa
               <ImagePreview
                 images={generatedImages}
                 isLoading={isLoading}
+                config={config}
                 customStyles={{
                   backgroundColor: config.gallery_background_color || 'transparent',
                   borderRadius: `${config.gallery_border_radius || 8}px`,
@@ -1151,6 +1156,7 @@ export function Widget({ instanceId, controlsOnly = false, designConfig, classNa
               <ImagePreview
                 images={generatedImages}
                 isLoading={isLoading}
+                config={config}
                 customStyles={{
                   backgroundColor: config.gallery_background_color || 'transparent',
                   borderRadius: `${config.gallery_border_radius || 16}px`,

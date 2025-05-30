@@ -135,55 +135,55 @@ export default function Designer({ instanceId }: DesignerProps) {
     }
   };
 
-  return (
-    <div className="h-screen flex bg-background overflow-hidden fixed inset-0" style={{ paddingTop: '40px' }}>
-      {/* Sidebar */}
-      <div className={`${isSidebarExpanded ? 'w-80' : 'w-12'} transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden`}>
-        {/* Header */}
-        <div className="p-4 border-b border-border flex items-center justify-between flex-shrink-0">
-          {isSidebarExpanded && (
-            <div>
-              <h1 className="text-lg font-semibold">Design Studio</h1>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <div className={`w-2 h-2 rounded-full ${
-                  saveStatus === 'saving' ? 'bg-yellow-500' :
-                  saveStatus === 'saved' ? 'bg-green-500' :
-                  saveStatus === 'error' ? 'bg-red-500' : 'bg-gray-400'
-                }`} />
-                {saveStatus === 'saving' ? 'Saving...' :
-                 saveStatus === 'saved' ? 'Saved' :
-                 saveStatus === 'error' ? 'Error' : 'Ready'}
+    return (
+      <div className="h-screen flex bg-background overflow-hidden fixed inset-0" style={{ paddingTop: '40px' }}>
+        {/* Sidebar */}
+        <div className={`${isSidebarExpanded ? 'w-80' : 'w-12'} transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden`}>
+          {/* Header */}
+          <div className="p-4 border-b border-border flex items-center justify-between flex-shrink-0">
+            {isSidebarExpanded && (
+              <div>
+                <h1 className="text-lg font-semibold">Design Studio</h1>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className={`w-2 h-2 rounded-full ${
+                    saveStatus === 'saving' ? 'bg-yellow-500' :
+                    saveStatus === 'saved' ? 'bg-green-500' :
+                    saveStatus === 'error' ? 'bg-red-500' : 'bg-gray-400'
+                  }`} />
+                  {saveStatus === 'saving' ? 'Saving...' :
+                   saveStatus === 'saved' ? 'Saved' :
+                   saveStatus === 'error' ? 'Error' : 'Ready'}
+                </div>
               </div>
-            </div>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-          >
-            {isSidebarExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
-        </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+            >
+              {isSidebarExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </Button>
+          </div>
 
-        {/* Design Controls */}
-        {isSidebarExpanded && (
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <div className="h-full overflow-y-auto overscroll-contain p-4">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full h-8 mb-4 bg-muted p-1 rounded-lg">
-                  <TabsTrigger value="settings" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Settings
-                  </TabsTrigger>
-                  <TabsTrigger value="branding" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Branding
-                  </TabsTrigger>
-                  <TabsTrigger value="design" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Design
-                  </TabsTrigger>
-                  <TabsTrigger value="launch" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Launch
-                  </TabsTrigger>
-                </TabsList>
+          {/* Design Controls */}
+          {isSidebarExpanded && (
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <div className="h-full overflow-y-auto overscroll-contain p-4">
+                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                    <TabsList className="w-full h-8 mb-4 bg-muted p-1 rounded-lg">
+                      <TabsTrigger value="settings" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                        Settings
+                      </TabsTrigger>
+                      <TabsTrigger value="branding" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                        Branding
+                      </TabsTrigger>
+                      <TabsTrigger value="design" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                        Design
+                      </TabsTrigger>
+                      <TabsTrigger value="launch" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                        Launch
+                      </TabsTrigger>
+                    </TabsList>
 
                 <TabsContent value="settings">
                   <SettingsTab
@@ -192,7 +192,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                     openSections={openSections}
                     toggleSection={toggleSection}
                   />
-                </TabsContent>
+                    </TabsContent>
 
                 <TabsContent value="branding">
                   <BrandingTab
@@ -200,8 +200,8 @@ export default function Designer({ instanceId }: DesignerProps) {
                     updateConfig={updateConfig}
                     openSections={openSections}
                     toggleSection={toggleSection}
-                  />
-                </TabsContent>
+                                      />
+                    </TabsContent>
 
                 <TabsContent value="design">
                   <DesignTab
@@ -209,17 +209,17 @@ export default function Designer({ instanceId }: DesignerProps) {
                     updateConfig={updateConfig}
                     openSections={openSections}
                     toggleSection={toggleSection}
-                  />
-                </TabsContent>
+                              />
+                    </TabsContent>
 
                 <TabsContent value="launch">
                   <LaunchTab
                     instanceId={instanceId}
                     config={config}
                   />
-                </TabsContent>
-              </Tabs>
-            </div>
+                    </TabsContent>
+                  </Tabs>
+                </div>
           </div>
         )}
       </div>
@@ -256,27 +256,63 @@ export default function Designer({ instanceId }: DesignerProps) {
         {/* Preview Content */}
         <div className="flex-1 bg-background overflow-hidden">
           {previewMode === 'iframe' ? (
-            <div className="h-full flex items-center justify-center p-4">
-              <div 
-                className="w-full max-w-4xl mx-auto rounded-lg overflow-hidden"
+            <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+              <div className="relative">
+                {/* Preview Label */}
+                <div className="absolute -top-8 left-0 text-xs text-muted-foreground flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Iframe Preview - This is how your widget will appear when embedded
+                </div>
+                
+                {/* Iframe Container with Visual Context */}
+                <div 
+                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl"
                 style={{ 
+                    width: config.iframe_width || '100%',
+                    maxWidth: '1000px',
                   height: config.iframe_height || '600px',
-                  borderRadius: `${config.iframe_border_radius || 12}px`,
-                  border: config.iframe_border ? `${config.iframe_border_width || 1}px solid ${config.iframe_border_color || '#e5e7eb'}` : 'none',
+                    borderRadius: `${config.iframe_border_radius ?? 12}px`,
+                    border: config.iframe_border ? `${config.iframe_border_width ?? 1}px solid ${config.iframe_border_color || '#e5e7eb'}` : 'none',
                   boxShadow: {
-                    none: "none",
-                    subtle: "0 1px 3px 0 rgb(0 0 0 / 0.1)",
-                    medium: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
-                    large: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
-                    glow: "0 0 15px rgba(99, 102, 241, 0.3)",
-                  }[config.iframe_shadow || 'medium']
+                      none: "0 0 0 1px rgba(0,0,0,0.05)",
+                      subtle: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 0 0 1px rgba(0,0,0,0.05)",
+                      medium: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06)",
+                      large: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)",
+                      glow: "0 0 25px rgba(99, 102, 241, 0.4), 0 8px 32px rgba(99, 102, 241, 0.15)",
+                    }[config.iframe_shadow || 'medium'],
+                    overflow: 'hidden'
                 }}
               >
+                  {/* Corner radius indicators */}
+                  {(config.iframe_border_radius ?? 12) > 0 && (
+                    <>
+                      <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-blue-400 opacity-30 rounded-tl-md"></div>
+                      <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-blue-400 opacity-30 rounded-tr-md"></div>
+                      <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-blue-400 opacity-30 rounded-bl-md"></div>
+                      <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-blue-400 opacity-30 rounded-br-md"></div>
+                    </>
+                  )}
+                  
                 <WidgetPageView
                   instanceId={instanceId}
                   liveConfig={config}
                   className="h-full w-full"
                 />
+                </div>
+                
+                {/* Iframe Info Panel */}
+                <div className="absolute -bottom-16 left-0 right-0 text-center">
+                  <div className="inline-flex items-center gap-4 text-xs text-muted-foreground bg-background/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
+                    <span>Size: {config.iframe_width || '100%'} × {config.iframe_height || '600px'}</span>
+                    {config.iframe_border && (
+                      <span>Border: {config.iframe_border_width ?? 1}px</span>
+                    )}
+                    {(config.iframe_border_radius ?? 12) > 0 && (
+                      <span>Radius: {config.iframe_border_radius ?? 12}px</span>
+                    )}
+                    <span>Shadow: {config.iframe_shadow || 'medium'}</span>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
@@ -290,4 +326,4 @@ export default function Designer({ instanceId }: DesignerProps) {
       </div>
     </div>
   );
-} 
+}

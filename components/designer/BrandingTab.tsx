@@ -87,7 +87,7 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
                   options={fontOptions}
                 />
                 <NumberInput
-                  label="Font Size (px)"
+                  label="Font Size"
                   value={config.brand_name_font_size || 28}
                   onChange={(value) => updateConfig({ brand_name_font_size: value })}
                   min={16}
@@ -179,15 +179,15 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
                   
                   <div className="grid grid-cols-2 gap-3">
                     <NumberInput
-                      label="Logo Height (px)"
+                      label="Height"
                       value={config.logo_height || 48}
                       onChange={(value) => updateConfig({ logo_height: value })}
                       min={24}
                       max={200}
                     />
                     <NumberInput
-                      label="Border Width (px)"
-                      value={config.logo_border_width || 0}
+                      label="Width"
+                      value={config.logo_border_width ?? 0}
                       onChange={(value) => updateConfig({ logo_border_width: value })}
                       min={0}
                       max={20}
@@ -196,16 +196,16 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
                   
                   <div className="grid grid-cols-2 gap-3">
                     <ColorInput
-                      label="Border Color"
+                      label="Color"
                       value={config.logo_border_color || "#e5e7eb"}
                       onChange={(value) => updateConfig({ logo_border_color: value })}
                     />
                     <NumberInput
-                      label="Border Radius (px)"
-                      value={config.logo_border_radius || 4}
+                      label="Radius"
+                      value={config.logo_border_radius ?? 4}
                       onChange={(value) => updateConfig({ logo_border_radius: value })}
                       min={0}
-                      max={100}
+                      max={50}
                     />
                   </div>
                 </div>
