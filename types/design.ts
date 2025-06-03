@@ -133,7 +133,6 @@ export interface DesignSettings {
   gallery_columns?: number;
   gallery_max_images?: number;
   gallery_shadow_style?: ShadowStyle;
-  gallery_scrolling_enabled?: boolean;
   gallery_font_family?: string;
   gallery_font_size?: number;
   
@@ -263,7 +262,6 @@ export const defaultDesignSettings: DesignSettings = {
   gallery_columns: 2,
   gallery_max_images: 4,
   gallery_shadow_style: "medium",
-  gallery_scrolling_enabled: false,
   gallery_font_family: "Inter",
   gallery_font_size: 14,
   
@@ -414,7 +412,6 @@ export interface DesignTheme {
   gallery_columns?: number;
   gallery_max_images?: number;
   gallery_shadow_style?: ShadowStyle;
-  gallery_scrolling_enabled?: boolean;
   gallery_font_family?: string;
   gallery_font_size?: number;
   
@@ -566,7 +563,6 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   gallery_columns: theme.gallery_columns ?? 2,
   gallery_max_images: theme.gallery_max_images ?? 4,
   gallery_shadow_style: theme.gallery_shadow_style ?? "medium",
-  gallery_scrolling_enabled: theme.gallery_scrolling_enabled ?? false,
   gallery_font_family: theme.gallery_font_family ?? "Inter",
   gallery_font_size: theme.gallery_font_size ?? 14,
   
@@ -1231,7 +1227,7 @@ export const fontCategories = [
 ];
 
 // Legacy compatibility - keeping minimal backwards compatibility
-export type WidgetStyle = "modern" | "minimal" | "classic";
+export type WidgetStyle = "modern" | "minimal" | "classic" | "bold" | "playful";
 export const stylePresets: Record<WidgetStyle, Partial<DesignSettings>> = {
   modern: {
     border_radius: 12,
@@ -1247,6 +1243,16 @@ export const stylePresets: Record<WidgetStyle, Partial<DesignSettings>> = {
     border_radius: 0,
     shadow_style: "none",
     container_padding: 20,
+  },
+  bold: {
+    border_radius: 0,
+    shadow_style: "large",
+    container_padding: 24,
+  },
+  playful: {
+    border_radius: 20,
+    shadow_style: "medium",
+    container_padding: 16,
   }
 };
 

@@ -44,8 +44,8 @@ export function RightLeftLayout({
   const rightColumnWidth = config.prompt_section_width || 40;
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden">
-      <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full w-full flex flex-col">
+      <div className="h-full flex flex-col">
         <div className="flex-shrink-0">
           <BrandHeader config={config} />
         </div>
@@ -189,7 +189,7 @@ export function RightLeftLayout({
           </div>
 
           {/* Mobile: Images Gallery */}
-          <div className="flex-1 min-h-0">
+          <div className="flex-1" style={{ height: '100%', overflow: 'hidden' }}>
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}
@@ -201,9 +201,9 @@ export function RightLeftLayout({
         </div>
 
         {/* Desktop Layout: Right-Left (lg breakpoint and above) */}
-        <div className="flex-1 hidden lg:flex flex-row gap-6 overflow-hidden min-h-0">
+        <div className="flex-1 hidden lg:flex flex-row gap-6 min-h-0">
           {/* Left Side: Generated Images - Takes remaining space */}
-          <div className="flex-1 min-w-0 min-h-0">
+          <div className="flex-1 min-w-0" style={{ height: '100%', overflow: 'hidden' }}>
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}
@@ -218,7 +218,7 @@ export function RightLeftLayout({
             className="flex flex-col min-w-0 h-full"
             style={{ width: `${rightColumnWidth}%` }}
           >
-            <div className="h-full flex flex-col overflow-hidden">
+            <div className="h-full flex flex-col">
               <div className="flex-1 min-h-0 flex flex-col">
                 <div className="flex-1 rounded-2xl p-4 sm:p-5 border transition-all duration-300 min-h-[200px]"
                   style={{

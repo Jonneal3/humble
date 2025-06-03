@@ -8,8 +8,7 @@ const PROTECTED_ROUTES = [
   '/designer-instances',
   '/design',
   '/instances',
-  '/get-credits',
-  '/widget'
+  '/get-credits'
 ]
 
 export async function middleware(req: NextRequest) {

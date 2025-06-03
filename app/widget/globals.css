@@ -8,12 +8,12 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 html, body {
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
   position: fixed;
   font-family: Inter, sans-serif;
   margin: 0;
@@ -24,4 +24,30 @@ html, body {
 nav, header, footer, .announcement-bar, .navbar {
   display: none !important;
   visibility: hidden !important;
+}
+
+/* Enhanced scrollbar styling for image gallery */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure proper touch scrolling on mobile */
+.image-gallery-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-scrolling: touch;
 } 

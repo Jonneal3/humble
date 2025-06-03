@@ -276,7 +276,7 @@ export default function Designer({ instanceId }: DesignerProps) {
 
         {/* Preview Content */}
         <div 
-          className="flex-1 bg-background overflow-hidden"
+          className="flex-1 bg-background"
           style={previewMode === 'full' ? { borderRadius: '0px' } : {}}
         >
           {previewMode === 'iframe' ? (

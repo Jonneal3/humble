@@ -51,7 +51,7 @@ export function WidgetPageView({ instanceId, liveConfig, className, style, fullP
 
   return (
     <div 
-      className={`w-full h-full overflow-hidden ${className || ''}`}
+      className={`w-full h-full ${className || ''}`}
       style={{
         backgroundColor: config?.background_color || '#ffffff',
         padding: fullPage ? 0 : (config?.container_padding ? `${config.container_padding}px` : undefined),

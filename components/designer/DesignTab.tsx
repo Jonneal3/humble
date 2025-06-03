@@ -861,7 +861,7 @@ export const DesignTab: React.FC<DesignTabProps> = ({
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium">Enable Scrolling</Label>
               <Switch
-                checked={config.gallery_scrolling_enabled ?? false}
+                checked={config.gallery_scrolling_enabled ?? true}
                 onCheckedChange={(checked) => updateConfig({ gallery_scrolling_enabled: checked })}
               />
             </div>

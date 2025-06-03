@@ -14,7 +14,7 @@ export default async function NavbarWrapper() {
   } = await supabase.auth.getUser();
 
   const { data: credits } = await supabase
-    .from("credits")
+    .from("billing")
     .select("*")
     .eq("user_id", user?.id ?? "")
     .single();

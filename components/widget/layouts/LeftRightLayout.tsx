@@ -44,8 +44,8 @@ export function LeftRightLayout({
   const leftColumnWidth = config.prompt_section_width || 40;
 
   return (
-    <div className="h-full w-full flex flex-col overflow-hidden">
-      <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full w-full flex flex-col">
+      <div className="h-full flex flex-col">
         <div className="flex-shrink-0">
           <BrandHeader config={config} />
         </div>
@@ -368,7 +368,7 @@ export function LeftRightLayout({
           </div>
 
           {/* Right Side: Generated Images - Takes remaining space */}
-          <div className="flex-1 min-w-0 min-h-0">
+          <div className="flex-1 min-w-0" style={{ height: '100%', overflow: 'hidden' }}>
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}

@@ -131,7 +131,7 @@ export async function POST(request: Request) {
       console.log("totalCreditsPurchased: " + totalCreditsPurchased);
 
       const { data: existingCredits } = await supabase
-        .from("credits")
+        .from("billing")
         .select("*")
         .eq("user_id", userId)
         .single();
@@ -140,7 +140,7 @@ export async function POST(request: Request) {
       if (existingCredits) {
         const newCredits = existingCredits.credits + totalCreditsPurchased;
         const { data, error } = await supabase
-          .from("credits")
+          .from("billing")
           .update({
             credits: newCredits,
           })
@@ -166,7 +166,7 @@ export async function POST(request: Request) {
         );
       } else {
         // Else create new credits row.
-        const { data, error } = await supabase.from("credits").insert({
+        const { data, error } = await supabase.from("billing").insert({
           user_id: userId,
           credits: totalCreditsPurchased,
         });
