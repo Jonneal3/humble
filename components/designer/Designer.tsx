@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useToast } from "@/lib/hooks";
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Smartphone } from "lucide-react";
 import { defaultDesignSettings, DesignSettings } from "@/types/design";
 import debounce from "lodash/debounce";
 import { WidgetPageView } from "@/components/designer/WidgetPageView";
@@ -25,7 +25,7 @@ export default function Designer({ instanceId }: DesignerProps) {
   const [config, setConfig] = useState<DesignSettings>(defaultDesignSettings);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [previewMode, setPreviewMode] = useState<'iframe' | 'full'>('full');
+  const [previewMode, setPreviewMode] = useState<'iframe' | 'full' | 'mobile'>('full');
   const [instance, setInstance] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('settings');
   const [isMobileView, setIsMobileView] = useState(false);
@@ -45,6 +45,7 @@ export default function Designer({ instanceId }: DesignerProps) {
       'color-presets': true,
       'overall-style': true,
       'layout': false,
+      'input-section': true,
       'uploader': false,
       'prompt': false,
       'suggestions': false,
@@ -98,8 +99,8 @@ export default function Designer({ instanceId }: DesignerProps) {
   // Detect mobile viewport size for layout optimization indicator
   useEffect(() => {
     const checkMobileView = () => {
-      // Use the actual lg breakpoint (1024px) that CSS uses for lg:hidden/lg:flex
-      setIsMobileView(window.innerWidth < 1024);
+      // Use 768px to match the actual mobile breakpoint used in Widget component
+      setIsMobileView(window.innerWidth < 768);
     };
 
     checkMobileView();
@@ -242,17 +243,29 @@ export default function Designer({ instanceId }: DesignerProps) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Preview Header */}
-        <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4">
+        <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4 flex-shrink-0">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-medium">Preview</h2>
-            {isMobileView && previewMode === 'full' && (config.layout_mode === 'left-right' || config.layout_mode === 'right-left') && (
+            {(isMobileView || previewMode === 'mobile') && previewMode === 'full' && (config.layout_mode === 'left-right' || config.layout_mode === 'right-left') && (
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md px-2 py-1">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                 Mobile optimized layout
               </div>
             )}
+            {previewMode === 'mobile' && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 rounded-md px-2 py-1">
+                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                Mobile Preview (767px)
+              </div>
+            )}
+            {previewMode === 'iframe' && (parseInt(config.iframe_width?.toString().replace('px', '') || '600') < 600 || parseInt(config.iframe_height?.toString().replace('px', '') || '600') < 500) && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md px-2 py-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Small iframe - mobile optimized
+              </div>
+            )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Button
               variant={previewMode === 'iframe' ? 'default' : 'outline'}
               size="sm"
@@ -261,6 +274,15 @@ export default function Designer({ instanceId }: DesignerProps) {
             >
               <Minimize2 className="h-3 w-3 mr-1" />
               Iframe
+            </Button>
+            <Button
+              variant={previewMode === 'mobile' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setPreviewMode('mobile')}
+              className="h-7 text-xs"
+            >
+              <Smartphone className="h-3 w-3 mr-1" />
+              Mobile
             </Button>
             <Button
               variant={previewMode === 'full' ? 'default' : 'outline'}
@@ -321,6 +343,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                   instanceId={instanceId}
                   liveConfig={config}
                   className="h-full w-full"
+                  fullPage={true}
                 />
                 </div>
                 
@@ -335,6 +358,46 @@ export default function Designer({ instanceId }: DesignerProps) {
                       <span>Radius: {config.iframe_border_radius ?? 12}px</span>
                     )}
                     <span>Shadow: {config.iframe_shadow || 'medium'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : previewMode === 'mobile' ? (
+            <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+              <div className="relative">
+                {/* Preview Label */}
+                <div className="absolute -top-8 left-0 text-xs text-muted-foreground flex items-center gap-2">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                  Mobile Preview - 767px width triggers mobile optimized layout
+                </div>
+                
+                {/* Mobile Container */}
+                <div 
+                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700"
+                  style={{ 
+                    width: '767px',
+                    height: '600px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  {/* Mobile device frame styling */}
+                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                  
+                  <div className="h-full w-full pt-8 pb-4 px-2">
+                    <WidgetPageView
+                      instanceId={instanceId}
+                      liveConfig={config}
+                      className="h-full w-full"
+                      fullPage={true}
+                    />
+                  </div>
+                </div>
+                
+                {/* Mobile Info Panel */}
+                <div className="absolute -bottom-12 left-0 right-0 text-center">
+                  <div className="inline-flex items-center gap-4 text-xs text-muted-foreground bg-background/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
+                    <span>Width: 767px (Mobile Breakpoint)</span>
+                    <span>Layout: {config.layout_mode === 'left-right' || config.layout_mode === 'right-left' ? 'Mobile Optimized' : 'Responsive'}</span>
                   </div>
                 </div>
               </div>

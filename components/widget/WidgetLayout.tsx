@@ -135,10 +135,9 @@ export function WidgetLayout({
 }: WidgetLayoutProps) {
   console.log('WidgetLayout: Current layout mode:', config.layout_mode);
 
-  // Base container styles
+  // Base container styles - simplified since children now handle their own styling
   const containerStyles = {
     backgroundColor: config.background_color || '#ffffff',
-    padding: `${config.container_padding || 24}px`,
     borderRadius: (fullPage && deployment) ? 0 : `${config.border_radius || 0}px`,
     height: '100%', // Take full available height from parent (works in iframe and full page)
     width: '100%',
@@ -150,7 +149,9 @@ export function WidgetLayout({
       config.shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
       config.shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
       config.shadow_style === 'glow' ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none'
-    )
+    ),
+    // Remove padding when using children (new layout components handle their own spacing)
+    padding: children ? 0 : `${config.container_padding || 24}px`
   };
 
   return (

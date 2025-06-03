@@ -4,9 +4,10 @@ import { DesignSettings } from "@/types/design";
 
 interface BrandHeaderProps {
   config: DesignSettings;
+  containerWidth?: number;
 }
 
-export function BrandHeader({ config }: BrandHeaderProps) {
+export function BrandHeader({ config, containerWidth = 1024 }: BrandHeaderProps) {
   if (!config.header_enabled || (!config.logo_url && !config.brand_name)) {
     return null;
   }
@@ -19,9 +20,19 @@ export function BrandHeader({ config }: BrandHeaderProps) {
     right: 'justify-end text-right'
   };
 
+  // Responsive bottom margin - much smaller in small containers
+  const bottomMargin = Math.max(4, Math.min(32, containerWidth * 0.015));
+  const itemGap = Math.max(6, Math.min(16, containerWidth * 0.01));
+
   return (
-    <div className={`flex-shrink-0 mb-6 sm:mb-8 flex ${alignmentClasses[headerAlignment as keyof typeof alignmentClasses]} w-full`}>
-      <div className="flex items-center gap-3 sm:gap-4">
+    <div 
+      className={`flex-shrink-0 flex ${alignmentClasses[headerAlignment as keyof typeof alignmentClasses]} w-full`}
+      style={{ marginBottom: `${bottomMargin}px` }}
+    >
+      <div 
+        className="flex items-center"
+        style={{ gap: `${itemGap}px` }}
+      >
         {/* Logo - Always left of brand name */}
         {config.logo_enabled && config.logo_url && (
           <img 

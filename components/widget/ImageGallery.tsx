@@ -13,6 +13,8 @@ interface ImageGalleryProps {
   fullPage?: boolean;
   deployment?: boolean;
   className?: string;
+  layoutContext?: 'horizontal' | 'vertical'; // horizontal = left-right/right-left, vertical = prompt-top/prompt-bottom
+  containerWidth?: number; // Width of the container for responsive behavior
 }
 
 export function ImageGallery({ 
@@ -21,18 +23,11 @@ export function ImageGallery({
   config, 
   fullPage = false, 
   deployment = false,
-  className = "" 
+  className = "",
+  layoutContext = 'horizontal',
+  containerWidth
 }: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (images.length > 0) {
-      const firstImage = images[0]?.image;
-      if (firstImage) {
-        setSelectedImage(firstImage);
-      }
-    }
-  }, [images]);
 
   // Get configuration values with defaults
   const galleryConfig = {
@@ -97,7 +92,7 @@ export function ImageGallery({
     gridTemplateColumns: `repeat(${galleryConfig.columns}, 1fr)`,
     gap: `${galleryConfig.spacing}px`,
     width: '100%',
-    paddingBottom: `${galleryConfig.spacing * 3}px`, 
+    paddingBottom: layoutContext === 'vertical' ? '35vh' : '25vh', 
     minHeight: 'min-content'
   };
 

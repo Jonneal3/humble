@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
-import { ChevronDown, Palette, Layout, Type, Image, Settings, HelpCircle } from "lucide-react";
+import { ChevronDown, Palette, Layout, Type, Image, Settings, HelpCircle, MessageSquare } from "lucide-react";
 import { ColorInput, NumberInput, SelectInput, FontSelector } from "./FormComponents";
 import { DesignSettings, designThemes, getCompleteTheme, fontOptions, ShadowStyle, BorderStyle, loadGoogleFont } from "@/types/design";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
@@ -347,24 +347,78 @@ export const DesignTab: React.FC<DesignTabProps> = ({
               Iframe Embed Settings
             </h4>
             
+            {/* Size Presets */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Common Sizes</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs justify-start"
+                  onClick={() => updateConfig({ iframe_width: "600px", iframe_height: "400px" })}
+                >
+                  Small (600×400)
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs justify-start"
+                  onClick={() => updateConfig({ iframe_width: "800px", iframe_height: "600px" })}
+                >
+                  Medium (800×600)
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs justify-start"
+                  onClick={() => updateConfig({ iframe_width: "1200px", iframe_height: "800px" })}
+                >
+                  Large (1200×800)
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs justify-start"
+                  onClick={() => updateConfig({ iframe_width: "100%", iframe_height: "600px" })}
+                >
+                  Full Width
+                </Button>
+              </div>
+            </div>
+            
+            {/* Custom Dimensions */}
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label className="text-xs font-medium">Width</Label>
-                <Input
-                  value={config.iframe_width || "100%"}
-                  onChange={(e) => updateConfig({ iframe_width: e.target.value })}
-                  className="h-8 text-xs"
-                  placeholder="100%, 800px, etc."
-                />
+                <div className="flex gap-1">
+                  <Input
+                    value={config.iframe_width?.replace('px', '') || "800"}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "100") {
+                        updateConfig({ iframe_width: "100%" });
+                      } else {
+                        updateConfig({ iframe_width: `${value}px` });
+                      }
+                    }}
+                    className="h-8 text-xs flex-1"
+                    placeholder="800"
+                  />
+                  <div className="text-xs text-muted-foreground self-center">px</div>
+                </div>
+                <div className="text-xs text-muted-foreground">Enter "100" for 100% width</div>
               </div>
               <div className="space-y-2">
                 <Label className="text-xs font-medium">Height</Label>
-                <Input
-                  value={config.iframe_height || "600px"}
-                  onChange={(e) => updateConfig({ iframe_height: e.target.value })}
-                  className="h-8 text-xs"
-                  placeholder="600px, 100vh, etc."
-                />
+                <div className="flex gap-1">
+                  <Input
+                    value={config.iframe_height?.replace('px', '') || "600"}
+                    onChange={(e) => updateConfig({ iframe_height: `${e.target.value}px` })}
+                    className="h-8 text-xs flex-1"
+                    placeholder="600"
+                  />
+                  <div className="text-xs text-muted-foreground self-center">px</div>
+                </div>
               </div>
             </div>
             
@@ -418,206 +472,64 @@ export const DesignTab: React.FC<DesignTabProps> = ({
         </div>
       </details>
 
-      {/* Image Uploader */}
+      {/* User Input Section - NEW GROUPED SECTION */}
       <details 
-        className="group"
-        open={openSections.design?.['uploader']}
+        className="group border-l-2 border-l-blue-500/20 pl-3" 
+        open={openSections.design?.['input-section']}
       >
         <summary 
           className="flex items-center justify-between cursor-pointer text-sm font-medium mb-3 text-foreground hover:text-foreground/80 transition-colors"
           onClick={(e) => {
             e.preventDefault();
-            toggleSection('design', 'uploader');
+            toggleSection('design', 'input-section');
           }}
         >
           <span className="flex items-center gap-2">
-            <Image className="h-4 w-4" />
-            Image Uploader
+            <MessageSquare className="h-4 w-4 text-blue-500" />
+            <span className="text-blue-600 dark:text-blue-400 font-semibold">User Input Section</span>
           </span>
-          <ChevronDown className={`h-4 w-4 transition-transform text-muted-foreground ${openSections.design?.['uploader'] ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-4 w-4 transition-transform text-muted-foreground ${openSections.design?.['input-section'] ? 'rotate-180' : ''}`} />
         </summary>
-        <div className="space-y-3 pl-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium">Enable Uploader</Label>
-            <Switch
-              checked={config.uploader_enabled ?? true}
-              onCheckedChange={(checked) => updateConfig({ uploader_enabled: checked })}
-            />
+        <div className="space-y-4 pl-2 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/20 rounded-lg p-3 -ml-1">
+          <div className="text-xs text-muted-foreground mb-3">
+            Configure how users interact with your widget - file uploads, text input, and suggestions.
           </div>
-          
-          {config.uploader_enabled && (
-            <>
-              <NumberInput
-                label="Max Reference Images"
-                value={config.uploader_max_images || 6}
-                onChange={(value) => updateConfig({ uploader_max_images: value })}
-                min={1}
-                max={10}
-              />
-              
+
+          {/* Main Input Section Settings */}
+          <div className="space-y-3 p-3 bg-background/50 rounded-md border border-border/50">
+            <h4 className="text-xs font-medium text-foreground flex items-center gap-2">
+              <div className="w-3 h-3 border border-current rounded opacity-60"></div>
+              Overall Input Area
+            </h4>
+            
+            <div className="space-y-3">
               <ColorInput
                 label="Background Color"
-                value={config.uploader_background_color || "#f8fafc"}
-                onChange={(value) => updateConfig({ uploader_background_color: value })}
+                value={config.prompt_background_color || "transparent"}
+                onChange={(value) => updateConfig({ prompt_background_color: value })}
                 showOpacity={true}
               />
-              
-              <div className="space-y-3">
-                <SelectInput
-                  label="Border Style"
-                  value={config.uploader_border_style || "dashed"}
-                  onChange={(value) => updateConfig({ uploader_border_style: value as BorderStyle })}
-                  options={[
-                    { value: "solid", label: "Solid" },
-                    { value: "dashed", label: "Dashed" },
-                    { value: "dotted", label: "Dotted" },
-                    { value: "none", label: "None" }
-                  ]}
-                />
-                <ColorInput
-                  label="Border Color"
-                  value={config.uploader_border_color || "#cbd5e1"}
-                  onChange={(value) => updateConfig({ uploader_border_color: value })}
-                />
-              </div>
               
               <div className="grid grid-cols-2 gap-3">
                 <NumberInput
                   label="Border Width"
-                  value={config.uploader_border_width ?? 2}
-                  onChange={(value) => updateConfig({ uploader_border_width: value })}
-                  min={0}
-                  max={20}
-                />
-                <NumberInput
-                  label="Border Radius"
-                  value={config.uploader_border_radius ?? 12}
-                  onChange={(value) => updateConfig({ uploader_border_radius: value })}
-                  min={0}
-                  max={100}
-                />
-              </div>
-              
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium">Primary Text</Label>
-                  <Input
-                    value={config.uploader_primary_text || "Add reference images to guide the AI generation"}
-                    onChange={(e) => updateConfig({ uploader_primary_text: e.target.value })}
-                    className="h-8 text-xs"
-                    placeholder="Add reference images to guide the AI generation"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium">Secondary Text</Label>
-                  <Input
-                    value={config.uploader_secondary_text || "Drag & drop or click to upload"}
-                    onChange={(e) => updateConfig({ uploader_secondary_text: e.target.value })}
-                    className="h-8 text-xs"
-                    placeholder="Drag & drop or click to upload"
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <ColorInput
-                  label="Text Color"
-                  value={config.uploader_text_color || "#64748b"}
-                  onChange={(value) => updateConfig({ uploader_text_color: value })}
-                />
-                <NumberInput
-                  label="Font Size"
-                  value={config.uploader_font_size || 14}
-                  onChange={(value) => updateConfig({ uploader_font_size: value })}
-                  min={10}
-                  max={24}
-                />
-              </div>
-              
-              <FontSelector
-                label="Font Family"
-                value={config.uploader_font_family || "Inter"}
-                onChange={(value) => updateConfig({ uploader_font_family: value })}
-              />
-            </>
-          )}
-        </div>
-      </details>
-
-      {/* Prompt Section */}
-      <details 
-        className="group"
-        open={openSections.design?.['prompt']}
-      >
-        <summary 
-          className="flex items-center justify-between cursor-pointer text-sm font-medium mb-3 text-foreground hover:text-foreground/80 transition-colors"
-          onClick={(e) => {
-            e.preventDefault();
-            toggleSection('design', 'prompt');
-          }}
-        >
-          <span className="flex items-center gap-2">
-            <Type className="h-4 w-4" />
-            Prompt Input
-          </span>
-          <ChevronDown className={`h-4 w-4 transition-transform text-muted-foreground ${openSections.design?.['prompt'] ? 'rotate-180' : ''}`} />
-        </summary>
-        <div className="space-y-4 pl-2">
-          {/* Typography Section */}
-          <div className="space-y-3">
-            <Label className="text-xs font-medium text-muted-foreground">Typography</Label>
-            <div className="space-y-3 pl-2">
-              <div className="grid grid-cols-2 gap-3">
-                <FontSelector
-                  label="Font Family"
-                  value={config.prompt_font_family || "Inter"}
-                  onChange={(value) => updateConfig({ prompt_font_family: value })}
-                />
-                <NumberInput
-                  label="Font Size"
-                  value={config.prompt_font_size || 16}
-                  onChange={(value) => updateConfig({ prompt_font_size: value })}
-                  min={12}
-                  max={32}
-                />
-              </div>
-              <ColorInput
-                label="Text Color"
-                value={config.prompt_text_color || "#374151"}
-                onChange={(value) => updateConfig({ prompt_text_color: value })}
-              />
-              <ColorInput
-                label="Placeholder Color"
-                value={config.prompt_placeholder_color || "#9ca3af"}
-                onChange={(value) => updateConfig({ prompt_placeholder_color: value })}
-              />
-            </div>
-          </div>
-          
-          {/* Border Section */}
-          <div className="space-y-3">
-            <Label className="text-xs font-medium text-muted-foreground">Border</Label>
-            <div className="space-y-3 pl-2">
-              <div className="grid grid-cols-2 gap-3">
-                <NumberInput
-                  label="Width"
                   value={config.prompt_border_width ?? 1}
                   onChange={(value) => updateConfig({ prompt_border_width: value })}
                   min={0}
                   max={20}
                 />
                 <NumberInput
-                  label="Radius"
+                  label="Border Radius"
                   value={config.prompt_border_radius ?? 12}
                   onChange={(value) => updateConfig({ prompt_border_radius: value })}
                   min={0}
                   max={100}
                 />
               </div>
+              
               <div className="grid grid-cols-2 gap-3">
                 <SelectInput
-                  label="Style"
+                  label="Border Style"
                   value={config.prompt_border_style || "solid"}
                   onChange={(value) => updateConfig({ prompt_border_style: value as BorderStyle })}
                   options={[
@@ -628,120 +540,63 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                   ]}
                 />
                 <ColorInput
-                  label="Color"
+                  label="Border Color"
                   value={config.prompt_border_color || "#e5e7eb"}
                   onChange={(value) => updateConfig({ prompt_border_color: value })}
                 />
               </div>
             </div>
           </div>
-        </div>
-      </details>
 
-      {/* Suggestion Buttons */}
-      <details 
-        className="group"
-        open={openSections.design?.['suggestions']}
-      >
-        <summary 
-          className="flex items-center justify-between cursor-pointer text-sm font-medium mb-3 text-foreground hover:text-foreground/80 transition-colors"
-          onClick={(e) => {
-            e.preventDefault();
-            toggleSection('design', 'suggestions');
-          }}
-        >
-          <span className="flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Suggestion Buttons
-          </span>
-          <ChevronDown className={`h-4 w-4 transition-transform text-muted-foreground ${openSections.design?.['suggestions'] ? 'rotate-180' : ''}`} />
-        </summary>
-        <div className="space-y-3 pl-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium">Enable Suggestions</Label>
-            <Switch
-              checked={config.suggestions_enabled ?? true}
-              onCheckedChange={(checked) => updateConfig({ suggestions_enabled: checked })}
-            />
-          </div>
-          
-          {config.suggestions_enabled && (
-            <>
-              <NumberInput
-                label="Number of Suggestions"
-                value={config.suggestions_count || 3}
-                onChange={(value) => updateConfig({ suggestions_count: value })}
-                min={1}
-                max={6}
-              />
-              
-              <div className="grid grid-cols-2 gap-3">
-                <ColorInput
-                  label="Background Color"
-                  value={config.suggestion_background_color || "#ffffff"}
-                  onChange={(value) => updateConfig({ suggestion_background_color: value })}
-                  showOpacity={true}
-                />
-                <ColorInput
-                  label="Text Color"
-                  value={config.suggestion_text_color || "#374151"}
-                  onChange={(value) => updateConfig({ suggestion_text_color: value })}
+          {/* Image Uploader Subsection */}
+          <details 
+            className="group bg-background/50 rounded-md border border-border/50"
+            open={openSections.design?.['uploader']}
+          >
+            <summary 
+              className="flex items-center justify-between cursor-pointer text-xs font-medium p-3 text-foreground hover:text-foreground/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleSection('design', 'uploader');
+              }}
+            >
+              <span className="flex items-center gap-2">
+                <Image className="h-3 w-3" />
+                Image Uploader
+              </span>
+              <ChevronDown className={`h-3 w-3 transition-transform text-muted-foreground ${openSections.design?.['uploader'] ? 'rotate-180' : ''}`} />
+            </summary>
+            <div className="space-y-3 px-3 pb-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium">Enable Uploader</Label>
+                <Switch
+                  checked={config.uploader_enabled ?? true}
+                  onCheckedChange={(checked) => updateConfig({ uploader_enabled: checked })}
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-3">
-                <FontSelector
-                  label="Font Family"
-                  value={config.suggestion_font_family || "Inter"}
-                  onChange={(value) => updateConfig({ suggestion_font_family: value })}
-                />
-                <NumberInput
-                  label="Font Size"
-                  value={config.suggestion_font_size || 12}
-                  onChange={(value) => updateConfig({ suggestion_font_size: value })}
-                  min={10}
-                  max={18}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <NumberInput
-                  label="Radius"
-                  value={config.suggestion_border_radius ?? 8}
-                  onChange={(value) => updateConfig({ suggestion_border_radius: value })}
-                  min={0}
-                  max={50}
-                />
-                <SelectInput
-                  label="Shadow Style"
-                  value={config.suggestion_shadow_style || "subtle"}
-                  onChange={(value) => updateConfig({ suggestion_shadow_style: value as ShadowStyle })}
-                  options={[
-                    { value: "none", label: "None" },
-                    { value: "subtle", label: "Subtle" },
-                    { value: "medium", label: "Medium" },
-                    { value: "large", label: "Large" },
-                    { value: "glow", label: "Glow" }
-                  ]}
-                />
-              </div>
-              
-              {/* Border Section */}
-              <div className="space-y-3">
-                <Label className="text-xs font-medium text-muted-foreground">Border</Label>
-                <div className="space-y-3 pl-2">
-                  <div className="grid grid-cols-2 gap-3">
-                    <NumberInput
-                      label="Width"
-                      value={config.suggestion_border_width ?? 1}
-                      onChange={(value) => updateConfig({ suggestion_border_width: value })}
-                      min={0}
-                      max={10}
-                    />
+              {config.uploader_enabled && (
+                <>
+                  <NumberInput
+                    label="Max Reference Images"
+                    value={config.uploader_max_images || 6}
+                    onChange={(value) => updateConfig({ uploader_max_images: value })}
+                    min={1}
+                    max={10}
+                  />
+                  
+                  <ColorInput
+                    label="Background Color"
+                    value={config.uploader_background_color || "#f8fafc"}
+                    onChange={(value) => updateConfig({ uploader_background_color: value })}
+                    showOpacity={true}
+                  />
+                  
+                  <div className="space-y-3">
                     <SelectInput
-                      label="Style"
-                      value={config.suggestion_border_style || "solid"}
-                      onChange={(value) => updateConfig({ suggestion_border_style: value as BorderStyle })}
+                      label="Border Style"
+                      value={config.uploader_border_style || "dashed"}
+                      onChange={(value) => updateConfig({ uploader_border_style: value as BorderStyle })}
                       options={[
                         { value: "solid", label: "Solid" },
                         { value: "dashed", label: "Dashed" },
@@ -749,16 +604,264 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                         { value: "none", label: "None" }
                       ]}
                     />
+                    <ColorInput
+                      label="Border Color"
+                      value={config.uploader_border_color || "#cbd5e1"}
+                      onChange={(value) => updateConfig({ uploader_border_color: value })}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <NumberInput
+                      label="Border Width"
+                      value={config.uploader_border_width ?? 2}
+                      onChange={(value) => updateConfig({ uploader_border_width: value })}
+                      min={0}
+                      max={20}
+                    />
+                    <NumberInput
+                      label="Border Radius"
+                      value={config.uploader_border_radius ?? 12}
+                      onChange={(value) => updateConfig({ uploader_border_radius: value })}
+                      min={0}
+                      max={100}
+                    />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="space-y-2">
+                      <Label className="text-xs font-medium">Primary Text</Label>
+                      <Input
+                        value={config.uploader_primary_text || "Add reference images to guide the AI generation"}
+                        onChange={(e) => updateConfig({ uploader_primary_text: e.target.value })}
+                        className="h-8 text-xs"
+                        placeholder="Add reference images to guide the AI generation"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label className="text-xs font-medium">Secondary Text</Label>
+                      <Input
+                        value={config.uploader_secondary_text || "Drag & drop or click to upload"}
+                        onChange={(e) => updateConfig({ uploader_secondary_text: e.target.value })}
+                        className="h-8 text-xs"
+                        placeholder="Drag & drop or click to upload"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <ColorInput
+                      label="Text Color"
+                      value={config.uploader_text_color || "#64748b"}
+                      onChange={(value) => updateConfig({ uploader_text_color: value })}
+                    />
+                    <NumberInput
+                      label="Font Size"
+                      value={config.uploader_font_size || 14}
+                      onChange={(value) => updateConfig({ uploader_font_size: value })}
+                      min={10}
+                      max={24}
+                    />
+                  </div>
+                  
+                  <FontSelector
+                    label="Font Family"
+                    value={config.uploader_font_family || "Inter"}
+                    onChange={(value) => updateConfig({ uploader_font_family: value })}
+                  />
+                </>
+              )}
+            </div>
+          </details>
+
+          {/* Prompt Input Subsection */}
+          <details 
+            className="group bg-background/50 rounded-md border border-border/50"
+            open={openSections.design?.['prompt']}
+          >
+            <summary 
+              className="flex items-center justify-between cursor-pointer text-xs font-medium p-3 text-foreground hover:text-foreground/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleSection('design', 'prompt');
+              }}
+            >
+              <span className="flex items-center gap-2">
+                <Type className="h-3 w-3" />
+                Prompt Input
+              </span>
+              <ChevronDown className={`h-3 w-3 transition-transform text-muted-foreground ${openSections.design?.['prompt'] ? 'rotate-180' : ''}`} />
+            </summary>
+            <div className="space-y-4 px-3 pb-3">
+              {/* Typography Section */}
+              <div className="space-y-3">
+                <Label className="text-xs font-medium text-muted-foreground">Typography</Label>
+                <div className="space-y-3 pl-2">
+                  <div className="grid grid-cols-2 gap-3">
+                    <FontSelector
+                      label="Font Family"
+                      value={config.prompt_font_family || "Inter"}
+                      onChange={(value) => updateConfig({ prompt_font_family: value })}
+                    />
+                    <NumberInput
+                      label="Font Size"
+                      value={config.prompt_font_size || 16}
+                      onChange={(value) => updateConfig({ prompt_font_size: value })}
+                      min={12}
+                      max={32}
+                    />
                   </div>
                   <ColorInput
-                    label="Color"
-                    value={config.suggestion_border_color || "#e5e7eb"}
-                    onChange={(value) => updateConfig({ suggestion_border_color: value })}
+                    label="Text Color"
+                    value={config.prompt_text_color || "#374151"}
+                    onChange={(value) => updateConfig({ prompt_text_color: value })}
+                  />
+                  <ColorInput
+                    label="Placeholder Color"
+                    value={config.prompt_placeholder_color || "#9ca3af"}
+                    onChange={(value) => updateConfig({ prompt_placeholder_color: value })}
                   />
                 </div>
               </div>
-            </>
-          )}
+            </div>
+          </details>
+
+          {/* Suggestion Buttons Subsection */}
+          <details 
+            className="group bg-background/50 rounded-md border border-border/50"
+            open={openSections.design?.['suggestions']}
+          >
+            <summary 
+              className="flex items-center justify-between cursor-pointer text-xs font-medium p-3 text-foreground hover:text-foreground/80 transition-colors"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleSection('design', 'suggestions');
+              }}
+            >
+              <span className="flex items-center gap-2">
+                <Settings className="h-3 w-3" />
+                Suggestion Buttons
+              </span>
+              <ChevronDown className={`h-3 w-3 transition-transform text-muted-foreground ${openSections.design?.['suggestions'] ? 'rotate-180' : ''}`} />
+            </summary>
+            <div className="space-y-3 px-3 pb-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium">Enable Suggestions</Label>
+                <Switch
+                  checked={config.suggestions_enabled ?? true}
+                  onCheckedChange={(checked) => updateConfig({ suggestions_enabled: checked })}
+                />
+              </div>
+              
+              {config.suggestions_enabled && (
+                <>
+                  <NumberInput
+                    label="Number of Suggestions"
+                    value={config.suggestions_count || 3}
+                    onChange={(value) => updateConfig({ suggestions_count: value })}
+                    min={1}
+                    max={12}
+                  />
+                  
+                  <div className="space-y-3">
+                    <Label className="text-xs font-medium text-muted-foreground">Appearance</Label>
+                    <div className="space-y-3 pl-2">
+                      <ColorInput
+                        label="Background Color"
+                        value={config.suggestion_background_color || "#ffffff"}
+                        onChange={(value) => updateConfig({ suggestion_background_color: value })}
+                        showOpacity={true}
+                      />
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <ColorInput
+                          label="Text Color"
+                          value={config.suggestion_text_color || "#374151"}
+                          onChange={(value) => updateConfig({ suggestion_text_color: value })}
+                        />
+                        <NumberInput
+                          label="Font Size"
+                          value={config.suggestion_font_size || 12}
+                          onChange={(value) => updateConfig({ suggestion_font_size: value })}
+                          min={10}
+                          max={20}
+                        />
+                      </div>
+                      
+                      <FontSelector
+                        label="Font Family"
+                        value={config.suggestion_font_family || "Inter"}
+                        onChange={(value) => updateConfig({ suggestion_font_family: value })}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Label className="text-xs font-medium text-muted-foreground">Border & Shadow</Label>
+                    <div className="space-y-3 pl-2">
+                      <div className="grid grid-cols-2 gap-3">
+                        <SelectInput
+                          label="Border Style"
+                          value={config.suggestion_border_style || "solid"}
+                          onChange={(value) => updateConfig({ suggestion_border_style: value as BorderStyle })}
+                          options={[
+                            { value: "solid", label: "Solid" },
+                            { value: "dashed", label: "Dashed" },
+                            { value: "dotted", label: "Dotted" },
+                            { value: "none", label: "None" }
+                          ]}
+                        />
+                        <ColorInput
+                          label="Border Color"
+                          value={config.suggestion_border_color || "#e5e7eb"}
+                          onChange={(value) => updateConfig({ suggestion_border_color: value })}
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <NumberInput
+                          label="Border Width"
+                          value={config.suggestion_border_width ?? 1}
+                          onChange={(value) => updateConfig({ suggestion_border_width: value })}
+                          min={0}
+                          max={10}
+                        />
+                        <NumberInput
+                          label="Border Radius"
+                          value={config.suggestion_border_radius ?? 8}
+                          onChange={(value) => updateConfig({ suggestion_border_radius: value })}
+                          min={0}
+                          max={50}
+                        />
+                      </div>
+                      
+                      <SelectInput
+                        label="Shadow Style"
+                        value={config.suggestion_shadow_style || "subtle"}
+                        onChange={(value) => updateConfig({ suggestion_shadow_style: value as ShadowStyle })}
+                        options={[
+                          { value: "none", label: "None" },
+                          { value: "subtle", label: "Subtle" },
+                          { value: "medium", label: "Medium" },
+                          { value: "large", label: "Large" },
+                          { value: "glow", label: "Glow" }
+                        ]}
+                      />
+                      
+                      <div className="flex items-center justify-between">
+                        <Label className="text-xs font-medium">Show Arrow Icon</Label>
+                        <Switch
+                          checked={config.suggestion_arrow_icon ?? true}
+                          onCheckedChange={(checked) => updateConfig({ suggestion_arrow_icon: checked })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </details>
         </div>
       </details>
 
@@ -856,14 +959,6 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                   max={16}
                 />
               </div>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">Enable Scrolling</Label>
-              <Switch
-                checked={config.gallery_scrolling_enabled ?? true}
-                onCheckedChange={(checked) => updateConfig({ gallery_scrolling_enabled: checked })}
-              />
             </div>
           </div>
           
