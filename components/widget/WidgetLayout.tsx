@@ -140,7 +140,11 @@ export function WidgetLayout({
     backgroundColor: config.background_color || '#ffffff',
     padding: `${config.container_padding || 24}px`,
     borderRadius: (fullPage && deployment) ? 0 : `${config.border_radius || 0}px`,
-    overflow: 'hidden' as const,
+    height: '100%', // Take full available height from parent (works in iframe and full page)
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column' as const,
+    boxSizing: 'border-box' as const,
     boxShadow: (fullPage && deployment) ? 'none' : (
       config.shadow_style === 'subtle' ? '0 1px 3px rgba(0,0,0,0.1)' :
       config.shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
@@ -155,10 +159,12 @@ export function WidgetLayout({
         className={`w-full h-full ${className}`}
         style={containerStyles}
       >
-        {/* If children are provided, use them (new approach) */}
-        {children ? children : 
-         /* Otherwise fall back to old layout structure (backwards compatibility) */
-         getLayoutStructure(config.layout_mode || "prompt-top", promptSection, imagesSection, config)}
+        <div className="flex-1 h-full">
+          {/* If children are provided, use them (new approach) */}
+          {children ? children : 
+           /* Otherwise fall back to old layout structure (backwards compatibility) */
+           getLayoutStructure(config.layout_mode || "prompt-top", promptSection, imagesSection, config)}
+        </div>
       </div>
     </ThemeProvider>
   );

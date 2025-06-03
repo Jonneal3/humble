@@ -34,7 +34,7 @@ export function ImagePreview({
   const galleryConfig = {
     columns: config?.gallery_columns || 2,
     spacing: config?.gallery_spacing ?? 16,
-    maxImages: config?.gallery_max_images || 4,
+    maxImages: config?.gallery_max_images || 12,
     backgroundColor: config?.gallery_background_color || 'transparent',
     borderEnabled: config?.gallery_border_enabled ?? false,
     borderWidth: config?.gallery_border_width ?? 0,
@@ -43,7 +43,7 @@ export function ImagePreview({
     imageBorderRadius: config?.gallery_image_border_radius ?? 8,
     shadowStyle: config?.gallery_shadow_style || 'medium',
     overlayEnabled: config?.overlay_enabled ?? true,
-    scrollingEnabled: config?.gallery_scrolling_enabled ?? false,
+    scrollingEnabled: config?.gallery_scrolling_enabled ?? true,
     fontFamily: config?.gallery_font_family || 'inherit',
     fontSize: config?.gallery_font_size || 14,
     overlayBackgroundColor: config?.overlay_background_color || 'rgba(0, 0, 0, 0.5)',
@@ -75,19 +75,25 @@ export function ImagePreview({
   const containerStyle: React.CSSProperties = {
     backgroundColor: galleryConfig.backgroundColor === 'transparent' ? undefined : galleryConfig.backgroundColor,
     padding: `${galleryConfig.spacing}px`,
-    height: '100%',
+    width: '100%',
+    height: '100%', // Take whatever height the parent gives us
     overflow: galleryConfig.scrollingEnabled ? 'auto' : 'hidden',
     fontFamily: galleryConfig.fontFamily,
     fontSize: `${galleryConfig.fontSize}px`,
+    boxSizing: 'border-box',
     ...customStyles,
     borderRadius: customStyles?.borderRadius ?? `${galleryConfig.containerBorderRadius}px`,
+    scrollBehavior: 'smooth'
   };
 
   const gridStyle: React.CSSProperties = {
     display: 'grid',
     gridTemplateColumns: `repeat(${galleryConfig.columns}, 1fr)`,
     gap: `${galleryConfig.spacing}px`,
-    height: galleryConfig.scrollingEnabled ? 'auto' : '100%',
+    width: '100%',
+    // Increased bottom padding to ensure last row is fully visible when scrolled
+    paddingBottom: `${galleryConfig.spacing * 3}px`, 
+    minHeight: 'min-content' // Allow grid to grow as needed
   };
 
   const imageStyle: React.CSSProperties = {
@@ -96,7 +102,7 @@ export function ImagePreview({
   };
 
   return (
-    <div style={containerStyle} className="w-full h-full">
+    <div style={containerStyle} className="w-full">
       <div style={gridStyle}>
         {imageSlots.map((slot) => (
           <div
@@ -186,26 +192,13 @@ export function ImagePreview({
                     
                     {/* Beautiful pulsating overlay - inspired by Astria */}
                     <div 
-                      className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-indigo-500/20 flex items-center justify-center rounded-lg"
-                      style={{
-                        animation: 'breathe 3s ease-in-out infinite'
-                      }}
+                      className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-indigo-500/20 flex items-center justify-center rounded-lg animate-pulse"
                     >
                       <div className="flex flex-col items-center gap-3 text-white">
                         {/* Spinning ring */}
-                        <div 
-                          className="w-10 h-10 border-3 border-white/30 border-t-white rounded-full"
-                          style={{
-                            animation: 'spin 2s linear infinite'
-                          }}
-                        />
+                        <div className="w-10 h-10 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
                         {/* Pulsating text */}
-                        <div 
-                          className="text-center"
-                          style={{
-                            animation: 'textPulse 2s ease-in-out infinite'
-                          }}
-                        >
+                        <div className="text-center animate-pulse">
                           <p className="text-sm font-medium">Generating...</p>
                           <p className="text-xs opacity-80">AI at work</p>
                         </div>
@@ -217,11 +210,10 @@ export function ImagePreview({
                       {[...Array(6)].map((_, i) => (
                         <div
                           key={i}
-                          className="absolute w-1 h-1 bg-white/40 rounded-full"
+                          className="absolute w-1 h-1 bg-white/40 rounded-full animate-bounce"
                           style={{
                             left: `${20 + (i * 15)}%`,
                             top: `${30 + (i * 8)}%`,
-                            animation: `float ${3 + (i * 0.5)}s ease-in-out infinite`,
                             animationDelay: `${i * 0.5}s`
                           }}
                         />
@@ -272,34 +264,6 @@ export function ImagePreview({
           </div>
         </div>
       )}
-
-      {/* CSS animations */}
-      <style jsx>{`
-        @keyframes breathe {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.02); }
-        }
-        
-        @keyframes textPulse {
-          0%, 100% { opacity: 0.8; }
-          50% { opacity: 1; }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-          50% { transform: translateY(-10px) rotate(180deg); opacity: 0.8; }
-        }
-        
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
     </div>
   );
 } 
