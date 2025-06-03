@@ -10,6 +10,8 @@ interface WidgetLayoutProps {
   imagesSection?: ReactNode; // Keep for backwards compatibility but optional
   className?: string;
   children?: ReactNode; // New: accept complete layout as children
+  fullPage?: boolean; // When true, removes container padding for full page view
+  deployment?: boolean; // When true, indicates actual deployment vs design preview
 }
 
 // Simple layout switcher with clean minimal styling
@@ -22,7 +24,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="lg:col-span-5 flex flex-col"
             style={{
-              backgroundColor: config.prompt_background_color || '#ffffff',
+              backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 8}px`,
               border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
               padding: `${config.container_padding || 20}px`,
@@ -35,7 +37,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="lg:col-span-7 flex flex-col"
             style={{
-              backgroundColor: config.gallery_background_color || '#ffffff',
+              backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
               border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
               padding: `${config.container_padding || 20}px`,
@@ -53,7 +55,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="flex-shrink-0"
             style={{
-              backgroundColor: config.prompt_background_color || '#ffffff',
+              backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 8}px`,
               border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
               padding: `${config.container_padding || 16}px`,
@@ -66,7 +68,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="flex-1 min-h-0"
             style={{
-              backgroundColor: config.gallery_background_color || '#ffffff',
+              backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
               border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
               padding: `${config.container_padding || 20}px`,
@@ -84,7 +86,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="flex-1 min-h-0"
             style={{
-              backgroundColor: config.gallery_background_color || '#ffffff',
+              backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
               border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
               padding: `${config.container_padding || 20}px`,
@@ -97,7 +99,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="flex-shrink-0"
             style={{
-              backgroundColor: config.prompt_background_color || '#ffffff',
+              backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 12}px`,
               border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
               padding: `${config.container_padding || 16}px`,
@@ -127,20 +129,24 @@ export function WidgetLayout({
   promptSection,
   imagesSection,
   className = "",
-  children
+  children,
+  fullPage = false,
+  deployment = false,
 }: WidgetLayoutProps) {
   console.log('WidgetLayout: Current layout mode:', config.layout_mode);
 
   // Base container styles
   const containerStyles = {
     backgroundColor: config.background_color || '#ffffff',
-    fontFamily: config.prompt_font_family || 'Inter, sans-serif',
     padding: `${config.container_padding || 24}px`,
-    borderRadius: `${config.border_radius || 0}px`,
-    boxShadow: config.shadow_style === 'subtle' ? '0 1px 3px rgba(0,0,0,0.1)' :
-               config.shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
-               config.shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
-               config.shadow_style === 'glow' ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none'
+    borderRadius: (fullPage && deployment) ? 0 : `${config.border_radius || 0}px`,
+    overflow: 'hidden' as const,
+    boxShadow: (fullPage && deployment) ? 'none' : (
+      config.shadow_style === 'subtle' ? '0 1px 3px rgba(0,0,0,0.1)' :
+      config.shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
+      config.shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
+      config.shadow_style === 'glow' ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none'
+    )
   };
 
   return (

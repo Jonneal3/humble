@@ -1,12 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { ChevronDown, Type } from "lucide-react";
-import { ColorInput, NumberInput, SelectInput } from "./FormComponents";
-import { DesignSettings } from "@/types/design";
-import { fontOptions } from "@/types/design";
+import { ColorInput, NumberInput, SelectInput, FontSelector } from "./FormComponents";
+import { DesignSettings, loadGoogleFont } from "@/types/design";
 
 interface BrandingTabProps {
   config: DesignSettings;
@@ -21,6 +20,16 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
   openSections,
   toggleSection,
 }) => {
+  // Load fonts when they change
+  useEffect(() => {
+    if (config.brand_name_font_family && 
+        config.brand_name_font_family !== 'inherit' && 
+        config.brand_name_font_family !== 'sans-serif' && 
+        config.brand_name_font_family !== 'serif') {
+      loadGoogleFont(config.brand_name_font_family);
+    }
+  }, [config.brand_name_font_family]);
+
   return (
     <div className="space-y-4 mt-2">
       {/* Header Section */}
@@ -80,11 +89,10 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
               />
               
               <div className="grid grid-cols-2 gap-3">
-                <SelectInput
+                <FontSelector
                   label="Font Family"
                   value={config.brand_name_font_family || "Inter"}
                   onChange={(value) => updateConfig({ brand_name_font_family: value })}
-                  options={fontOptions}
                 />
                 <NumberInput
                   label="Font Size"
@@ -104,7 +112,7 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
               </div>
               
               {config.logo_enabled && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label className="text-xs font-medium">Logo Upload</Label>
                   
                   {/* Current Logo Preview */}
@@ -177,35 +185,46 @@ export const BrandingTab: React.FC<BrandingTabProps> = ({
                     />
                   )}
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* Logo Size Settings */}
+                  <div className="space-y-2">
+                    <Label className="text-xs font-medium text-muted-foreground">Logo Size</Label>
                     <NumberInput
-                      label="Height"
+                      label="Height (px)"
                       value={config.logo_height || 48}
                       onChange={(value) => updateConfig({ logo_height: value })}
                       min={24}
                       max={200}
                     />
-                    <NumberInput
-                      label="Width"
-                      value={config.logo_border_width ?? 0}
-                      onChange={(value) => updateConfig({ logo_border_width: value })}
-                      min={0}
-                      max={20}
-                    />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* Logo Border Settings */}
+                  <div className="space-y-2 p-3 bg-muted/20 rounded-lg border border-muted/40">
+                    <Label className="text-xs font-medium flex items-center gap-2">
+                      <div className="w-3 h-3 border border-current rounded opacity-60"></div>
+                      Logo Border
+                    </Label>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <NumberInput
+                        label="Border Width"
+                        value={config.logo_border_width ?? 0}
+                        onChange={(value) => updateConfig({ logo_border_width: value })}
+                        min={0}
+                        max={20}
+                      />
+                      <NumberInput
+                        label="Border Radius"
+                        value={config.logo_border_radius ?? 4}
+                        onChange={(value) => updateConfig({ logo_border_radius: value })}
+                        min={0}
+                        max={50}
+                      />
+                    </div>
+                    
                     <ColorInput
-                      label="Color"
+                      label="Border Color"
                       value={config.logo_border_color || "#e5e7eb"}
                       onChange={(value) => updateConfig({ logo_border_color: value })}
-                    />
-                    <NumberInput
-                      label="Radius"
-                      value={config.logo_border_radius ?? 4}
-                      onChange={(value) => updateConfig({ logo_border_radius: value })}
-                      min={0}
-                      max={50}
                     />
                   </div>
                 </div>

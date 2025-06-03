@@ -28,6 +28,7 @@ export default function Designer({ instanceId }: DesignerProps) {
   const [previewMode, setPreviewMode] = useState<'iframe' | 'full'>('full');
   const [instance, setInstance] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('settings');
+  const [isMobileView, setIsMobileView] = useState(false);
   
   // Track which sections are open in each tab
   const [openSections, setOpenSections] = useState<Record<string, Record<string, boolean>>>({
@@ -42,7 +43,7 @@ export default function Designer({ instanceId }: DesignerProps) {
     },
     design: {
       'color-presets': true,
-      'overall-style': false,
+      'overall-style': true,
       'layout': false,
       'uploader': false,
       'prompt': false,
@@ -92,6 +93,18 @@ export default function Designer({ instanceId }: DesignerProps) {
       document.body.style.overflow = '';
       document.documentElement.style.overflow = '';
     };
+  }, []);
+
+  // Detect mobile viewport size for layout optimization indicator
+  useEffect(() => {
+    const checkMobileView = () => {
+      // Use the actual lg breakpoint (1024px) that CSS uses for lg:hidden/lg:flex
+      setIsMobileView(window.innerWidth < 1024);
+    };
+
+    checkMobileView();
+    window.addEventListener('resize', checkMobileView);
+    return () => window.removeEventListener('resize', checkMobileView);
   }, []);
 
   // Debounced save function
@@ -167,8 +180,8 @@ export default function Designer({ instanceId }: DesignerProps) {
 
           {/* Design Controls */}
           {isSidebarExpanded && (
-            <div className="flex-1 min-h-0 overflow-hidden">
-              <div className="h-full overflow-y-auto overscroll-contain p-4">
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full overflow-y-auto px-4 py-4">
                   <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                     <TabsList className="w-full h-8 mb-4 bg-muted p-1 rounded-lg">
                       <TabsTrigger value="settings" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
@@ -185,7 +198,8 @@ export default function Designer({ instanceId }: DesignerProps) {
                       </TabsTrigger>
                     </TabsList>
 
-                <TabsContent value="settings">
+                <div className="space-y-0 pb-8">
+                <TabsContent value="settings" className="mt-0">
                   <SettingsTab
                     instance={instance}
                     updateInstance={updateInstance}
@@ -194,7 +208,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                   />
                     </TabsContent>
 
-                <TabsContent value="branding">
+                <TabsContent value="branding" className="mt-0">
                   <BrandingTab
                     config={config}
                     updateConfig={updateConfig}
@@ -203,7 +217,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                                       />
                     </TabsContent>
 
-                <TabsContent value="design">
+                <TabsContent value="design" className="mt-0">
                   <DesignTab
                     config={config}
                     updateConfig={updateConfig}
@@ -212,12 +226,13 @@ export default function Designer({ instanceId }: DesignerProps) {
                               />
                     </TabsContent>
 
-                <TabsContent value="launch">
+                <TabsContent value="launch" className="mt-0">
                   <LaunchTab
                     instanceId={instanceId}
                     config={config}
                   />
                     </TabsContent>
+                  </div>
                   </Tabs>
                 </div>
           </div>
@@ -230,6 +245,12 @@ export default function Designer({ instanceId }: DesignerProps) {
         <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-medium">Preview</h2>
+            {isMobileView && previewMode === 'full' && (config.layout_mode === 'left-right' || config.layout_mode === 'right-left') && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md px-2 py-1">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                Mobile optimized layout
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -254,7 +275,10 @@ export default function Designer({ instanceId }: DesignerProps) {
         </div>
 
         {/* Preview Content */}
-        <div className="flex-1 bg-background overflow-hidden">
+        <div 
+          className="flex-1 bg-background overflow-hidden"
+          style={previewMode === 'full' ? { borderRadius: '0px' } : {}}
+        >
           {previewMode === 'iframe' ? (
             <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
               <div className="relative">
@@ -320,6 +344,7 @@ export default function Designer({ instanceId }: DesignerProps) {
               instanceId={instanceId}
               liveConfig={config}
               className="h-full w-full"
+              fullPage={true}
             />
           )}
         </div>

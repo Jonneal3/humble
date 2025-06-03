@@ -48,10 +48,14 @@ export default async function WidgetPage({ params }: { params: { instanceId: str
   }
 
   return (
-    <Widget 
-      instanceId={params.instanceId}
-      controlsOnly={false}
-      designConfig={designConfig}
-    />
+    <div className="w-screen h-screen overflow-hidden" style={{ margin: 0, padding: 0 }}>
+      <Widget 
+        instanceId={params.instanceId}
+        controlsOnly={false}
+        designConfig={designConfig}
+        fullPage={true}
+        deployment={true}
+      />
+    </div>
   );
 } 

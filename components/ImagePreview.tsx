@@ -44,6 +44,10 @@ export function ImagePreview({
     shadowStyle: config?.gallery_shadow_style || 'medium',
     overlayEnabled: config?.overlay_enabled ?? true,
     scrollingEnabled: config?.gallery_scrolling_enabled ?? false,
+    fontFamily: config?.gallery_font_family || 'inherit',
+    fontSize: config?.gallery_font_size || 14,
+    overlayBackgroundColor: config?.overlay_background_color || 'rgba(0, 0, 0, 0.5)',
+    overlayIconColor: config?.overlay_icon_color || '#ffffff',
   };
 
   // Shadow styles mapping
@@ -69,13 +73,14 @@ export function ImagePreview({
   });
 
   const containerStyle: React.CSSProperties = {
-    ...customStyles,
     backgroundColor: galleryConfig.backgroundColor === 'transparent' ? undefined : galleryConfig.backgroundColor,
     padding: `${galleryConfig.spacing}px`,
-    borderRadius: `${galleryConfig.containerBorderRadius}px`,
     height: '100%',
     overflow: galleryConfig.scrollingEnabled ? 'auto' : 'hidden',
+    fontFamily: galleryConfig.fontFamily,
+    fontSize: `${galleryConfig.fontSize}px`,
     ...customStyles,
+    borderRadius: customStyles?.borderRadius ?? `${galleryConfig.containerBorderRadius}px`,
   };
 
   const gridStyle: React.CSSProperties = {
@@ -115,7 +120,10 @@ export function ImagePreview({
                 
                 {/* Hover Overlay */}
                 {galleryConfig.overlayEnabled && (
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+                  <div 
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3"
+                    style={{ backgroundColor: galleryConfig.overlayBackgroundColor }}
+                  >
                     <button 
                       className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                       onClick={(e) => {
@@ -123,7 +131,10 @@ export function ImagePreview({
                         // Add download logic here
                       }}
                     >
-                      <Download className="w-4 h-4 text-white" />
+                      <Download 
+                        className="w-4 h-4 transition-colors" 
+                        style={{ color: galleryConfig.overlayIconColor }}
+                      />
                     </button>
                     <button 
                       className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
@@ -132,7 +143,10 @@ export function ImagePreview({
                         setSelectedImage(slot.image);
                       }}
                     >
-                      <Eye className="w-4 h-4 text-white" />
+                      <Eye 
+                        className="w-4 h-4 transition-colors" 
+                        style={{ color: galleryConfig.overlayIconColor }}
+                      />
                     </button>
                     <button 
                       className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
@@ -141,7 +155,10 @@ export function ImagePreview({
                         // Add use as reference logic here
                       }}
                     >
-                      <RotateCcw className="w-4 h-4 text-white" />
+                      <RotateCcw 
+                        className="w-4 h-4 transition-colors" 
+                        style={{ color: galleryConfig.overlayIconColor }}
+                      />
                     </button>
                   </div>
                 )}

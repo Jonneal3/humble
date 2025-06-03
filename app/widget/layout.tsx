@@ -25,9 +25,7 @@ export default function WidgetLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <div className="widget-container min-h-screen bg-white">
-          {children}
-        </div>
+        {children}
         <Toaster />
         <Analytics />
       </body>
