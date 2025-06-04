@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { ThemeProvider } from "@/components/homepage/theme-provider";
-import { DesignSettings } from "@/types/design";
+import { DesignSettings, getPaddingCSS } from "@/types/design";
 
 interface WidgetLayoutProps {
   config: DesignSettings;
@@ -27,7 +27,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
               backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 8}px`,
               border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
-              padding: `${config.container_padding || 20}px`,
+              padding: getPaddingCSS(config),
             }}
           >
             {promptSection}
@@ -40,7 +40,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
               backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
               border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
-              padding: `${config.container_padding || 20}px`,
+              padding: getPaddingCSS(config),
             }}
           >
             {imagesSection}
@@ -58,7 +58,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
               backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 8}px`,
               border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
-              padding: `${config.container_padding || 16}px`,
+              padding: getPaddingCSS(config),
             }}
           >
             {promptSection}
@@ -71,7 +71,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
               backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
               border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
-              padding: `${config.container_padding || 20}px`,
+              padding: getPaddingCSS(config),
             }}
           >
             {imagesSection}
@@ -89,7 +89,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
               backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
               border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
-              padding: `${config.container_padding || 20}px`,
+              padding: getPaddingCSS(config),
             }}
           >
             {imagesSection}
@@ -102,7 +102,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
               backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 12}px`,
               border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
-              padding: `${config.container_padding || 16}px`,
+              padding: getPaddingCSS(config),
             }}
           >
             {promptSection}
@@ -137,7 +137,7 @@ export function WidgetLayout({
 
   // Base container styles - simplified since children now handle their own styling
   const containerStyles = {
-    backgroundColor: config.background_color || '#ffffff',
+    backgroundColor: (fullPage && deployment) ? 'transparent' : (config.background_color || '#ffffff'),
     borderRadius: (fullPage && deployment) ? 0 : `${config.border_radius || 0}px`,
     height: '100%', // Take full available height from parent (works in iframe and full page)
     width: '100%',
@@ -150,21 +150,22 @@ export function WidgetLayout({
       config.shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
       config.shadow_style === 'glow' ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none'
     ),
-    // Remove padding when using children (new layout components handle their own spacing)
-    padding: children ? 0 : `${config.container_padding || 24}px`
+    // Remove padding from here since it's handled at the root level
+    padding: 0
   };
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <div 
-        className={`w-full h-full ${className}`}
+        className={`w-full h-full relative overflow-hidden ${className}`}
         style={containerStyles}
       >
-        <div className="flex-1 h-full">
-          {/* If children are provided, use them (new approach) */}
-          {children ? children : 
-           /* Otherwise fall back to old layout structure (backwards compatibility) */
-           getLayoutStructure(config.layout_mode || "prompt-top", promptSection, imagesSection, config)}
+        <div className="absolute inset-0 flex flex-col">
+          {children || (
+            <div className="flex-1 min-h-0 overflow-auto">
+              {getLayoutStructure(config.layout_mode || "prompt-top", promptSection, imagesSection, config)}
+            </div>
+          )}
         </div>
       </div>
     </ThemeProvider>

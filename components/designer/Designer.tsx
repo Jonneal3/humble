@@ -199,7 +199,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                       </TabsTrigger>
                     </TabsList>
 
-                <div className="space-y-0 pb-8">
+                <div className="space-y-0 pb-24">
                 <TabsContent value="settings" className="mt-0">
                   <SettingsTab
                     instance={instance}
@@ -246,16 +246,16 @@ export default function Designer({ instanceId }: DesignerProps) {
         <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4 flex-shrink-0">
           <div className="flex items-center gap-2">
             <h2 className="text-sm font-medium">Preview</h2>
-            {(isMobileView || previewMode === 'mobile') && previewMode === 'full' && (config.layout_mode === 'left-right' || config.layout_mode === 'right-left') && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md px-2 py-1">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Mobile optimized layout
+            {previewMode === 'mobile' && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md px-2 py-1">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Mobile: All layouts use prompt-top style
               </div>
             )}
-            {previewMode === 'mobile' && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 rounded-md px-2 py-1">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                Mobile Preview (767px)
+            {previewMode === 'full' && (isMobileView || (config.layout_mode === 'left-right' || config.layout_mode === 'right-left')) && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-md px-2 py-1">
+                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                {isMobileView ? 'Auto mobile layout active' : 'Desktop layout'}
               </div>
             )}
             {previewMode === 'iframe' && (parseInt(config.iframe_width?.toString().replace('px', '') || '600') < 600 || parseInt(config.iframe_height?.toString().replace('px', '') || '600') < 500) && (
@@ -298,11 +298,11 @@ export default function Designer({ instanceId }: DesignerProps) {
 
         {/* Preview Content */}
         <div 
-          className="flex-1 bg-background"
+          className="flex-1 bg-background overflow-auto"
           style={previewMode === 'full' ? { borderRadius: '0px' } : {}}
         >
           {previewMode === 'iframe' ? (
-            <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+            <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 overflow-auto">
               <div className="relative">
                 {/* Preview Label */}
                 <div className="absolute -top-8 left-0 text-xs text-muted-foreground flex items-center gap-2">
@@ -312,7 +312,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                 
                 {/* Iframe Container with Visual Context */}
                 <div 
-                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl"
+                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl overflow-auto"
                 style={{ 
                     width: config.iframe_width || '100%',
                     maxWidth: '1000px',
@@ -325,17 +325,16 @@ export default function Designer({ instanceId }: DesignerProps) {
                       medium: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06)",
                       large: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)",
                       glow: "0 0 25px rgba(99, 102, 241, 0.4), 0 8px 32px rgba(99, 102, 241, 0.15)",
-                    }[config.iframe_shadow || 'medium'],
-                    overflow: 'hidden'
+                    }[config.iframe_shadow || 'medium']
                 }}
               >
                   {/* Corner radius indicators */}
                   {(config.iframe_border_radius ?? 12) > 0 && (
                     <>
-                      <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-blue-400 opacity-30 rounded-tl-md"></div>
-                      <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-blue-400 opacity-30 rounded-tr-md"></div>
-                      <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-blue-400 opacity-30 rounded-bl-md"></div>
-                      <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-blue-400 opacity-30 rounded-br-md"></div>
+                      <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-blue-400 opacity-30 rounded-tl-md z-10"></div>
+                      <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-blue-400 opacity-30 rounded-tr-md z-10"></div>
+                      <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-blue-400 opacity-30 rounded-bl-md z-10"></div>
+                      <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-blue-400 opacity-30 rounded-br-md z-10"></div>
                     </>
                   )}
                   
@@ -343,7 +342,7 @@ export default function Designer({ instanceId }: DesignerProps) {
                   instanceId={instanceId}
                   liveConfig={config}
                   className="h-full w-full"
-                  fullPage={true}
+                  fullPage={false}
                 />
                 </div>
                 
@@ -363,41 +362,47 @@ export default function Designer({ instanceId }: DesignerProps) {
               </div>
             </div>
           ) : previewMode === 'mobile' ? (
-            <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+            <div className="h-full flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 overflow-auto">
               <div className="relative">
                 {/* Preview Label */}
-                <div className="absolute -top-8 left-0 text-xs text-muted-foreground flex items-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  Mobile Preview - 767px width triggers mobile optimized layout
+                <div className="absolute -top-12 left-0 right-0 text-center">
+                  <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    Mobile Preview - All layouts automatically use prompt-top style on mobile
+                  </div>
                 </div>
                 
                 {/* Mobile Container */}
                 <div 
-                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700"
+                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700 overflow-auto"
                   style={{ 
-                    width: '767px',
-                    height: '600px',
-                    overflow: 'hidden'
+                    width: '400px',
+                    height: '600px'
                   }}
                 >
                   {/* Mobile device frame styling */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gray-300 dark:bg-gray-600 rounded-full z-10"></div>
                   
-                  <div className="h-full w-full pt-8 pb-4 px-2">
+                  <div className="h-full w-full pt-8 pb-4 px-2 overflow-auto">
                     <WidgetPageView
                       instanceId={instanceId}
-                      liveConfig={config}
+                      liveConfig={{
+                        ...config,
+                        // Force prompt-top layout for mobile preview to show accurate mobile behavior
+                        layout_mode: 'prompt-top'
+                      }}
                       className="h-full w-full"
-                      fullPage={true}
+                      fullPage={false}
                     />
                   </div>
                 </div>
                 
                 {/* Mobile Info Panel */}
-                <div className="absolute -bottom-12 left-0 right-0 text-center">
+                <div className="absolute -bottom-16 left-0 right-0 text-center">
                   <div className="inline-flex items-center gap-4 text-xs text-muted-foreground bg-background/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
-                    <span>Width: 767px (Mobile Breakpoint)</span>
-                    <span>Layout: {config.layout_mode === 'left-right' || config.layout_mode === 'right-left' ? 'Mobile Optimized' : 'Responsive'}</span>
+                    <span>Width: 400px (Mobile)</span>
+                    <span>Layout: Prompt-Top (Auto-Applied)</span>
+                    <span>Responsive: ✓</span>
                   </div>
                 </div>
               </div>
@@ -407,7 +412,7 @@ export default function Designer({ instanceId }: DesignerProps) {
               instanceId={instanceId}
               liveConfig={config}
               className="h-full w-full"
-              fullPage={true}
+              fullPage={false}
             />
           )}
         </div>

@@ -1,12 +1,10 @@
 "use client";
 
-import { DesignSettings } from "@/types/design";
+import { DesignSettings, getEffectivePadding } from "@/types/design";
 import { Suggestion } from "@/lib/suggestions";
 import { BrandHeader } from "../BrandHeader";
 import { ImageGallery } from "../ImageGallery";
-import { ImageUpload } from "../../ImageUpload";
-import { RefreshCw, ArrowUp, ArrowUpRight } from "lucide-react";
-import { Spinner } from "../../ui/spinner";
+import { UserInputSection } from "../UserInputSection";
 
 interface PromptTopLayoutProps {
   config: DesignSettings;
@@ -45,12 +43,15 @@ export function PromptTopLayout({
 }: PromptTopLayoutProps) {
   const isMobile = containerWidth < 768; // Use 768px as mobile breakpoint
 
+  // Get configured container padding instead of hardcoded responsive padding
+  const effectivePadding = getEffectivePadding(config);
+  
+  // Calculate scaling factor based on prompt section height for top/bottom layouts
+  const heightScaleFactor = isMobile ? 1 : (config.prompt_section_height || 30) / 30; // 30% is the base scale
+
   return (
     <div 
-      className="h-full flex flex-col w-full max-w-6xl mx-auto"
-      style={{ 
-        padding: `${Math.max(4, Math.min(24, containerWidth * 0.015))}px ${Math.max(8, Math.min(24, containerWidth * 0.02))}px`
-      }}
+      className={`${fullPage || deployment ? 'h-screen' : 'h-full'} flex flex-col overflow-hidden`}
     >
       <div className="flex-shrink-0">
         <BrandHeader config={config} containerWidth={containerWidth} />
@@ -58,130 +59,28 @@ export function PromptTopLayout({
 
       {/* Mobile Layout: Single Column */}
       {isMobile && (
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="flex-1 flex flex-col min-h-0 relative" style={{ gap: `${Math.max(0.5, Math.min(1.5, containerWidth * 0.003))}rem` }}>
           {/* Mobile content with responsive fonts */}
-          <div className="flex-shrink-0">
-            <div className="rounded-xl p-3 border transition-all duration-300"
-              style={{
-                backgroundColor: config.prompt_background_color || '#f9fafb',
-                borderRadius: `${config.prompt_border_radius || 12}px`,
-                borderColor: config.prompt_border_color || '#e5e7eb',
-                borderWidth: `${config.prompt_border_width || 1}px`,
-                borderStyle: config.prompt_border_style || 'solid'
-              }}
-            >
-              <div className="space-y-3">
-                {config.uploader_enabled && (
-                  <div className="flex-shrink-0 mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <ImageUpload
-                          onImageUpload={onImageUpload}
-                          onImageRemove={onImageRemove}
-                          currentImages={referenceImages}
-                          maxImages={config.uploader_max_images || 6}
-                          variant="chatgpt"
-                          customStyles={{
-                            container: {
-                              backgroundColor: config.uploader_background_color || '#f8fafc',
-                              borderStyle: config.uploader_border_style || 'dashed',
-                              borderColor: config.uploader_border_color || '#cbd5e1',
-                              borderWidth: `${config.uploader_border_width ?? 2}px`,
-                              borderRadius: `${config.uploader_border_radius ?? 12}px`
-                            },
-                            button: {
-                              backgroundColor: config.uploader_background_color || '#f8fafc',
-                              borderStyle: config.uploader_border_style || 'dashed',
-                              borderColor: config.uploader_border_color || '#cbd5e1',
-                              borderWidth: `${config.uploader_border_width ?? 2}px`,
-                              borderRadius: `${config.uploader_border_radius ?? 12}px`
-                            }
-                          }}
-                        />
-                      </div>
-                      {referenceImages.length === 0 && (
-                        <div className="flex-1">
-                          <p className="text-xs text-slate-500 font-medium">Add reference images to guide the AI generation</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <textarea
-                      value={prompt}
-                      onChange={(e) => setPrompt(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          if (!isLoading && prompt.trim()) {
-                            onPromptSubmit(prompt);
-                          }
-                        }
-                      }}
-                      placeholder="Describe what you want to create..."
-                      rows={2}
-                      className="bg-transparent border-none p-0 resize-none outline-none leading-relaxed w-full"
-                      style={{
-                        color: config.prompt_text_color || '#374151',
-                        fontFamily: config.prompt_font_family || 'inherit',
-                        fontWeight: '500',
-                        fontSize: `${config.prompt_font_size || 16}px`
-                      }}
-                      disabled={isLoading}
-                    />
-                  </div>
-                  
-                  <div className="flex-shrink-0">
-                    <button
-                      onClick={() => onPromptSubmit(prompt)}
-                      disabled={isLoading || !prompt.trim()}
-                      className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
-                    >
-                      {isLoading ? (
-                        <Spinner className="w-3 h-3" />
-                      ) : (
-                        <ArrowUp className="w-3 h-3" strokeWidth={2.5} />
-                      )}
-                    </button>
-                  </div>
-                </div>
-                
-                {(config.suggestions_enabled ?? true) && (
-                  <div className="flex flex-wrap gap-1.5">
-                    <button
-                      onClick={onRefreshSuggestions}
-                      className="flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-br from-slate-50 to-gray-100 border border-slate-200 hover:from-blue-50 hover:to-indigo-50 hover:border-blue-200 group transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                      disabled={isLoading}
-                      title="Refresh suggestions"
-                    >
-                      <RefreshCw className="w-3 h-3 text-slate-600 group-hover:text-blue-600 transition-colors" />
-                    </button>
-                    
-                    {suggestions.slice(0, 4).map((suggestion, index) => (
-                      <button
-                        key={index}
-                        onClick={() => onSuggestionClick(suggestion)}
-                        disabled={isLoading}
-                        className="flex items-center gap-1 px-2 py-1.5 rounded-md border text-xs font-medium flex-shrink-0 max-w-[calc(50%-0.375rem)]"
-                        style={{
-                          backgroundColor: config.suggestion_background_color || '#ffffff',
-                          borderColor: config.suggestion_border_color || '#e5e7eb',
-                          color: config.suggestion_text_color || '#374151'
-                        }}
-                      >
-                        <span className="truncate">{suggestion.text}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="flex-shrink-0 relative">
+            <UserInputSection
+              config={config}
+              prompt={prompt}
+              setPrompt={setPrompt}
+              isLoading={isLoading}
+              suggestions={suggestions}
+              referenceImages={referenceImages}
+              onPromptSubmit={onPromptSubmit}
+              onSuggestionClick={onSuggestionClick}
+              onImageUpload={onImageUpload}
+              onImageRemove={onImageRemove}
+              onRefreshSuggestions={onRefreshSuggestions}
+              variant="mobile"
+              heightScaleFactor={heightScaleFactor}
+              containerWidth={containerWidth}
+            />
           </div>
 
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 overflow-auto relative">
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}
@@ -197,150 +96,41 @@ export function PromptTopLayout({
 
       {/* Desktop Layout: Prompt Top */}
       {!isMobile && (
-        <div className="flex flex-col flex-1">
-          <div className="flex-shrink-0 mb-6">
-            <div className="w-full max-w-4xl mx-auto">
-              <div className="rounded-2xl p-4 border transition-all duration-300 min-h-[180px]"
-                style={{
-                  backgroundColor: config.prompt_background_color || '#f9fafb',
-                  borderRadius: `${config.prompt_border_radius || 16}px`,
-                  borderColor: config.prompt_border_color || '#e5e7eb',
-                  borderWidth: `${config.prompt_border_width || 1}px`,
-                  borderStyle: config.prompt_border_style || 'solid'
-                }}
-              >
-                <div className="flex flex-col">
-                  {config.uploader_enabled && (
-                    <div className="flex-shrink-0 mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="relative">
-                          <ImageUpload
-                            onImageUpload={onImageUpload}
-                            onImageRemove={onImageRemove}
-                            currentImages={referenceImages}
-                            maxImages={config.uploader_max_images || 6}
-                            variant="chatgpt"
-                            customStyles={{
-                              container: {
-                                backgroundColor: config.uploader_background_color || '#f8fafc',
-                                borderStyle: config.uploader_border_style || 'dashed',
-                                borderColor: config.uploader_border_color || '#cbd5e1',
-                                borderWidth: `${config.uploader_border_width ?? 2}px`,
-                                borderRadius: `${config.uploader_border_radius ?? 12}px`
-                              },
-                              button: {
-                                backgroundColor: config.uploader_background_color || '#f8fafc',
-                                borderStyle: config.uploader_border_style || 'dashed',
-                                borderColor: config.uploader_border_color || '#cbd5e1',
-                                borderWidth: `${config.uploader_border_width ?? 2}px`,
-                                borderRadius: `${config.uploader_border_radius ?? 12}px`
-                              }
-                            }}
-                          />
-                        </div>
-                        {referenceImages.length === 0 && (
-                          <div className="flex-1">
-                            <p className="text-xs text-slate-500 font-medium">Add reference images to guide the AI generation</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex gap-3 items-start flex-1 min-h-[80px]">
-                    <div className="flex-1 min-h-0">
-                      <textarea
-                        value={prompt}
-                        onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
-                            if (!isLoading && prompt.trim()) {
-                              onPromptSubmit(prompt);
-                            }
-                          }
-                        }}
-                        placeholder="Describe what you want to create..."
-                        className="bg-transparent border-none p-0 resize-none outline-none leading-relaxed w-full h-full"
-                        style={{
-                          fontSize: `${config.prompt_font_size || 16}px`,
-                          color: config.prompt_text_color || '#374151',
-                          fontFamily: config.prompt_font_family || 'inherit',
-                          minHeight: '80px'
-                        }}
-                        disabled={isLoading}
-                      />
-                    </div>
-                    
-                    <div className="flex-shrink-0 self-end">
-                      <button
-                        onClick={() => onPromptSubmit(prompt)}
-                        disabled={isLoading || !prompt.trim()}
-                        className="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
-                      >
-                        {isLoading ? (
-                          <Spinner className="w-4 h-4" />
-                        ) : (
-                          <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {(config.suggestions_enabled ?? true) && (
-                    <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-zinc-200/50">
-                      <button
-                        onClick={onRefreshSuggestions}
-                        className="flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-br from-slate-50 to-gray-100 border border-slate-200 hover:from-blue-50 hover:to-indigo-50 hover:border-blue-200 group transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
-                        disabled={isLoading}
-                        title="Refresh suggestions"
-                      >
-                        <RefreshCw className="w-3 h-3 text-slate-600 group-hover:text-blue-600 transition-colors" />
-                      </button>
-                      
-                      {suggestions.slice(0, config.suggestions_count || 6).map((suggestion, index) => (
-                        <button
-                          key={index}
-                          onClick={() => onSuggestionClick(suggestion)}
-                          disabled={isLoading}
-                          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border group transition-all duration-200 shadow-sm font-medium text-xs flex-shrink-0 max-w-[calc(50%-0.25rem)]"
-                          style={{
-                            backgroundColor: config.suggestion_background_color || '#ffffff',
-                            borderColor: config.suggestion_border_color || '#e5e7eb',
-                            borderWidth: `${config.suggestion_border_width || 1}px`,
-                            borderStyle: config.suggestion_border_style || 'solid',
-                            borderRadius: `${config.suggestion_border_radius || 8}px`,
-                            fontFamily: config.suggestion_font_family || 'inherit',
-                            fontSize: `${config.suggestion_font_size || 12}px`,
-                            boxShadow: config.suggestion_shadow_style === 'subtle' ? '0 1px 3px rgba(0,0,0,0.1)' :
-                                      config.suggestion_shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
-                                      config.suggestion_shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
-                                      config.suggestion_shadow_style === 'glow' ? '0 0 15px rgba(99, 102, 241, 0.3)' : 
-                                      '0 1px 2px rgba(0,0,0,0.05)'
-                          }}
-                        >
-                          <span 
-                            className="group-hover:opacity-90 transition-opacity truncate"
-                            style={{ color: config.suggestion_text_color || '#374151' }}
-                          >
-                            {suggestion.text}
-                          </span>
-                          {(config.suggestion_arrow_icon ?? true) && (
-                            <ArrowUpRight 
-                              className="w-3 h-3 flex-shrink-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                              style={{ color: config.suggestion_text_color || '#6b7280' }}
-                            />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+        <div className="flex flex-col flex-1 min-h-0 relative">
+          <div 
+            className="flex-shrink-0 mb-6 relative"
+            style={{ 
+              height: `${config.prompt_section_height || 30}%`,
+              minHeight: `${180 * heightScaleFactor}px`,
+              maxHeight: '70%'
+            }}
+          >
+            <UserInputSection
+              config={config}
+              prompt={prompt}
+              setPrompt={setPrompt}
+              isLoading={isLoading}
+              suggestions={suggestions}
+              referenceImages={referenceImages}
+              onPromptSubmit={onPromptSubmit}
+              onSuggestionClick={onSuggestionClick}
+              onImageUpload={onImageUpload}
+              onImageRemove={onImageRemove}
+              onRefreshSuggestions={onRefreshSuggestions}
+              variant="desktop"
+              heightScaleFactor={heightScaleFactor}
+              containerWidth={containerWidth}
+              style={{ height: '100%' }}
+            />
           </div>
           
-          <div className="flex-1 min-h-0">
+          <div 
+            className="flex-1 min-h-0 overflow-auto relative"
+            style={{ 
+              height: `${100 - (config.prompt_section_height || 30)}%`,
+              maxHeight: `${100 - (config.prompt_section_height || 30)}%`
+            }}
+          >
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}

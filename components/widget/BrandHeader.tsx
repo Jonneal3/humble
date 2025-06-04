@@ -20,14 +20,12 @@ export function BrandHeader({ config, containerWidth = 1024 }: BrandHeaderProps)
     right: 'justify-end text-right'
   };
 
-  // Responsive bottom margin - much smaller in small containers
-  const bottomMargin = Math.max(4, Math.min(32, containerWidth * 0.015));
+  // Use minimal spacing that respects the configured padding
   const itemGap = Math.max(6, Math.min(16, containerWidth * 0.01));
 
   return (
     <div 
       className={`flex-shrink-0 flex ${alignmentClasses[headerAlignment as keyof typeof alignmentClasses]} w-full`}
-      style={{ marginBottom: `${bottomMargin}px` }}
     >
       <div 
         className="flex items-center"

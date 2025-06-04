@@ -70,12 +70,54 @@ export function ImageGallery({
     };
   });
 
+  // Calculate the number of images that actually have content
+  const imagesWithContent = imageSlots.filter(slot => slot.hasImage).length;
+  
+  // Calculate the number of rows needed based on images with content
+  const rowsNeeded = Math.ceil(imagesWithContent / galleryConfig.columns);
+  
+  // Simplify the approach - use more reliable responsive logic
+  // Instead of complex calculations, use simpler viewport-relative units that scale better
+  const effectiveContainerWidth = containerWidth || 1024;
+  
+  // Use CSS-style responsive breakpoints based on actual container width
+  const isVerySmall = effectiveContainerWidth < 480;
+  const isSmall = effectiveContainerWidth >= 480 && effectiveContainerWidth < 768;
+  const isMedium = effectiveContainerWidth >= 768 && effectiveContainerWidth < 1024;
+  
+  // Calculate image size more conservatively
+  const containerPadding = galleryConfig.spacing * 2;
+  const gridGaps = (galleryConfig.columns - 1) * galleryConfig.spacing;
+  const availableWidth = effectiveContainerWidth - containerPadding - gridGaps;
+  const actualImageWidth = availableWidth / galleryConfig.columns;
+  
+  // Simple, reliable padding calculation based on container size
+  let responsivePadding: number;
+  
+  if (isVerySmall) {
+    // Very small screens - reasonable padding
+    responsivePadding = Math.max(60, actualImageWidth * 0.15);
+  } else if (isSmall) {
+    // Small screens - reasonable padding
+    responsivePadding = Math.max(70, actualImageWidth * 0.18);
+  } else if (isMedium) {
+    // Medium screens - reasonable padding
+    responsivePadding = Math.max(80, actualImageWidth * 0.2);
+  } else {
+    // Large screens - comfortable padding
+    responsivePadding = Math.max(50, actualImageWidth * 0.12);
+  }
+  
+  // Add moderate bonus for vertical layouts on smaller screens
+  if (layoutContext === 'vertical' && (isVerySmall || isSmall)) {
+    responsivePadding += 30;
+  }
+
   const containerStyle: React.CSSProperties = {
     backgroundColor: galleryConfig.backgroundColor === 'transparent' ? undefined : galleryConfig.backgroundColor,
     padding: `${galleryConfig.spacing}px`,
     width: '100%',
     height: '100%',
-    maxHeight: '100vh',
     overflow: 'auto',
     fontFamily: galleryConfig.fontFamily,
     fontSize: `${galleryConfig.fontSize}px`,
@@ -92,8 +134,9 @@ export function ImageGallery({
     gridTemplateColumns: `repeat(${galleryConfig.columns}, 1fr)`,
     gap: `${galleryConfig.spacing}px`,
     width: '100%',
-    paddingBottom: layoutContext === 'vertical' ? '35vh' : '25vh', 
-    minHeight: 'min-content'
+    paddingBottom: `${responsivePadding}px`, 
+    // Ensure the grid takes up space and can create overflow
+    minHeight: 'fit-content'
   };
 
   const imageStyle: React.CSSProperties = {

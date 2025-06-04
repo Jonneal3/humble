@@ -172,13 +172,81 @@ export const DesignTab: React.FC<DesignTabProps> = ({
               onChange={(value) => updateConfig({ background_color: value })}
               showOpacity={true}
             />
-            <NumberInput
-              label="Container Padding"
-              value={config.container_padding || 24}
-              onChange={(value) => updateConfig({ container_padding: value })}
-              min={0}
-              max={120}
-            />
+            
+            {/* Container Padding Controls */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-medium">Container Padding</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={() => {
+                    const value = config.container_padding || 24;
+                    updateConfig({
+                      container_padding_top: value,
+                      container_padding_right: value,
+                      container_padding_bottom: value,
+                      container_padding_left: value,
+                    });
+                  }}
+                >
+                  Sync All
+                </Button>
+              </div>
+              
+              {/* Unified Control */}
+              <NumberInput
+                label="All Sides"
+                value={config.container_padding !== undefined ? config.container_padding : 24}
+                onChange={(value) => updateConfig({ 
+                  container_padding: value,
+                  container_padding_top: value,
+                  container_padding_right: value,
+                  container_padding_bottom: value,
+                  container_padding_left: value,
+                })}
+                min={0}
+                max={120}
+              />
+              
+              {/* Individual Controls */}
+              <details className="space-y-2">
+                <summary className="text-xs font-medium cursor-pointer hover:text-foreground/80 transition-colors">
+                  Individual Sides
+                </summary>
+                <div className="grid grid-cols-2 gap-2 pl-2">
+                  <NumberInput
+                    label="Top"
+                    value={config.container_padding_top !== undefined ? config.container_padding_top : (config.container_padding !== undefined ? config.container_padding : 24)}
+                    onChange={(value) => updateConfig({ container_padding_top: value })}
+                    min={0}
+                    max={120}
+                  />
+                  <NumberInput
+                    label="Right"
+                    value={config.container_padding_right !== undefined ? config.container_padding_right : (config.container_padding !== undefined ? config.container_padding : 24)}
+                    onChange={(value) => updateConfig({ container_padding_right: value })}
+                    min={0}
+                    max={120}
+                  />
+                  <NumberInput
+                    label="Bottom"
+                    value={config.container_padding_bottom !== undefined ? config.container_padding_bottom : (config.container_padding !== undefined ? config.container_padding : 24)}
+                    onChange={(value) => updateConfig({ container_padding_bottom: value })}
+                    min={0}
+                    max={120}
+                  />
+                  <NumberInput
+                    label="Left"
+                    value={config.container_padding_left !== undefined ? config.container_padding_left : (config.container_padding !== undefined ? config.container_padding : 24)}
+                    onChange={(value) => updateConfig({ container_padding_left: value })}
+                    min={0}
+                    max={120}
+                  />
+                </div>
+              </details>
+            </div>
           </div>
         </div>
       </details>
@@ -298,6 +366,7 @@ export const DesignTab: React.FC<DesignTabProps> = ({
             </p>
           </div>
           
+          {/* Layout Split Control for Left/Right */}
           {(config.layout_mode === "left-right" || config.layout_mode === "right-left") && (
             <div className="space-y-3">
               <div className="space-y-2">
@@ -332,6 +401,49 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                       <>
                         <span>← More space for images</span>
                         <span>More space for prompts →</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Layout Split Control for Top/Bottom */}
+          {(config.layout_mode === "prompt-top" || config.layout_mode === "prompt-bottom") && (
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-medium">
+                    {config.layout_mode === "prompt-top" ? "Top/Bottom Split" : "Bottom/Top Split"}
+                  </Label>
+                  <span className="text-xs text-muted-foreground">
+                    {config.layout_mode === "prompt-top" 
+                      ? `${config.prompt_section_height || 30}% / ${100 - (config.prompt_section_height || 30)}%`
+                      : `${100 - (config.prompt_section_height || 30)}% / ${config.prompt_section_height || 30}%`
+                    }
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  <input
+                    type="range"
+                    min="10"
+                    max="80"
+                    value={config.prompt_section_height || 30}
+                    onChange={(e) => updateConfig({ prompt_section_height: parseInt(e.target.value) })}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                    key={`height-slider-${config.layout_mode}`}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    {config.layout_mode === "prompt-top" ? (
+                      <>
+                        <span>↑ More space for prompts</span>
+                        <span>More space for images ↓</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>↑ More space for images</span>
+                        <span>More space for prompts ↓</span>
                       </>
                     )}
                   </div>
@@ -472,9 +584,9 @@ export const DesignTab: React.FC<DesignTabProps> = ({
         </div>
       </details>
 
-      {/* User Input Section - NEW GROUPED SECTION */}
+      {/* User Input Section - MOVED TO TOP LEVEL */}
       <details 
-        className="group border-l-2 border-l-blue-500/20 pl-3" 
+        className="group" 
         open={openSections.design?.['input-section']}
       >
         <summary 
@@ -485,12 +597,12 @@ export const DesignTab: React.FC<DesignTabProps> = ({
           }}
         >
           <span className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-blue-500" />
-            <span className="text-blue-600 dark:text-blue-400 font-semibold">User Input Section</span>
+            <MessageSquare className="h-4 w-4" />
+            <span>User Input Section</span>
           </span>
           <ChevronDown className={`h-4 w-4 transition-transform text-muted-foreground ${openSections.design?.['input-section'] ? 'rotate-180' : ''}`} />
         </summary>
-        <div className="space-y-4 pl-2 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/20 rounded-lg p-3 -ml-1">
+        <div className="space-y-4 pl-2">
           <div className="text-xs text-muted-foreground mb-3">
             Configure how users interact with your widget - file uploads, text input, and suggestions.
           </div>
@@ -1045,6 +1157,21 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                 min={10}
                 max={24}
               />
+            </div>
+          </div>
+
+          {/* Mobile Optimization Notice */}
+          <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-start gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full mt-1 flex-shrink-0"></div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-blue-900 dark:text-blue-100">
+                  📱 Mobile Optimization
+                </p>
+                <p className="text-xs text-blue-700 dark:text-blue-200">
+                  All layouts automatically switch to <strong>prompt-top style</strong> on mobile devices (&lt;768px width) for optimal user experience. Use the Mobile preview to see how this looks.
+                </p>
+              </div>
             </div>
           </div>
         </div>

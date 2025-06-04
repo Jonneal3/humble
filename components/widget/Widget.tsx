@@ -297,13 +297,22 @@ export function Widget({
 
   // Full widget with layout
   return (
-    <div className={componentId} ref={containerRef}>
+    <div 
+      className={componentId} 
+      ref={containerRef} 
+      style={{ 
+        height: '100%', 
+        width: '100%',
+        padding: !fullPage ? `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px` : '0',
+        boxSizing: 'border-box'
+      }}
+    >
       <WidgetLayout
         config={config}
         promptSection={<div />} // Not used anymore
         imagesSection={<div />} // Not used anymore  
         className={className}
-        fullPage={fullPage}
+        fullPage={true} // Always true so WidgetLayout doesn't add its own padding
         deployment={deployment}
       >
         {getLayoutComponent()}

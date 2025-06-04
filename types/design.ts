@@ -13,7 +13,11 @@ export interface DesignSettings {
   background_opacity?: number; // 0-1 for background transparency
   background_gradient?: string;
   background_image?: string;
-  container_padding?: number;
+  container_padding?: number; // Legacy: applies to all sides when individual padding not specified
+  container_padding_top?: number; // Individual padding controls
+  container_padding_right?: number;
+  container_padding_bottom?: number;
+  container_padding_left?: number;
   border_radius?: number;
   shadow_style?: ShadowStyle;
   sidebar_background_color?: string; // Background color for the designer sidebar
@@ -58,6 +62,7 @@ export interface DesignSettings {
   // ===========================================
   layout_mode?: LayoutMode;
   prompt_section_width?: number; // Percentage for left-right layout
+  prompt_section_height?: number; // Percentage for top-bottom layout
   
   // ===========================================
   // IFRAME SETTINGS (when layout_mode is 'iframe')
@@ -161,6 +166,10 @@ export const defaultDesignSettings: DesignSettings = {
   background_gradient: "",
   background_image: "",
   container_padding: 24,
+  container_padding_top: 24,
+  container_padding_right: 24,
+  container_padding_bottom: 24,
+  container_padding_left: 24,
   border_radius: 12,
   shadow_style: "medium",
   sidebar_background_color: "#ffffff", // Default sidebar background
@@ -195,6 +204,7 @@ export const defaultDesignSettings: DesignSettings = {
   // Layout
   layout_mode: "prompt-top",
   prompt_section_width: 40,
+  prompt_section_height: 30,
   
   // Iframe Settings
   iframe_width: "100%",
@@ -292,7 +302,11 @@ export interface DesignTheme {
   background_opacity?: number; // 0-1 for background transparency
   background_gradient?: string;
   background_image?: string;
-  container_padding?: number;
+  container_padding?: number; // Legacy: applies to all sides when individual padding not specified
+  container_padding_top?: number; // Individual padding controls
+  container_padding_right?: number;
+  container_padding_bottom?: number;
+  container_padding_left?: number;
   border_radius?: number;
   shadow_style?: ShadowStyle;
   sidebar_background_color?: string; // Background color for the designer sidebar
@@ -337,6 +351,7 @@ export interface DesignTheme {
   // ===========================================
   layout_mode?: LayoutMode;
   prompt_section_width?: number;
+  prompt_section_height?: number;
   
   // ===========================================
   // IFRAME SETTINGS
@@ -445,6 +460,10 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   background_gradient: theme.background_gradient ?? "",
   background_image: theme.background_image ?? "",
   container_padding: theme.container_padding ?? 24,
+  container_padding_top: theme.container_padding_top ?? 24,
+  container_padding_right: theme.container_padding_right ?? 24,
+  container_padding_bottom: theme.container_padding_bottom ?? 24,
+  container_padding_left: theme.container_padding_left ?? 24,
   border_radius: theme.border_radius ?? 12,
   shadow_style: theme.shadow_style ?? "medium",
   
@@ -488,6 +507,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   // ===========================================
   layout_mode: theme.layout_mode ?? "prompt-top",
   prompt_section_width: theme.prompt_section_width ?? 40,
+  prompt_section_height: theme.prompt_section_height ?? 30,
   
   // ===========================================
   // IFRAME SETTINGS
@@ -592,6 +612,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling - cooler blue-gray theme
     background_color: "#f8fafc",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 12,
     shadow_style: "medium",
     
@@ -671,6 +695,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling - Warm beige/cream theme
     background_color: "#fefcf8",
     container_padding: 32,
+    container_padding_top: 32,
+    container_padding_right: 32,
+    container_padding_bottom: 32,
+    container_padding_left: 32,
     border_radius: 16,
     shadow_style: "subtle",
     
@@ -750,6 +778,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling - Pure white with cool ice blue accents
     background_color: "#ffffff",
     container_padding: 20,
+    container_padding_top: 20,
+    container_padding_right: 20,
+    container_padding_bottom: 20,
+    container_padding_left: 20,
     border_radius: 8,
     shadow_style: "large",
     
@@ -829,6 +861,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#fefcf3",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 14,
     shadow_style: "medium",
     
@@ -910,6 +946,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#0f0f0f",
     container_padding: 28,
+    container_padding_top: 28,
+    container_padding_right: 28,
+    container_padding_bottom: 28,
+    container_padding_left: 28,
     border_radius: 16,
     shadow_style: "glow",
     
@@ -989,6 +1029,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#1e1e1e",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 10,
     shadow_style: "medium",
     
@@ -1068,6 +1112,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#111111",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 8,
     shadow_style: "glow",
     
@@ -1147,6 +1195,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#18181b",
     container_padding: 28,
+    container_padding_top: 28,
+    container_padding_right: 28,
+    container_padding_bottom: 28,
+    container_padding_left: 28,
     border_radius: 12,
     shadow_style: "large",
     
@@ -1228,6 +1280,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#f0f9ff",
     container_padding: 32,
+    container_padding_top: 32,
+    container_padding_right: 32,
+    container_padding_bottom: 32,
+    container_padding_left: 32,
     border_radius: 20,
     shadow_style: "large",
     
@@ -1307,6 +1363,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#f0f8ff",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 14,
     shadow_style: "medium",
     
@@ -1386,6 +1446,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#1e293b",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 10,
     shadow_style: "large",
     
@@ -1467,6 +1531,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#f0fdf4",
     container_padding: 26,
+    container_padding_top: 26,
+    container_padding_right: 26,
+    container_padding_bottom: 26,
+    container_padding_left: 26,
     border_radius: 12,
     shadow_style: "subtle",
     
@@ -1546,6 +1614,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#f0fdfa",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 16,
     shadow_style: "medium",
     
@@ -1625,6 +1697,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#f6f7f6",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 14,
     shadow_style: "subtle",
     
@@ -1706,6 +1782,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#fff7ed",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 16,
     shadow_style: "glow",
     
@@ -1785,6 +1865,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#fffbeb",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 12,
     shadow_style: "medium",
     
@@ -1864,6 +1948,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#fff5f5",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 14,
     shadow_style: "subtle",
     
@@ -1945,6 +2033,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#faf5ff",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 16,
     shadow_style: "glow",
     
@@ -2024,6 +2116,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#fdf2f8",
     container_padding: 24,
+    container_padding_top: 24,
+    container_padding_right: 24,
+    container_padding_bottom: 24,
+    container_padding_left: 24,
     border_radius: 14,
     shadow_style: "medium",
     
@@ -2103,6 +2199,10 @@ export const designThemes: DesignTheme[] = [
     // Overall styling
     background_color: "#faf5ff",
     container_padding: 30,
+    container_padding_top: 30,
+    container_padding_right: 30,
+    container_padding_bottom: 30,
+    container_padding_left: 30,
     border_radius: 18,
     shadow_style: "subtle",
     
@@ -2332,4 +2432,22 @@ export const getBackgroundColor = (color?: string, opacity?: number): string => 
   if (opacity === undefined || opacity === 1) return color;
   if (color.startsWith('rgba') || color.startsWith('rgb')) return color;
   return hexToRgba(color, opacity);
+};
+
+// Utility function to get effective padding values
+export const getEffectivePadding = (settings: DesignSettings) => {
+  const fallback = settings.container_padding !== undefined ? settings.container_padding : 24;
+  
+  return {
+    top: settings.container_padding_top !== undefined ? settings.container_padding_top : fallback,
+    right: settings.container_padding_right !== undefined ? settings.container_padding_right : fallback,
+    bottom: settings.container_padding_bottom !== undefined ? settings.container_padding_bottom : fallback,
+    left: settings.container_padding_left !== undefined ? settings.container_padding_left : fallback,
+  };
+};
+
+// Utility function to get CSS padding string
+export const getPaddingCSS = (settings: DesignSettings): string => {
+  const padding = getEffectivePadding(settings);
+  return `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
 }; 
