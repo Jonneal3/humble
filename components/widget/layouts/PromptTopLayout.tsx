@@ -1,6 +1,6 @@
 "use client";
 
-import { DesignSettings, getEffectivePadding } from "@/types/design";
+import { DesignSettings, getEffectivePadding, getPaddingCSS } from "@/types/design";
 import { Suggestion } from "@/lib/suggestions";
 import { BrandHeader } from "../BrandHeader";
 import { ImageGallery } from "../ImageGallery";
@@ -97,12 +97,18 @@ export function PromptTopLayout({
       {/* Desktop Layout: Prompt Top */}
       {!isMobile && (
         <div className="flex flex-col flex-1 min-h-0 relative">
+          {/* UserInputSection - Fixed at top */}
           <div 
-            className="flex-shrink-0 mb-6 relative"
+            className="flex-shrink-0 mb-6 max-w-2xl mx-auto w-full relative z-20"
             style={{ 
               height: `${config.prompt_section_height || 30}%`,
               minHeight: `${180 * heightScaleFactor}px`,
-              maxHeight: '70%'
+              maxHeight: '70%',
+              backgroundColor: config.background_color || '#ffffff',
+              marginLeft: config.prompt_section_alignment === 'left' ? '0' : 
+                         config.prompt_section_alignment === 'right' ? 'auto' : 'auto',
+              marginRight: config.prompt_section_alignment === 'left' ? 'auto' : 
+                          config.prompt_section_alignment === 'right' ? '0' : 'auto'
             }}
           >
             <UserInputSection
@@ -123,23 +129,31 @@ export function PromptTopLayout({
               style={{ height: '100%' }}
             />
           </div>
-          
-          <div 
-            className="flex-1 min-h-0 overflow-auto relative"
-            style={{ 
-              height: `${100 - (config.prompt_section_height || 30)}%`,
-              maxHeight: `${100 - (config.prompt_section_height || 30)}%`
-            }}
-          >
-            <ImageGallery
-              images={generatedImages}
-              isLoading={isLoading}
-              config={config}
-              fullPage={fullPage}
-              deployment={deployment}
-              layoutContext="vertical"
-              containerWidth={containerWidth}
-            />
+
+          {/* Gallery Section - Extends under UIC */}
+          <div className="flex-1 min-h-0 -mt-48 relative">
+            <div className="absolute inset-0">
+              {/* Fade effect at top of gallery */}
+              <div 
+                className="absolute top-0 left-0 right-0 h-48 pointer-events-none z-10"
+                style={{
+                  background: `linear-gradient(180deg, 
+                    ${config.background_color || '#ffffff'} 0%,
+                    ${config.background_color || '#ffffff'}80 40%,
+                    transparent 100%
+                  )`
+                }}
+              ></div>
+              <ImageGallery
+                images={generatedImages}
+                isLoading={isLoading}
+                config={config}
+                fullPage={fullPage}
+                deployment={deployment}
+                layoutContext="vertical"
+                containerWidth={containerWidth}
+              />
+            </div>
           </div>
         </div>
       )}

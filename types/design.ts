@@ -3,6 +3,7 @@ export type LayoutMode = "left-right" | "right-left" | "prompt-top" | "prompt-bo
 export type BorderStyle = "solid" | "dashed" | "dotted" | "none";
 export type ShadowStyle = "none" | "subtle" | "medium" | "large" | "glow";
 export type TextAlign = "left" | "center" | "right";
+export type PromptAlignment = "left" | "center" | "right";
 
 // Core Design Interface - Much Simpler and Focused
 export interface DesignSettings {
@@ -21,6 +22,27 @@ export interface DesignSettings {
   border_radius?: number;
   shadow_style?: ShadowStyle;
   sidebar_background_color?: string; // Background color for the designer sidebar
+  
+  // ===========================================
+  // LAYOUT CONFIGURATION
+  // ===========================================
+  layout_mode?: LayoutMode;
+  prompt_section_width?: number; // Percentage for left-right layout
+  prompt_section_height?: number; // Percentage for top-bottom layout
+  
+  // ===========================================
+  // PROMPT SECTION
+  // ===========================================
+  prompt_background_color?: string;
+  prompt_border_style?: BorderStyle;
+  prompt_border_color?: string;
+  prompt_border_width?: number;
+  prompt_border_radius?: number;
+  prompt_text_color?: string;
+  prompt_font_family?: string;
+  prompt_font_size?: number;
+  prompt_placeholder_color?: string;
+  prompt_section_alignment?: PromptAlignment; // Controls horizontal alignment in top/bottom layouts
   
   // ===========================================
   // HEADER SECTION
@@ -58,13 +80,6 @@ export interface DesignSettings {
   cta_color?: string;
   
   // ===========================================
-  // LAYOUT CONFIGURATION
-  // ===========================================
-  layout_mode?: LayoutMode;
-  prompt_section_width?: number; // Percentage for left-right layout
-  prompt_section_height?: number; // Percentage for top-bottom layout
-  
-  // ===========================================
   // IFRAME SETTINGS (when layout_mode is 'iframe')
   // ===========================================
   iframe_width?: string; // e.g., "100%", "800px"
@@ -96,19 +111,6 @@ export interface DesignSettings {
   uploader_icon_style?: string; // For upload folder/icon design
   uploader_primary_text?: string; // Main upload text (e.g., "Add reference images to guide the AI generation")
   uploader_secondary_text?: string; // Secondary text (e.g., "Drag & drop or click to upload")
-  
-  // ===========================================
-  // PROMPT SECTION
-  // ===========================================
-  prompt_background_color?: string;
-  prompt_border_style?: BorderStyle;
-  prompt_border_color?: string;
-  prompt_border_width?: number;
-  prompt_border_radius?: number;
-  prompt_text_color?: string;
-  prompt_font_family?: string;
-  prompt_font_size?: number;
-  prompt_placeholder_color?: string;
   
   // Suggestion Buttons
   suggestions_enabled?: boolean;
@@ -172,7 +174,24 @@ export const defaultDesignSettings: DesignSettings = {
   container_padding_left: 24,
   border_radius: 12,
   shadow_style: "medium",
-  sidebar_background_color: "#ffffff", // Default sidebar background
+  sidebar_background_color: "#ffffff",
+  
+  // Layout
+  layout_mode: "prompt-top",
+  prompt_section_width: 40,
+  prompt_section_height: 30,
+  
+  // Prompt Section
+  prompt_background_color: "transparent",
+  prompt_border_style: "solid",
+  prompt_border_color: "#e5e7eb",
+  prompt_border_width: 1,
+  prompt_border_radius: 12,
+  prompt_text_color: "#374151",
+  prompt_font_family: "Inter",
+  prompt_font_size: 16,
+  prompt_placeholder_color: "#9ca3af",
+  prompt_section_alignment: "center",
   
   // Header
   header_enabled: true,
@@ -200,11 +219,6 @@ export const defaultDesignSettings: DesignSettings = {
   cta_font_family: "Inter",
   cta_font_size: 16,
   cta_color: "#374151",
-  
-  // Layout
-  layout_mode: "prompt-top",
-  prompt_section_width: 40,
-  prompt_section_height: 30,
   
   // Iframe Settings
   iframe_width: "100%",
@@ -234,17 +248,6 @@ export const defaultDesignSettings: DesignSettings = {
   uploader_icon_style: "folder",
   uploader_primary_text: "Add reference images to guide the AI generation",
   uploader_secondary_text: "Drag & drop or click to upload",
-  
-  // Prompt Section
-  prompt_background_color: "transparent",
-  prompt_border_style: "solid",
-  prompt_border_color: "#e5e7eb",
-  prompt_border_width: 1,
-  prompt_border_radius: 12,
-  prompt_text_color: "#374151",
-  prompt_font_family: "Inter",
-  prompt_font_size: 16,
-  prompt_placeholder_color: "#9ca3af",
   
   // Suggestion Buttons
   suggestions_enabled: true,
@@ -398,6 +401,7 @@ export interface DesignTheme {
   prompt_font_family?: string;
   prompt_font_size?: number;
   prompt_placeholder_color?: string;
+  prompt_section_alignment?: PromptAlignment; // Controls horizontal alignment in top/bottom layouts
   
   // Suggestion Buttons
   suggestions_enabled?: boolean;
@@ -554,6 +558,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   prompt_font_family: theme.prompt_font_family ?? "Inter",
   prompt_font_size: theme.prompt_font_size ?? 16,
   prompt_placeholder_color: theme.prompt_placeholder_color ?? "#9ca3af",
+  prompt_section_alignment: theme.prompt_section_alignment ?? "center",
   
   // Suggestion Buttons
   suggestions_enabled: theme.suggestions_enabled ?? true,

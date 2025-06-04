@@ -5,7 +5,7 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { ChevronDown, Palette, Layout, Type, Image, Settings, HelpCircle, MessageSquare } from "lucide-react";
 import { ColorInput, NumberInput, SelectInput, FontSelector } from "./FormComponents";
-import { DesignSettings, designThemes, getCompleteTheme, fontOptions, ShadowStyle, BorderStyle, loadGoogleFont } from "@/types/design";
+import { DesignSettings, designThemes, getCompleteTheme, fontOptions, ShadowStyle, BorderStyle, loadGoogleFont, LayoutMode } from "@/types/design";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface DesignTabProps {
@@ -21,6 +21,9 @@ export const DesignTab: React.FC<DesignTabProps> = ({
   openSections,
   toggleSection,
 }) => {
+  // Helper function to check layout mode
+  const isHorizontalLayout = (mode: typeof config.layout_mode) => mode === "left-right" || mode === "right-left";
+
   // Load fonts when they change for real-time preview
   React.useEffect(() => {
     if (config.prompt_font_family && 
@@ -615,48 +618,43 @@ export const DesignTab: React.FC<DesignTabProps> = ({
             </h4>
             
             <div className="space-y-3">
+              {/* Prompt Section Position */}
+              <div className="space-y-2">
+                <Label className="text-xs font-medium">Prompt Section Position</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Button
+                    variant={config.prompt_section_alignment === 'left' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-8"
+                    onClick={() => updateConfig({ prompt_section_alignment: 'left' })}
+                  >
+                    Left
+                  </Button>
+                  <Button
+                    variant={config.prompt_section_alignment === 'center' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-8"
+                    onClick={() => updateConfig({ prompt_section_alignment: 'center' })}
+                  >
+                    Center
+                  </Button>
+                  <Button
+                    variant={config.prompt_section_alignment === 'right' ? 'default' : 'outline'}
+                    size="sm"
+                    className="h-8"
+                    onClick={() => updateConfig({ prompt_section_alignment: 'right' })}
+                  >
+                    Right
+                  </Button>
+                </div>
+              </div>
+
               <ColorInput
                 label="Background Color"
                 value={config.prompt_background_color || "transparent"}
                 onChange={(value) => updateConfig({ prompt_background_color: value })}
                 showOpacity={true}
               />
-              
-              <div className="grid grid-cols-2 gap-3">
-                <NumberInput
-                  label="Border Width"
-                  value={config.prompt_border_width ?? 1}
-                  onChange={(value) => updateConfig({ prompt_border_width: value })}
-                  min={0}
-                  max={20}
-                />
-                <NumberInput
-                  label="Border Radius"
-                  value={config.prompt_border_radius ?? 12}
-                  onChange={(value) => updateConfig({ prompt_border_radius: value })}
-                  min={0}
-                  max={100}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <SelectInput
-                  label="Border Style"
-                  value={config.prompt_border_style || "solid"}
-                  onChange={(value) => updateConfig({ prompt_border_style: value as BorderStyle })}
-                  options={[
-                    { value: "solid", label: "Solid" },
-                    { value: "dashed", label: "Dashed" },
-                    { value: "dotted", label: "Dotted" },
-                    { value: "none", label: "None" }
-                  ]}
-                />
-                <ColorInput
-                  label="Border Color"
-                  value={config.prompt_border_color || "#e5e7eb"}
-                  onChange={(value) => updateConfig({ prompt_border_color: value })}
-                />
-              </div>
             </div>
           </div>
 

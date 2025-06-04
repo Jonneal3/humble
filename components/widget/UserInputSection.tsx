@@ -192,13 +192,12 @@ export function UserInputSection({
   // Desktop version
   return (
     <div 
-      className={`rounded-2xl border transition-all duration-300 flex flex-col ${className}`}
+      className={`border transition-all duration-300 flex flex-col ${className}`}
       style={{
         backgroundColor: config.prompt_background_color || '#ffffff',
         borderRadius: `${(config.prompt_border_radius || 16) * heightScaleFactor}px`,
         borderColor: config.prompt_border_color || '#e5e7eb',
         borderWidth: `${(config.prompt_border_width || 1) * heightScaleFactor}px`,
-        borderStyle: config.prompt_border_style || 'solid',
         padding: `${8 * heightScaleFactor}px`,
         boxSizing: 'border-box',
         width: '100%',

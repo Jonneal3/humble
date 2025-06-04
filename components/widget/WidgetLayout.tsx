@@ -50,14 +50,12 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
 
     case "prompt-top":
       return (
-        <div className="h-full flex flex-col gap-4">
+        <div className="h-full flex flex-col gap-4 items-center">
           {/* Top: Compact Prompt */}
           <div 
-            className="flex-shrink-0"
+            className="flex-shrink-0 w-full max-w-2xl mx-auto"
             style={{
               backgroundColor: config.prompt_background_color || 'transparent',
-              borderRadius: `${config.prompt_border_radius || 8}px`,
-              border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
               padding: getPaddingCSS(config),
             }}
           >
@@ -66,7 +64,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           
           {/* Bottom: Images Area */}
           <div 
-            className="flex-1 min-h-0"
+            className="flex-1 min-h-0 w-full max-w-5xl mx-auto"
             style={{
               backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
@@ -81,10 +79,10 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
 
     case "prompt-bottom":
       return (
-        <div className="h-full flex flex-col gap-3">
+        <div className="h-full flex flex-col gap-3 items-center">
           {/* Top: Images Area */}
           <div 
-            className="flex-1 min-h-0"
+            className="flex-1 min-h-0 w-full max-w-5xl mx-auto"
             style={{
               backgroundColor: config.gallery_background_color || 'transparent',
               borderRadius: `${config.gallery_border_radius || 8}px`,
@@ -97,11 +95,9 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           
           {/* Bottom: Input Bar */}
           <div 
-            className="flex-shrink-0"
+            className="flex-shrink-0 w-full max-w-2xl mx-auto"
             style={{
               backgroundColor: config.prompt_background_color || 'transparent',
-              borderRadius: `${config.prompt_border_radius || 12}px`,
-              border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
               padding: getPaddingCSS(config),
             }}
           >
@@ -137,14 +133,14 @@ export function WidgetLayout({
 
   // Base container styles - simplified since children now handle their own styling
   const containerStyles = {
-    backgroundColor: (fullPage && deployment) ? 'transparent' : (config.background_color || '#ffffff'),
-    borderRadius: (fullPage && deployment) ? 0 : `${config.border_radius || 0}px`,
+    backgroundColor: (fullPage || deployment) ? 'transparent' : (config.background_color || '#ffffff'),
+    borderRadius: (fullPage || deployment) ? 0 : `${config.border_radius || 0}px`,
     height: '100%', // Take full available height from parent (works in iframe and full page)
     width: '100%',
     display: 'flex',
     flexDirection: 'column' as const,
     boxSizing: 'border-box' as const,
-    boxShadow: (fullPage && deployment) ? 'none' : (
+    boxShadow: (fullPage || deployment) ? 'none' : (
       config.shadow_style === 'subtle' ? '0 1px 3px rgba(0,0,0,0.1)' :
       config.shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
       config.shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
