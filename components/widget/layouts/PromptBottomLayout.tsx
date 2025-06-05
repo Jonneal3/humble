@@ -103,13 +103,15 @@ export function PromptBottomLayout({
             <div className="absolute inset-0">
               {/* Fade effect at bottom of gallery */}
               <div 
-                className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none z-10"
+                className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none z-10"
                 style={{
                   background: `linear-gradient(0deg, 
-                    ${config.background_color || '#ffffff'} 0%,
-                    ${config.background_color || '#ffffff'}80 40%,
-                    transparent 100%
-                  )`
+                    ${config.background_color || '#ffffff'}55 0%,
+                    ${config.background_color || '#ffffff'}30 50%,
+                    ${config.background_color || '#ffffff'}10 85%,
+                    ${config.background_color || '#ffffff'}00 100%
+                  )`,
+                  borderRadius: `${config.prompt_border_radius || 12}px`
                 }}
               ></div>
               <ImageGallery
@@ -135,7 +137,9 @@ export function PromptBottomLayout({
               marginLeft: config.prompt_section_alignment === 'left' ? '0' : 
                          config.prompt_section_alignment === 'right' ? 'auto' : 'auto',
               marginRight: config.prompt_section_alignment === 'left' ? 'auto' : 
-                          config.prompt_section_alignment === 'right' ? '0' : 'auto'
+                          config.prompt_section_alignment === 'right' ? '0' : 'auto',
+              borderRadius: `${config.prompt_border_radius || 12}px`,
+              padding: '2px' // Small padding to ensure the border radius is visible
             }}
           >
             <UserInputSection

@@ -43,6 +43,9 @@ export interface DesignSettings {
   prompt_font_size?: number;
   prompt_placeholder_color?: string;
   prompt_section_alignment?: PromptAlignment; // Controls horizontal alignment in top/bottom layouts
+  submit_button_background_color?: string;
+  submit_button_text_color?: string;
+  submit_button_hover_background_color?: string;
   
   // ===========================================
   // HEADER SECTION
@@ -192,6 +195,9 @@ export const defaultDesignSettings: DesignSettings = {
   prompt_font_size: 16,
   prompt_placeholder_color: "#9ca3af",
   prompt_section_alignment: "center",
+  submit_button_background_color: "#3b82f6",
+  submit_button_text_color: "#ffffff",
+  submit_button_hover_background_color: "#2563eb",
   
   // Header
   header_enabled: true,
@@ -402,6 +408,9 @@ export interface DesignTheme {
   prompt_font_size?: number;
   prompt_placeholder_color?: string;
   prompt_section_alignment?: PromptAlignment; // Controls horizontal alignment in top/bottom layouts
+  submit_button_background_color?: string;
+  submit_button_text_color?: string;
+  submit_button_hover_background_color?: string;
   
   // Suggestion Buttons
   suggestions_enabled?: boolean;
@@ -456,24 +465,41 @@ export interface DesignTheme {
 
 // Helper function to get complete theme with defaults
 export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
-  // ===========================================
-  // OVERALL STYLE SETTINGS
-  // ===========================================
+  // Overall Style
   background_color: theme.background_color ?? "#ffffff",
   background_opacity: theme.background_opacity ?? 1,
   background_gradient: theme.background_gradient ?? "",
   background_image: theme.background_image ?? "",
   container_padding: theme.container_padding ?? 24,
-  container_padding_top: theme.container_padding_top ?? 24,
-  container_padding_right: theme.container_padding_right ?? 24,
-  container_padding_bottom: theme.container_padding_bottom ?? 24,
-  container_padding_left: theme.container_padding_left ?? 24,
+  container_padding_top: theme.container_padding_top ?? theme.container_padding ?? 24,
+  container_padding_right: theme.container_padding_right ?? theme.container_padding ?? 24,
+  container_padding_bottom: theme.container_padding_bottom ?? theme.container_padding ?? 24,
+  container_padding_left: theme.container_padding_left ?? theme.container_padding ?? 24,
   border_radius: theme.border_radius ?? 12,
   shadow_style: theme.shadow_style ?? "medium",
+  sidebar_background_color: theme.sidebar_background_color ?? "#ffffff",
   
-  // ===========================================
-  // HEADER SECTION
-  // ===========================================
+  // Layout
+  layout_mode: theme.layout_mode ?? "prompt-top",
+  prompt_section_width: theme.prompt_section_width ?? 40,
+  prompt_section_height: theme.prompt_section_height ?? 30,
+  
+  // Prompt Section
+  prompt_background_color: theme.prompt_background_color ?? "transparent",
+  prompt_border_style: theme.prompt_border_style ?? "solid",
+  prompt_border_color: theme.prompt_border_color ?? "#e5e7eb",
+  prompt_border_width: theme.prompt_border_width ?? 1,
+  prompt_border_radius: theme.prompt_border_radius ?? 12,
+  prompt_text_color: theme.prompt_text_color ?? "#374151",
+  prompt_font_family: theme.prompt_font_family ?? "Inter",
+  prompt_font_size: theme.prompt_font_size ?? 16,
+  prompt_placeholder_color: theme.prompt_placeholder_color ?? "#9ca3af",
+  prompt_section_alignment: theme.prompt_section_alignment ?? "center",
+  submit_button_background_color: theme.submit_button_background_color ?? theme.accent_color ?? "#3b82f6",
+  submit_button_text_color: theme.submit_button_text_color ?? "#ffffff",
+  submit_button_hover_background_color: theme.submit_button_hover_background_color ?? "#2563eb",
+  
+  // Header
   header_enabled: theme.header_enabled ?? true,
   header_alignment: theme.header_alignment ?? "center",
   
@@ -492,9 +518,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   brand_name_font_family: theme.brand_name_font_family ?? "Inter",
   brand_name_font_size: theme.brand_name_font_size ?? 28,
   
-  // ===========================================
-  // TITLE/CTA SECTION
-  // ===========================================
+  // Title/CTA Section
   title_enabled: theme.title_enabled ?? false,
   title_text: theme.title_text ?? "Create Amazing AI Images",
   title_color: theme.title_color ?? "#374151",
@@ -506,16 +530,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   cta_font_size: theme.cta_font_size ?? 16,
   cta_color: theme.cta_color ?? "#374151",
   
-  // ===========================================
-  // LAYOUT CONFIGURATION
-  // ===========================================
-  layout_mode: theme.layout_mode ?? "prompt-top",
-  prompt_section_width: theme.prompt_section_width ?? 40,
-  prompt_section_height: theme.prompt_section_height ?? 30,
-  
-  // ===========================================
-  // IFRAME SETTINGS
-  // ===========================================
+  // Iframe Settings
   iframe_width: theme.iframe_width ?? "100%",
   iframe_height: theme.iframe_height ?? "600px",
   iframe_border: theme.iframe_border ?? true,
@@ -529,9 +544,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   iframe_allowtransparency: theme.iframe_allowtransparency ?? true,
   iframe_scrolling: theme.iframe_scrolling ?? "auto",
   
-  // ===========================================
-  // IMAGE UPLOADER SECTION
-  // ===========================================
+  // Image Uploader Section
   uploader_enabled: theme.uploader_enabled ?? true,
   uploader_max_images: theme.uploader_max_images ?? 3,
   uploader_background_color: theme.uploader_background_color ?? "#f8fafc",
@@ -545,20 +558,6 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   uploader_icon_style: theme.uploader_icon_style ?? "folder",
   uploader_primary_text: theme.uploader_primary_text ?? "Add reference images to guide the AI generation",
   uploader_secondary_text: theme.uploader_secondary_text ?? "Drag & drop or click to upload",
-  
-  // ===========================================
-  // PROMPT SECTION
-  // ===========================================
-  prompt_background_color: theme.prompt_background_color ?? "transparent",
-  prompt_border_style: theme.prompt_border_style ?? "solid",
-  prompt_border_color: theme.prompt_border_color ?? "#e5e7eb",
-  prompt_border_width: theme.prompt_border_width ?? 1,
-  prompt_border_radius: theme.prompt_border_radius ?? 12,
-  prompt_text_color: theme.prompt_text_color ?? "#374151",
-  prompt_font_family: theme.prompt_font_family ?? "Inter",
-  prompt_font_size: theme.prompt_font_size ?? 16,
-  prompt_placeholder_color: theme.prompt_placeholder_color ?? "#9ca3af",
-  prompt_section_alignment: theme.prompt_section_alignment ?? "center",
   
   // Suggestion Buttons
   suggestions_enabled: theme.suggestions_enabled ?? true,
@@ -574,9 +573,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   suggestion_shadow_style: theme.suggestion_shadow_style ?? "subtle",
   suggestion_arrow_icon: theme.suggestion_arrow_icon ?? true,
   
-  // ===========================================
-  // IMAGE GALLERY SECTION
-  // ===========================================
+  // Image Gallery Section
   gallery_background_color: theme.gallery_background_color ?? "transparent",
   gallery_border_style: theme.gallery_border_style ?? "solid",
   gallery_border_color: theme.gallery_border_color ?? "#e5e7eb",
@@ -600,1685 +597,276 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   overlay_font_family: theme.overlay_font_family ?? "Inter",
   overlay_font_size: theme.overlay_font_size ?? 14,
   
-  // ===========================================
-  // RESPONSIVE SETTINGS
-  // ===========================================
+  // Responsive Settings
   mobile_layout_mode: theme.mobile_layout_mode ?? "prompt-top",
   mobile_gallery_columns: theme.mobile_gallery_columns ?? 1,
-  mobile_font_scale: theme.mobile_font_scale ?? 0.9,
+  mobile_font_scale: theme.mobile_font_scale ?? 0.9
 });
 
 export const designThemes: DesignTheme[] = [
-  // Light Themes
   {
     name: "Modern Light",
     description: "Cool blue-gray minimal",
-    
-    // Overall styling - cooler blue-gray theme
-    background_color: "#f8fafc",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 12,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#0f172a",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling - blue-gray tones
-    prompt_background_color: "#f1f5f9",
+    background_color: "#ffffff",
+    accent_color: "#3b82f6",
+    prompt_background_color: "#f9fafb",
     prompt_text_color: "#1e293b",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 12,
-    prompt_border_color: "#cbd5e1",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
+    prompt_border_color: "#e5e7eb",
     prompt_placeholder_color: "#64748b",
-    
-    // Suggestions styling
+    submit_button_background_color: "#3b82f6",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#2563eb",
     suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#334155", 
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 8,
-    suggestion_border_color: "#e2e8f0",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling - blue-gray theme
-    uploader_enabled: true,
-    uploader_background_color: "#f1f5f9",
-    uploader_border_color: "#94a3b8",
-    uploader_text_color: "#475569",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 12,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 8,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#e2e8f0",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#3b82f6"
+    suggestion_text_color: "#374151",
+    suggestion_border_color: "#e5e7eb",
+    uploader_background_color: "#f8fafc",
+    uploader_border_color: "#cbd5e1",
+    uploader_text_color: "#64748b",
+    container_padding: 24,
+    border_radius: 12,
+    shadow_style: "medium"
   },
   {
     name: "Soft Pearl",
     description: "Warm beige elegance",
-    
-    // Overall styling - Warm beige/cream theme
-    background_color: "#fefcf8",
-    container_padding: 32,
-    container_padding_top: 32,
-    container_padding_right: 32,
-    container_padding_bottom: 32,
-    container_padding_left: 32,
-    border_radius: 16,
-    shadow_style: "subtle",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#292524",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 32,
-    
-    // Prompt styling
-    prompt_background_color: "#faf7f0",
-    prompt_text_color: "#44403c",
-    prompt_font_family: "Inter",
-    prompt_font_size: 17,
-    prompt_border_radius: 16,
+    background_color: "#fdfaf6",
+    accent_color: "#d4a373",
+    prompt_background_color: "#faf6f1",
+    prompt_text_color: "#292524",
     prompt_border_color: "#e7e5e4",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
     prompt_placeholder_color: "#78716c",
-    
-    // Suggestions styling
-    suggestion_background_color: "#fffef7",
-    suggestion_text_color: "#57534e",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 12,
+    submit_button_background_color: "#d4a373",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#c4946a",
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: "#292524",
     suggestion_border_color: "#e7e5e4",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#f5f1e8",
-    uploader_border_color: "#d6cc9a",
+    uploader_background_color: "#faf6f1",
+    uploader_border_color: "#e7e5e4",
     uploader_text_color: "#78716c",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 16,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 20,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 12,
-    gallery_shadow_style: "subtle",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#e7e5e4",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#d97706"
+    container_padding: 32,
+    border_radius: 16,
+    shadow_style: "subtle"
   },
   {
     name: "Arctic White",
     description: "Pure white with ice blue",
-    
-    // Overall styling - Pure white with cool ice blue accents
     background_color: "#ffffff",
-    container_padding: 20,
-    container_padding_top: 20,
-    container_padding_right: 20,
-    container_padding_bottom: 20,
-    container_padding_left: 20,
-    border_radius: 8,
-    shadow_style: "large",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#1a202c",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#fefeff",
-    prompt_text_color: "#1a202c",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 8,
-    prompt_border_color: "#cbd5e1",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#a0aec0",
-    
-    // Suggestions styling
+    accent_color: "#38bdf8",
+    prompt_background_color: "#f8fafc",
+    prompt_text_color: "#1e293b",
+    prompt_border_color: "#e2e8f0",
+    prompt_placeholder_color: "#64748b",
+    submit_button_background_color: "#38bdf8",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#0ea5e9",
     suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#2d3748",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 6,
+    suggestion_text_color: "#1e293b",
     suggestion_border_color: "#e2e8f0",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#fafbfc",
-    uploader_border_color: "#0ea5e9",
-    uploader_text_color: "#2d3748",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 8,
-    uploader_border_width: 2,
-    uploader_border_style: "solid",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 12,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 6,
-    gallery_shadow_style: "large",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: true,
-    gallery_border_color: "#e2e8f0",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(59, 130, 246, 0.8)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#0ea5e9"
-  },
-  {
-    name: "Cream Dream",
-    description: "Warm cream tones",
-    
-    // Overall styling
-    background_color: "#fefcf3",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 14,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#3c2414",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#f9f6ed",
-    prompt_text_color: "#654321",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 14,
-    prompt_border_color: "#e6ddd4",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#8b7355",
-    
-    // Suggestions styling
-    suggestion_background_color: "#faf8f1",
-    suggestion_text_color: "#654321",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#e6ddd4",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#f5f1e8",
-    uploader_border_color: "#e6ddd4",
-    uploader_text_color: "#8b7355",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 14,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 18,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#e6ddd4",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#d97706"
-  },
-
-  // Dark Themes
-  {
-    name: "Midnight",
-    description: "Deep dark elegance",
-    
-    // Overall styling
-    background_color: "#0f0f0f",
-    container_padding: 28,
-    container_padding_top: 28,
-    container_padding_right: 28,
-    container_padding_bottom: 28,
-    container_padding_left: 28,
-    border_radius: 16,
-    shadow_style: "glow",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#ffffff",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#1a1a1a",
-    prompt_text_color: "#e5e5e5",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 16,
-    prompt_border_color: "#404040",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#a3a3a3",
-    
-    // Suggestions styling
-    suggestion_background_color: "#262626",
-    suggestion_text_color: "#e5e5e5",
-    suggestion_font_family: "Inter", 
-    suggestion_font_size: 12,
-    suggestion_border_radius: 12,
-    suggestion_border_color: "#404040",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "glow",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#171717",
-    uploader_border_color: "#404040",
-    uploader_text_color: "#a3a3a3",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 16,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "#111111",
-    gallery_spacing: 20,
-    gallery_border_radius: 16,
-    gallery_image_border_radius: 12,
-    gallery_shadow_style: "glow",
-    gallery_border_color: "#404040",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(59, 130, 246, 0.8)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#3b82f6"
-  },
-  {
-    name: "Dark Professional",
-    description: "Professional dark mode",
-    
-    // Overall styling
-    background_color: "#1e1e1e",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 10,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#ffffff",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#2d2d2d",
-    prompt_text_color: "#ffffff",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 10,
-    prompt_border_color: "#525252",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#a3a3a3",
-    
-    // Suggestions styling
-    suggestion_background_color: "#3c3c3c",
-    suggestion_text_color: "#ffffff",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 8,
-    suggestion_border_color: "#525252",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "medium",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#252525",
-    uploader_border_color: "#525252",
-    uploader_text_color: "#d4d4d8",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 10,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 10,
-    gallery_image_border_radius: 8,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#525252",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.7)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#6366f1"
-  },
-  {
-    name: "Carbon Black",
-    description: "Sleek carbon fiber",
-    
-    // Overall styling
-    background_color: "#111111",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
+    uploader_background_color: "#f8fafc",
+    uploader_border_color: "#e2e8f0",
+    uploader_text_color: "#64748b",
+    container_padding: 20,
     border_radius: 8,
-    shadow_style: "glow",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#fafafa",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#1f1f1f",
-    prompt_text_color: "#d4d4d8",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 8,
-    prompt_border_color: "#3f3f46",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#a1a1aa",
-    
-    // Suggestions styling
-    suggestion_background_color: "#27272a",
-    suggestion_text_color: "#d4d4d8",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 6,
-    suggestion_border_color: "#3f3f46",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "glow",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#18181b",
-    uploader_border_color: "#3f3f46",
-    uploader_text_color: "#a1a1aa",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 8,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 14,
-    gallery_border_radius: 8,
-    gallery_image_border_radius: 6,
-    gallery_shadow_style: "glow",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#3f3f46",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.8)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#a855f7"
+    shadow_style: "large"
   },
   {
-    name: "Space Gray",
-    description: "Modern space theme",
-    
-    // Overall styling
-    background_color: "#18181b",
-    container_padding: 28,
-    container_padding_top: 28,
-    container_padding_right: 28,
-    container_padding_bottom: 28,
-    container_padding_left: 28,
-    border_radius: 12,
-    shadow_style: "large",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#f4f4f5",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#27272a",
-    prompt_text_color: "#e4e4e7",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 12,
-    prompt_border_color: "#52525b",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#a1a1aa",
-    
-    // Suggestions styling
-    suggestion_background_color: "#3f3f46",
-    suggestion_text_color: "#e4e4e7",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#52525b",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "large",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#1f1f23",
-    uploader_border_color: "#52525b",
-    uploader_text_color: "#a1a1aa",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 12,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 18,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "large",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#52525b",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.7)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#06b6d4"
-  },
-
-  // Blue Themes
-  {
-    name: "Ocean Breeze",
-    description: "Calming ocean blues",
-    
-    // Overall styling
-    background_color: "#f0f9ff",
-    container_padding: 32,
-    container_padding_top: 32,
-    container_padding_right: 32,
-    container_padding_bottom: 32,
-    container_padding_left: 32,
-    border_radius: 20,
-    shadow_style: "large",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#0c4a6e",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#e0f2fe",
-    prompt_text_color: "#075985",
-    prompt_font_family: "Inter",
-    prompt_font_size: 17,
-    prompt_border_radius: 20,
-    prompt_border_color: "#7dd3fc",
-    prompt_border_width: 2,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#0369a1",
-    
-    // Suggestions styling
-    suggestion_background_color: "#f0f9ff",
-    suggestion_text_color: "#075985",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 13,
-    suggestion_border_radius: 16,
-    suggestion_border_color: "#7dd3fc",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "medium",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#e0f2fe",
-    uploader_border_color: "#7dd3fc",
-    uploader_text_color: "#0369a1",
-    uploader_font_family: "Inter",
-    uploader_font_size: 15,
-    uploader_border_radius: 20,
-    uploader_border_width: 3,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "#f0f9ff",
-    gallery_spacing: 24,
-    gallery_border_radius: 20,
-    gallery_image_border_radius: 16,
-    gallery_shadow_style: "large",
-    gallery_border_color: "#7dd3fc",
-    gallery_font_family: "Inter",
-    gallery_font_size: 15,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(14, 165, 233, 0.9)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 15,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#0ea5e9"
-  },
-  {
-    name: "Sky Blue",
-    description: "Fresh sky colors",
-    
-    // Overall styling
-    background_color: "#f0f8ff",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 14,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#1e3a8a",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#dbeafe",
-    prompt_text_color: "#1e40af",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 14,
-    prompt_border_color: "#93c5fd",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#3730a3",
-    
-    // Suggestions styling
-    suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#1e40af",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#93c5fd",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "medium",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#dbeafe",
-    uploader_border_color: "#93c5fd",
-    uploader_text_color: "#1d4ed8",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 14,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 14,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#93c5fd",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#3b82f6"
-  },
-  {
-    name: "Deep Navy",
-    description: "Professional navy",
-    
-    // Overall styling
-    background_color: "#1e293b",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 10,
-    shadow_style: "large",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#f1f5f9",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#334155",
-    prompt_text_color: "#e2e8f0",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 10,
-    prompt_border_color: "#64748b",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#cbd5e1",
-    
-    // Suggestions styling
-    suggestion_background_color: "#475569",
-    suggestion_text_color: "#e2e8f0",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 8,
-    suggestion_border_color: "#64748b",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "large",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#2d3c52",
-    uploader_border_color: "#64748b",
-    uploader_text_color: "#cbd5e1",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 10,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 18,
-    gallery_border_radius: 10,
-    gallery_image_border_radius: 8,
-    gallery_shadow_style: "large",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#64748b",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.7)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#38bdf8"
-  },
-
-  // Green Themes
-  {
-    name: "Forest Fresh",
-    description: "Natural forest greens",
-    
-    // Overall styling
-    background_color: "#f0fdf4",
-    container_padding: 26,
-    container_padding_top: 26,
-    container_padding_right: 26,
-    container_padding_bottom: 26,
-    container_padding_left: 26,
-    border_radius: 12,
-    shadow_style: "subtle",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#022c22",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#dcfce7",
+    name: "Forest Green",
+    description: "Natural and balanced",
+    background_color: "#f8faf8",
+    accent_color: "#059669",
+    prompt_background_color: "#f0fdf4",
     prompt_text_color: "#064e3b",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 12,
-    prompt_border_color: "#86efac",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
+    prompt_border_color: "#d1fae5",
     prompt_placeholder_color: "#047857",
-    
-    // Suggestions styling
+    submit_button_background_color: "#059669",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#047857",
     suggestion_background_color: "#ffffff",
     suggestion_text_color: "#064e3b",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#86efac",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#dcfce7",
-    uploader_border_color: "#86efac",
+    suggestion_border_color: "#d1fae5",
+    uploader_background_color: "#f0fdf4",
+    uploader_border_color: "#d1fae5",
     uploader_text_color: "#047857",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 12,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 18,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "subtle",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#86efac",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#22c55e"
+    container_padding: 28,
+    border_radius: 12,
+    shadow_style: "medium"
   },
   {
-    name: "Mint Cool",
-    description: "Cool mint vibes",
-    
-    // Overall styling
-    background_color: "#f0fdfa",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
+    name: "Royal Purple",
+    description: "Rich and sophisticated",
+    background_color: "#faf5ff",
+    accent_color: "#7c3aed",
+    prompt_background_color: "#f5f3ff",
+    prompt_text_color: "#4c1d95",
+    prompt_border_color: "#ddd6fe",
+    prompt_placeholder_color: "#6d28d9",
+    submit_button_background_color: "#7c3aed",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#6d28d9",
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: "#4c1d95",
+    suggestion_border_color: "#ddd6fe",
+    uploader_background_color: "#f5f3ff",
+    uploader_border_color: "#ddd6fe",
+    uploader_text_color: "#6d28d9",
+    container_padding: 32,
     border_radius: 16,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#134e4a",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#ccfbf1",
-    prompt_text_color: "#0f766e",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 16,
-    prompt_border_color: "#5eead4",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#0d9488",
-    
-    // Suggestions styling
-    suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#0f766e",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 12,
-    suggestion_border_color: "#5eead4",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "medium",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#ccfbf1",
-    uploader_border_color: "#5eead4",
-    uploader_text_color: "#0d9488",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 16,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 16,
-    gallery_image_border_radius: 12,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#5eead4",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#14b8a6"
+    shadow_style: "large"
   },
   {
-    name: "Sage Wisdom",
-    description: "Sophisticated sage",
-    
-    // Overall styling
-    background_color: "#f6f7f6",
+    name: "Ocean Blue",
+    description: "Deep and calming",
+    background_color: "#f0f9ff",
+    accent_color: "#0284c7",
+    prompt_background_color: "#f0f9ff",
+    prompt_text_color: "#0c4a6e",
+    prompt_border_color: "#bae6fd",
+    prompt_placeholder_color: "#0369a1",
+    submit_button_background_color: "#0284c7",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#0369a1",
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: "#0c4a6e",
+    suggestion_border_color: "#bae6fd",
+    uploader_background_color: "#f0f9ff",
+    uploader_border_color: "#bae6fd",
+    uploader_text_color: "#0369a1",
     container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 14,
-    shadow_style: "subtle",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#1a2f1a",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#e8f2e8",
-    prompt_text_color: "#2d4a2d",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 14,
-    prompt_border_color: "#a7d3a7",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#4a6b4a",
-    
-    // Suggestions styling
-    suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#2d4a2d",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#a7d3a7",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#e8f2e8",
-    uploader_border_color: "#a7d3a7",
-    uploader_text_color: "#4a6b4a",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 14,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 14,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "subtle",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#a7d3a7",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#4ade80"
+    border_radius: 12,
+    shadow_style: "medium"
   },
-
-  // Warm Themes
   {
-    name: "Sunset Glow",
-    description: "Warm sunset oranges",
-    
-    // Overall styling
+    name: "Sunset Orange",
+    description: "Warm and inviting",
     background_color: "#fff7ed",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 16,
-    shadow_style: "glow",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#431407",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#ffedd5",
+    accent_color: "#ea580c",
+    prompt_background_color: "#fff7ed",
     prompt_text_color: "#7c2d12",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 16,
     prompt_border_color: "#fed7aa",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#9a3412",
-    
-    // Suggestions styling
+    prompt_placeholder_color: "#c2410c",
+    submit_button_background_color: "#ea580c",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#c2410c",
     suggestion_background_color: "#ffffff",
     suggestion_text_color: "#7c2d12",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 12,
     suggestion_border_color: "#fed7aa",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "glow",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#ffedd5",
+    uploader_background_color: "#fff7ed",
     uploader_border_color: "#fed7aa",
-    uploader_text_color: "#9a3412",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 16,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 20,
-    gallery_border_radius: 16,
-    gallery_image_border_radius: 12,
-    gallery_shadow_style: "glow",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#fed7aa",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(249, 115, 22, 0.8)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#f97316"
-  },
-  {
-    name: "Golden Hour",
-    description: "Rich golden tones",
-    
-    // Overall styling
-    background_color: "#fffbeb",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 12,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#451a03",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#fef3c7",
-    prompt_text_color: "#92400e",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 12,
-    prompt_border_color: "#fde68a",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#b45309",
-    
-    // Suggestions styling
-    suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#92400e",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#fde68a",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "medium",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#fef3c7",
-    uploader_border_color: "#fde68a",
-    uploader_text_color: "#b45309",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 12,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 12,
-    gallery_image_border_radius: 8,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#fde68a",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#f59e0b"
-  },
-  {
-    name: "Coral Reef",
-    description: "Vibrant coral accents",
-    
-    // Overall styling
-    background_color: "#fff5f5",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
+    uploader_text_color: "#c2410c",
+    container_padding: 28,
     border_radius: 14,
-    shadow_style: "subtle",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#742a2a",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#fed7d7",
-    prompt_text_color: "#c53030",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 14,
-    prompt_border_color: "#fc8181",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#e53e3e",
-    
-    // Suggestions styling
-    suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#c53030",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#fc8181",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#fed7d7",
-    uploader_border_color: "#fc8181",
-    uploader_text_color: "#e53e3e",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 14,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 14,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "subtle",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#fc8181",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#f56565"
-  },
-
-  // Purple & Pink Themes
-  {
-    name: "Purple Magic",
-    description: "Mystical purple hues",
-    
-    // Overall styling
-    background_color: "#faf5ff",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 16,
-    shadow_style: "glow",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#4c1d95",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#f3e8ff",
-    prompt_text_color: "#6b21a8",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 16,
-    prompt_border_color: "#c084fc",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#7c3aed",
-    
-    // Suggestions styling
-    suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#6b21a8",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 12,
-    suggestion_border_color: "#c084fc",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "glow",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#f3e8ff",
-    uploader_border_color: "#c084fc",
-    uploader_text_color: "#7c3aed",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 16,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 22,
-    gallery_border_radius: 16,
-    gallery_image_border_radius: 12,
-    gallery_shadow_style: "glow",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#c084fc",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(168, 85, 247, 0.8)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#a855f7"
+    shadow_style: "medium"
   },
   {
-    name: "Rose Garden",
-    description: "Elegant rose tones",
-    
-    // Overall styling
+    name: "Cherry Blossom",
+    description: "Delicate and fresh",
     background_color: "#fdf2f8",
-    container_padding: 24,
-    container_padding_top: 24,
-    container_padding_right: 24,
-    container_padding_bottom: 24,
-    container_padding_left: 24,
-    border_radius: 14,
-    shadow_style: "medium",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#831843",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#fce7f3",
-    prompt_text_color: "#be185d",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 14,
-    prompt_border_color: "#f9a8d4",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#d946ef",
-    
-    // Suggestions styling
+    accent_color: "#db2777",
+    prompt_background_color: "#fdf2f8",
+    prompt_text_color: "#831843",
+    prompt_border_color: "#fbcfe8",
+    prompt_placeholder_color: "#be185d",
+    submit_button_background_color: "#db2777",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#be185d",
     suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#be185d",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 10,
-    suggestion_border_color: "#f9a8d4",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "medium",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#fce7f3",
-    uploader_border_color: "#f9a8d4",
-    uploader_text_color: "#d946ef",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 14,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 16,
-    gallery_border_radius: 14,
-    gallery_image_border_radius: 10,
-    gallery_shadow_style: "medium",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#f9a8d4",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#ec4899"
+    suggestion_text_color: "#831843",
+    suggestion_border_color: "#fbcfe8",
+    uploader_background_color: "#fdf2f8",
+    uploader_border_color: "#fbcfe8",
+    uploader_text_color: "#be185d",
+    container_padding: 24,
+    border_radius: 16,
+    shadow_style: "medium"
   },
   {
-    name: "Lavender Dreams",
-    description: "Soft lavender beauty",
-    
-    // Overall styling
-    background_color: "#faf5ff",
-    container_padding: 30,
-    container_padding_top: 30,
-    container_padding_right: 30,
-    container_padding_bottom: 30,
-    container_padding_left: 30,
-    border_radius: 18,
-    shadow_style: "subtle",
-    
-    // Header
-    header_enabled: true,
-    header_alignment: "center",
-    brand_name_color: "#5b21b6",
-    brand_name_font_family: "Inter",
-    brand_name_font_size: 28,
-    
-    // Prompt styling
-    prompt_background_color: "#ede9fe",
-    prompt_text_color: "#7c3aed",
-    prompt_font_family: "Inter",
-    prompt_font_size: 16,
-    prompt_border_radius: 18,
-    prompt_border_color: "#c4b5fd",
-    prompt_border_width: 1,
-    prompt_border_style: "solid",
-    prompt_placeholder_color: "#8b5cf6",
-    
-    // Suggestions styling
+    name: "Midnight Blue",
+    description: "Professional and focused",
+    background_color: "#f8fafc",
+    accent_color: "#1e40af",
+    prompt_background_color: "#f8fafc",
+    prompt_text_color: "#1e3a8a",
+    prompt_border_color: "#bfdbfe",
+    prompt_placeholder_color: "#1e40af",
+    submit_button_background_color: "#1e40af",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#1e3a8a",
     suggestion_background_color: "#ffffff",
-    suggestion_text_color: "#7c3aed",
-    suggestion_font_family: "Inter",
-    suggestion_font_size: 12,
-    suggestion_border_radius: 14,
+    suggestion_text_color: "#1e3a8a",
+    suggestion_border_color: "#bfdbfe",
+    uploader_background_color: "#f8fafc",
+    uploader_border_color: "#bfdbfe",
+    uploader_text_color: "#1e40af",
+    container_padding: 24,
+    border_radius: 10,
+    shadow_style: "medium"
+  },
+  {
+    name: "Golden Sand",
+    description: "Warm and luxurious",
+    background_color: "#fffbeb",
+    accent_color: "#b45309",
+    prompt_background_color: "#fffbeb",
+    prompt_text_color: "#78350f",
+    prompt_border_color: "#fde68a",
+    prompt_placeholder_color: "#92400e",
+    submit_button_background_color: "#b45309",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#92400e",
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: "#78350f",
+    suggestion_border_color: "#fde68a",
+    uploader_background_color: "#fffbeb",
+    uploader_border_color: "#fde68a",
+    uploader_text_color: "#92400e",
+    container_padding: 32,
+    border_radius: 14,
+    shadow_style: "medium"
+  },
+  {
+    name: "Emerald Green",
+    description: "Fresh and vibrant",
+    background_color: "#f0fdf4",
+    accent_color: "#059669",
+    prompt_background_color: "#f0fdf4",
+    prompt_text_color: "#064e3b",
+    prompt_border_color: "#6ee7b7",
+    prompt_placeholder_color: "#047857",
+    submit_button_background_color: "#059669",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#047857",
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: "#064e3b",
+    suggestion_border_color: "#6ee7b7",
+    uploader_background_color: "#f0fdf4",
+    uploader_border_color: "#6ee7b7",
+    uploader_text_color: "#047857",
+    container_padding: 28,
+    border_radius: 12,
+    shadow_style: "medium"
+  },
+  {
+    name: "Lavender Dream",
+    description: "Soft and soothing",
+    background_color: "#f5f3ff",
+    accent_color: "#7c3aed",
+    prompt_background_color: "#f5f3ff",
+    prompt_text_color: "#4c1d95",
+    prompt_border_color: "#c4b5fd",
+    prompt_placeholder_color: "#6d28d9",
+    submit_button_background_color: "#7c3aed",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#6d28d9",
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: "#4c1d95",
     suggestion_border_color: "#c4b5fd",
-    suggestion_border_width: 1,
-    suggestion_border_style: "solid",
-    suggestion_shadow_style: "subtle",
-    suggestion_arrow_icon: true,
-    
-    // Uploader styling
-    uploader_enabled: true,
-    uploader_background_color: "#ede9fe",
+    uploader_background_color: "#f5f3ff",
     uploader_border_color: "#c4b5fd",
-    uploader_text_color: "#8b5cf6",
-    uploader_font_family: "Inter",
-    uploader_font_size: 14,
-    uploader_border_radius: 18,
-    uploader_border_width: 2,
-    uploader_border_style: "dashed",
-    uploader_primary_text: "Add reference images to guide the AI generation",
-    uploader_secondary_text: "Drag & drop or click to upload",
-    
-    // Gallery styling
-    gallery_background_color: "transparent",
-    gallery_spacing: 24,
-    gallery_border_radius: 18,
-    gallery_image_border_radius: 14,
-    gallery_shadow_style: "subtle",
-    gallery_font_family: "Inter",
-    gallery_font_size: 14,
-    gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: "#c4b5fd",
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
-    
-    // Overlay styling
-    overlay_enabled: true,
-    overlay_background_color: "rgba(0, 0, 0, 0.5)",
-    overlay_icon_color: "#ffffff",
-    overlay_font_family: "Inter",
-    overlay_font_size: 14,
-    overlay_download_enabled: true,
-    overlay_reference_enabled: true,
-    
-    // Theme accent
-    accent_color: "#8b5cf6"
+    uploader_text_color: "#6d28d9",
+    container_padding: 26,
+    border_radius: 14,
+    shadow_style: "medium"
   }
 ];
 
@@ -2455,4 +1043,299 @@ export const getEffectivePadding = (settings: DesignSettings) => {
 export const getPaddingCSS = (settings: DesignSettings): string => {
   const padding = getEffectivePadding(settings);
   return `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
-}; 
+};
+
+export const DEFAULT_THEMES: DesignTheme[] = [
+  {
+    name: "Default Light",
+    description: "Clean and modern light theme",
+    
+    // Overall styling
+    background_color: "#ffffff",
+    container_padding: 24,
+    border_radius: 12,
+    shadow_style: "medium",
+    
+    // Header
+    header_enabled: true,
+    header_alignment: "center",
+    brand_name_color: "#1f2937",
+    brand_name_font_family: "Inter",
+    brand_name_font_size: 28,
+    
+    // Prompt styling
+    prompt_background_color: "#f9fafb",
+    prompt_text_color: "#1e293b",
+    prompt_font_family: "Inter",
+    prompt_font_size: 16,
+    prompt_border_radius: 12,
+    prompt_border_color: "#e5e7eb",
+    prompt_border_width: 1,
+    prompt_border_style: "solid",
+    prompt_placeholder_color: "#64748b",
+    
+    // Theme accent and submit button
+    accent_color: "#3b82f6",
+    submit_button_background_color: "#3b82f6",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#2563eb"
+  },
+  {
+    name: "Warm Earth",
+    description: "Earthy tones with warm accents",
+    
+    // Overall styling
+    background_color: "#fffbf5",
+    container_padding: 32,
+    border_radius: 16,
+    shadow_style: "subtle",
+    
+    // Header
+    header_enabled: true,
+    header_alignment: "center",
+    brand_name_color: "#292524",
+    brand_name_font_family: "Inter",
+    brand_name_font_size: 32,
+    
+    // Prompt styling
+    prompt_background_color: "#faf7f0",
+    prompt_text_color: "#44403c",
+    prompt_font_family: "Inter",
+    prompt_font_size: 17,
+    prompt_border_radius: 16,
+    prompt_border_color: "#e7e5e4",
+    prompt_border_width: 1,
+    prompt_border_style: "solid",
+    prompt_placeholder_color: "#78716c",
+    
+    // Theme accent and submit button
+    accent_color: "#d97706",
+    submit_button_background_color: "#d97706",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#c26500"
+  },
+  {
+    name: "Ocean Blue",
+    description: "Cool and refreshing blue theme",
+    
+    // Overall styling
+    background_color: "#f8fafc",
+    container_padding: 20,
+    border_radius: 8,
+    shadow_style: "large",
+    
+    // Header
+    header_enabled: true,
+    header_alignment: "center",
+    brand_name_color: "#1a202c",
+    brand_name_font_family: "Inter",
+    brand_name_font_size: 28,
+    
+    // Prompt styling
+    prompt_background_color: "#f1f5f9",
+    prompt_text_color: "#1a202c",
+    prompt_font_family: "Inter",
+    prompt_font_size: 16,
+    prompt_border_radius: 8,
+    prompt_border_color: "#cbd5e1",
+    prompt_border_width: 1,
+    prompt_border_style: "solid",
+    prompt_placeholder_color: "#a0aec0",
+    
+    // Theme accent and submit button
+    accent_color: "#0ea5e9",
+    submit_button_background_color: "#0ea5e9",
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: "#0b87c7"
+  }
+];
+
+// Color theory helper functions
+const hexToHSL = (hex: string): { h: number; s: number; l: number } => {
+  // Remove the # if present
+  hex = hex.replace('#', '');
+  
+  // Convert hex to RGB
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+  
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    
+    h /= 6;
+  }
+  
+  return { h: h * 360, s: s * 100, l: l * 100 };
+};
+
+const HSLToHex = (h: number, s: number, l: number): string => {
+  h = h % 360;
+  s = Math.max(0, Math.min(100, s)) / 100;
+  l = Math.max(0, Math.min(100, l)) / 100;
+  
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  
+  if (h >= 0 && h < 60) {
+    r = c; g = x; b = 0;
+  } else if (h >= 60 && h < 120) {
+    r = x; g = c; b = 0;
+  } else if (h >= 120 && h < 180) {
+    r = 0; g = c; b = x;
+  } else if (h >= 180 && h < 240) {
+    r = 0; g = x; b = c;
+  } else if (h >= 240 && h < 300) {
+    r = x; g = 0; b = c;
+  } else if (h >= 300 && h < 360) {
+    r = c; g = 0; b = x;
+  }
+  
+  const toHex = (n: number): string => {
+    const hex = Math.round((n + m) * 255).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
+// Theme generation function
+export const generateTheme = (name: string): DesignTheme => {
+  // Generate a seed based on the name
+  let seed = 0;
+  for (let i = 0; i < name.length; i++) {
+    seed = ((seed << 5) - seed) + name.charCodeAt(i);
+    seed = seed & seed;
+  }
+  
+  // Generate base hue from seed
+  const baseHue = Math.abs(seed) % 360;
+  
+  // Generate accent color (complementary or triadic)
+  const accentHue = (baseHue + (Math.abs(seed) % 2 === 0 ? 180 : 120)) % 360;
+  
+  // Generate base colors
+  const baseColor = HSLToHex(baseHue, 30, 98); // Light base
+  const accentColor = HSLToHex(accentHue, 80, 55); // Vibrant accent
+  const textColor = HSLToHex(baseHue, 20, 15); // Dark text
+  const borderColor = HSLToHex(baseHue, 15, 90); // Light border
+  const promptBg = HSLToHex(baseHue, 20, 97); // Slightly tinted background
+  
+  // Determine style based on name characteristics
+  const isElegant = /elegant|luxury|premium|refined|classic/.test(name.toLowerCase());
+  const isPlayful = /playful|fun|bright|creative|vibrant/.test(name.toLowerCase());
+  const isMinimal = /minimal|clean|simple|modern|sleek/.test(name.toLowerCase());
+  
+  // Style configuration
+  const style = {
+    borderRadius: isElegant ? 8 : isPlayful ? 16 : 12,
+    shadowStyle: isElegant ? "medium" : isPlayful ? "large" : "subtle",
+    padding: isMinimal ? 20 : isElegant ? 32 : 24,
+    fontSize: isElegant ? 17 : 16,
+  } as const;
+  
+  return {
+    name,
+    description: `Generated theme based on "${name}"`,
+    
+    // Overall styling
+    background_color: baseColor,
+    container_padding: style.padding,
+    border_radius: style.borderRadius,
+    shadow_style: style.shadowStyle as ShadowStyle,
+    
+    // Header
+    header_enabled: true,
+    header_alignment: "center",
+    brand_name_color: textColor,
+    brand_name_font_family: "Inter",
+    brand_name_font_size: style.fontSize + 12,
+    
+    // Prompt styling
+    prompt_background_color: promptBg,
+    prompt_text_color: textColor,
+    prompt_font_family: "Inter",
+    prompt_font_size: style.fontSize,
+    prompt_border_radius: style.borderRadius,
+    prompt_border_color: borderColor,
+    prompt_border_width: 1,
+    prompt_border_style: "solid",
+    prompt_placeholder_color: HSLToHex(baseHue, 20, 60),
+    
+    // Suggestions styling
+    suggestion_background_color: "#ffffff",
+    suggestion_text_color: textColor,
+    suggestion_font_family: "Inter",
+    suggestion_font_size: style.fontSize - 4,
+    suggestion_border_radius: style.borderRadius - 4,
+    suggestion_border_color: borderColor,
+    suggestion_border_width: 1,
+    suggestion_border_style: "solid",
+    suggestion_shadow_style: "subtle",
+    suggestion_arrow_icon: true,
+    
+    // Uploader styling
+    uploader_enabled: true,
+    uploader_background_color: promptBg,
+    uploader_border_color: HSLToHex(baseHue, 30, 80),
+    uploader_text_color: HSLToHex(baseHue, 20, 40),
+    uploader_font_family: "Inter",
+    uploader_font_size: style.fontSize - 2,
+    uploader_border_radius: style.borderRadius,
+    uploader_border_width: 2,
+    uploader_border_style: "dashed",
+    
+    // Gallery styling
+    gallery_background_color: "transparent",
+    gallery_spacing: style.padding - 8,
+    gallery_border_radius: style.borderRadius,
+    gallery_image_border_radius: style.borderRadius - 4,
+    gallery_shadow_style: style.shadowStyle as ShadowStyle,
+    gallery_font_family: "Inter",
+    gallery_font_size: style.fontSize - 2,
+    gallery_columns: 2,
+    gallery_border_enabled: false,
+    gallery_border_color: borderColor,
+    gallery_border_width: 1,
+    gallery_border_style: "solid",
+    
+    // Overlay styling
+    overlay_enabled: true,
+    overlay_background_color: "rgba(0, 0, 0, 0.5)",
+    overlay_icon_color: "#ffffff",
+    overlay_font_family: "Inter",
+    overlay_font_size: style.fontSize - 2,
+    overlay_download_enabled: true,
+    overlay_reference_enabled: true,
+    
+    // Theme accent and submit button
+    accent_color: accentColor,
+    submit_button_background_color: accentColor,
+    submit_button_text_color: "#ffffff",
+    submit_button_hover_background_color: HSLToHex(accentHue, 85, 45)
+  };
+};

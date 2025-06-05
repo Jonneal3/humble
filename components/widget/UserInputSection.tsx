@@ -144,7 +144,17 @@ export function UserInputSection({
               <button
                 onClick={() => onPromptSubmit(prompt)}
                 disabled={isLoading || !prompt.trim()}
-                className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+                className="flex items-center justify-center w-8 h-8 rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+                style={{
+                  backgroundColor: config.submit_button_background_color || "#3b82f6",
+                  color: config.submit_button_text_color || "#ffffff"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = config.submit_button_background_color || "#3b82f6";
+                }}
               >
                 {isLoading ? (
                   <Spinner className="w-3 h-3" />
@@ -160,11 +170,16 @@ export function UserInputSection({
             <div className="flex flex-wrap gap-1.5">
               <button
                 onClick={onRefreshSuggestions}
-                className="flex items-center justify-center p-1.5 rounded-lg bg-gradient-to-br from-slate-50 to-gray-100 border border-slate-200 hover:from-blue-50 hover:to-indigo-50 hover:border-blue-200 group transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
+                className="flex items-center justify-center p-1.5 rounded-lg border transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
                 disabled={isLoading}
                 title="Refresh suggestions"
+                style={{
+                  backgroundColor: config.suggestion_background_color || '#ffffff',
+                  borderColor: config.suggestion_border_color || '#e5e7eb',
+                  color: config.suggestion_text_color || '#374151'
+                }}
               >
-                <RefreshCw className="w-3 h-3 text-slate-600 group-hover:text-blue-600 transition-colors" />
+                <RefreshCw className="w-3 h-3 transition-colors" />
               </button>
               
               {suggestions.slice(0, 4).map((suggestion, index) => (
@@ -293,10 +308,18 @@ export function UserInputSection({
             <button
               onClick={() => onPromptSubmit(prompt)}
               disabled={isLoading || !prompt.trim()}
-              className="flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+              className="flex items-center justify-center rounded-2xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
               style={{
+                backgroundColor: config.submit_button_background_color || "#3b82f6",
+                color: config.submit_button_text_color || "#ffffff",
                 width: `${40 * heightScaleFactor}px`,
                 height: `${40 * heightScaleFactor}px`
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = config.submit_button_background_color || "#3b82f6";
               }}
             >
               {isLoading ? (
@@ -318,14 +341,17 @@ export function UserInputSection({
           >
             <button
               onClick={onRefreshSuggestions}
-              className="flex items-center justify-center rounded-lg bg-gradient-to-br from-slate-50 to-gray-100 border border-slate-200 hover:from-blue-50 hover:to-indigo-50 hover:border-blue-200 group transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
+              className="flex items-center justify-center rounded-lg border transition-all duration-200 shadow-sm hover:shadow-md flex-shrink-0"
               disabled={isLoading}
               title="Refresh suggestions"
               style={{
+                backgroundColor: config.suggestion_background_color || '#ffffff',
+                borderColor: config.suggestion_border_color || '#e5e7eb',
+                color: config.suggestion_text_color || '#374151',
                 padding: `${6 * heightScaleFactor}px`
               }}
             >
-              <RefreshCw style={{ width: `${12 * heightScaleFactor}px`, height: `${12 * heightScaleFactor}px` }} className="text-slate-600 group-hover:text-blue-600 transition-colors" />
+              <RefreshCw style={{ width: `${12 * heightScaleFactor}px`, height: `${12 * heightScaleFactor}px` }} className="transition-colors" />
             </button>
             
             {suggestions.slice(0, config.suggestions_count || 6).map((suggestion, index) => (

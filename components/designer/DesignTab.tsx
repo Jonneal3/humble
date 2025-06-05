@@ -5,7 +5,7 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { ChevronDown, Palette, Layout, Type, Image, Settings, HelpCircle, MessageSquare } from "lucide-react";
 import { ColorInput, NumberInput, SelectInput, FontSelector } from "./FormComponents";
-import { DesignSettings, designThemes, getCompleteTheme, fontOptions, ShadowStyle, BorderStyle, loadGoogleFont, LayoutMode } from "@/types/design";
+import { DesignSettings, designThemes, getCompleteTheme, fontOptions, ShadowStyle, BorderStyle, loadGoogleFont, LayoutMode, generateTheme } from "@/types/design";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
 
 interface DesignTabProps {
@@ -79,7 +79,8 @@ export const DesignTab: React.FC<DesignTabProps> = ({
               <Palette className="h-3 w-3" />
               Themes
             </Label>
-            <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2">
+            
+            <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-2 pb-1 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent hover:scrollbar-thumb-border/80">
               {designThemes.map((theme) => (
                 <Button
                   key={theme.name}
@@ -88,59 +89,43 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                   className="h-auto p-3 text-left justify-start hover:bg-muted/50 transition-all"
                   onClick={() => {
                     console.log('Applying theme:', theme.name, theme);
-                    // Apply ONLY the visual properties directly from theme
+                    // Apply the predefined theme directly
                     updateConfig({
-                      // Background & container
+                      // Overall style
                       background_color: theme.background_color,
                       container_padding: theme.container_padding,
                       border_radius: theme.border_radius,
                       shadow_style: theme.shadow_style,
                       
-                      // Prompt colors & styling
+                      // Prompt section
                       prompt_background_color: theme.prompt_background_color,
                       prompt_text_color: theme.prompt_text_color,
-                      prompt_font_family: theme.prompt_font_family,
-                      prompt_font_size: theme.prompt_font_size,
-                      prompt_border_radius: theme.prompt_border_radius,
                       prompt_border_color: theme.prompt_border_color,
+                      prompt_placeholder_color: theme.prompt_placeholder_color,
+                      prompt_border_style: theme.prompt_border_style,
+                      prompt_border_width: theme.prompt_border_width,
+                      prompt_border_radius: theme.prompt_border_radius,
                       
-                      // Suggestion colors & styling  
+                      // Submit button
+                      submit_button_background_color: theme.submit_button_background_color,
+                      submit_button_text_color: theme.submit_button_text_color,
+                      submit_button_hover_background_color: theme.submit_button_hover_background_color,
+                      
+                      // Suggestions
                       suggestion_background_color: theme.suggestion_background_color,
                       suggestion_text_color: theme.suggestion_text_color,
-                      suggestion_font_family: theme.suggestion_font_family,
-                      suggestion_font_size: theme.suggestion_font_size,
-                      suggestion_border_radius: theme.suggestion_border_radius,
                       suggestion_border_color: theme.suggestion_border_color,
-                      suggestion_shadow_style: theme.suggestion_shadow_style,
+                      suggestion_border_style: theme.suggestion_border_style,
+                      suggestion_border_width: theme.suggestion_border_width,
+                      suggestion_border_radius: theme.suggestion_border_radius,
                       
-                      // Uploader colors & styling
+                      // Uploader
                       uploader_background_color: theme.uploader_background_color,
                       uploader_border_color: theme.uploader_border_color,
                       uploader_text_color: theme.uploader_text_color,
-                      uploader_font_family: theme.uploader_font_family,
-                      uploader_font_size: theme.uploader_font_size,
-                      uploader_border_radius: theme.uploader_border_radius,
-                      uploader_border_width: theme.uploader_border_width,
                       uploader_border_style: theme.uploader_border_style,
-                      
-                      // Gallery colors & styling
-                      gallery_background_color: theme.gallery_background_color,
-                      gallery_spacing: theme.gallery_spacing,
-                      gallery_border_radius: theme.gallery_border_radius,
-                      gallery_image_border_radius: theme.gallery_image_border_radius,
-                      gallery_shadow_style: theme.gallery_shadow_style,
-                      gallery_border_color: theme.gallery_border_color,
-                      gallery_font_family: theme.gallery_font_family,
-                      gallery_font_size: theme.gallery_font_size,
-                      
-                      // Overlay colors
-                      overlay_background_color: theme.overlay_background_color,
-                      overlay_icon_color: theme.overlay_icon_color,
-                      overlay_font_family: theme.overlay_font_family,
-                      overlay_font_size: theme.overlay_font_size,
-                      
-                      // Brand colors (not text content)
-                      brand_name_color: theme.brand_name_color
+                      uploader_border_width: theme.uploader_border_width,
+                      uploader_border_radius: theme.uploader_border_radius
                     });
                   }}
                 >
@@ -803,7 +788,7 @@ export const DesignTab: React.FC<DesignTabProps> = ({
               </span>
               <ChevronDown className={`h-3 w-3 transition-transform text-muted-foreground ${openSections.design?.['prompt'] ? 'rotate-180' : ''}`} />
             </summary>
-            <div className="space-y-4 px-3 pb-3">
+            <div className="space-y-3 px-3 pb-3">
               {/* Typography Section */}
               <div className="space-y-3">
                 <Label className="text-xs font-medium text-muted-foreground">Typography</Label>
@@ -829,10 +814,29 @@ export const DesignTab: React.FC<DesignTabProps> = ({
                   />
                   <ColorInput
                     label="Placeholder Color"
-                    value={config.prompt_placeholder_color || "#9ca3af"}
+                    value={config.prompt_placeholder_color || "#64748b"}
                     onChange={(value) => updateConfig({ prompt_placeholder_color: value })}
                   />
                 </div>
+              </div>
+
+              <div className="space-y-3">
+                <Label className="text-xs font-medium">Submit Button</Label>
+                <ColorInput
+                  label="Background Color"
+                  value={config.submit_button_background_color || "#3b82f6"}
+                  onChange={(value) => updateConfig({ submit_button_background_color: value })}
+                />
+                <ColorInput
+                  label="Text Color"
+                  value={config.submit_button_text_color || "#ffffff"}
+                  onChange={(value) => updateConfig({ submit_button_text_color: value })}
+                />
+                <ColorInput
+                  label="Hover Background Color"
+                  value={config.submit_button_hover_background_color || "#2563eb"}
+                  onChange={(value) => updateConfig({ submit_button_hover_background_color: value })}
+                />
               </div>
             </div>
           </details>
