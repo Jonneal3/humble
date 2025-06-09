@@ -20,7 +20,9 @@ export default async function MainLayout({
 
   return (
     <InstancesProvider>
-      {children}
+      <div className="h-full">
+        {children}
+      </div>
     </InstancesProvider>
   );
 } 

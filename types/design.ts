@@ -29,6 +29,7 @@ export interface DesignSettings {
   layout_mode?: LayoutMode;
   prompt_section_width?: number; // Percentage for left-right layout
   prompt_section_height?: number; // Percentage for top-bottom layout
+  prompt_gallery_spacing?: number; // Spacing between prompt and gallery sections
   
   // ===========================================
   // PROMPT SECTION
@@ -133,18 +134,27 @@ export interface DesignSettings {
   // IMAGE GALLERY SECTION
   // ===========================================
   gallery_background_color?: string;
-  gallery_border_style?: BorderStyle;
-  gallery_border_color?: string;
-  gallery_border_width?: number;
   gallery_border_radius?: number;
-  gallery_image_border_radius?: number;
-  gallery_border_enabled?: boolean;
   gallery_spacing?: number;
   gallery_columns?: number;
   gallery_max_images?: number;
   gallery_shadow_style?: ShadowStyle;
   gallery_font_family?: string;
   gallery_font_size?: number;
+
+  // Gallery Container Border
+  gallery_container_border_enabled?: boolean;
+  gallery_container_border_width?: number;
+  gallery_container_border_color?: string;
+  gallery_container_border_style?: BorderStyle;
+  gallery_container_border_radius?: number;
+
+  // Individual Image Border
+  gallery_image_border_enabled?: boolean;
+  gallery_image_border_width?: number;
+  gallery_image_border_color?: string;
+  gallery_image_border_style?: BorderStyle;
+  gallery_image_border_radius?: number;
   
   // Gallery Overlay Settings
   overlay_enabled?: boolean;
@@ -161,6 +171,13 @@ export interface DesignSettings {
   mobile_layout_mode?: LayoutMode;
   mobile_gallery_columns?: number;
   mobile_font_scale?: number;
+
+  // ===========================================
+  // DEMO OVERLAY SETTINGS
+  // ===========================================
+  demo_enabled?: boolean;
+  demo_upload_message?: string;
+  demo_generation_message?: string;
 }
 
 // Default settings - much cleaner
@@ -183,6 +200,7 @@ export const defaultDesignSettings: DesignSettings = {
   layout_mode: "prompt-top",
   prompt_section_width: 40,
   prompt_section_height: 30,
+  prompt_gallery_spacing: 24, // Default spacing between prompt and gallery
   
   // Prompt Section
   prompt_background_color: "transparent",
@@ -271,18 +289,26 @@ export const defaultDesignSettings: DesignSettings = {
   
   // Image Gallery
   gallery_background_color: "transparent",
-  gallery_border_style: "solid",
-  gallery_border_color: "#e5e7eb",
-  gallery_border_width: 0,
-  gallery_border_radius: 12,
-  gallery_image_border_radius: 8,
-  gallery_border_enabled: false,
   gallery_spacing: 16,
   gallery_columns: 2,
   gallery_max_images: 4,
   gallery_shadow_style: "medium",
   gallery_font_family: "Inter",
   gallery_font_size: 14,
+  
+  // Gallery Container Border
+  gallery_container_border_enabled: false,
+  gallery_container_border_width: 1,
+  gallery_container_border_color: "#e5e7eb",
+  gallery_container_border_style: "solid",
+  gallery_container_border_radius: 12,
+
+  // Individual Image Border
+  gallery_image_border_enabled: false,
+  gallery_image_border_width: 1,
+  gallery_image_border_color: "#e5e7eb",
+  gallery_image_border_style: "solid",
+  gallery_image_border_radius: 8,
   
   // Gallery Overlay
   overlay_enabled: true,
@@ -297,6 +323,11 @@ export const defaultDesignSettings: DesignSettings = {
   mobile_layout_mode: "prompt-top",
   mobile_gallery_columns: 1,
   mobile_font_scale: 0.9,
+
+  // Demo Overlay
+  demo_enabled: true,
+  demo_upload_message: "Upload your reference images to guide the AI",
+  demo_generation_message: "Your AI-generated images will appear here"
 };
 
 // Theme Presets - Comprehensive Design Themes
@@ -430,18 +461,27 @@ export interface DesignTheme {
   // IMAGE GALLERY SECTION
   // ===========================================
   gallery_background_color?: string;
-  gallery_border_style?: BorderStyle;
-  gallery_border_color?: string;
-  gallery_border_width?: number;
   gallery_border_radius?: number;
-  gallery_image_border_radius?: number;
-  gallery_border_enabled?: boolean;
   gallery_spacing?: number;
   gallery_columns?: number;
   gallery_max_images?: number;
   gallery_shadow_style?: ShadowStyle;
   gallery_font_family?: string;
   gallery_font_size?: number;
+  
+  // Gallery Container Border
+  gallery_container_border_enabled?: boolean;
+  gallery_container_border_width?: number;
+  gallery_container_border_color?: string;
+  gallery_container_border_style?: BorderStyle;
+  gallery_container_border_radius?: number;
+
+  // Individual Image Border
+  gallery_image_border_enabled?: boolean;
+  gallery_image_border_width?: number;
+  gallery_image_border_color?: string;
+  gallery_image_border_style?: BorderStyle;
+  gallery_image_border_radius?: number;
   
   // Gallery Overlay Settings
   overlay_enabled?: boolean;
@@ -575,18 +615,27 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   
   // Image Gallery Section
   gallery_background_color: theme.gallery_background_color ?? "transparent",
-  gallery_border_style: theme.gallery_border_style ?? "solid",
-  gallery_border_color: theme.gallery_border_color ?? "#e5e7eb",
-  gallery_border_width: theme.gallery_border_width ?? 0,
   gallery_border_radius: theme.gallery_border_radius ?? 12,
-  gallery_image_border_radius: theme.gallery_image_border_radius ?? 8,
-  gallery_border_enabled: theme.gallery_border_enabled ?? false,
   gallery_spacing: theme.gallery_spacing ?? 16,
   gallery_columns: theme.gallery_columns ?? 2,
   gallery_max_images: theme.gallery_max_images ?? 4,
   gallery_shadow_style: theme.gallery_shadow_style ?? "medium",
   gallery_font_family: theme.gallery_font_family ?? "Inter",
   gallery_font_size: theme.gallery_font_size ?? 14,
+  
+  // Gallery Container Border
+  gallery_container_border_enabled: theme.gallery_container_border_enabled ?? false,
+  gallery_container_border_width: theme.gallery_container_border_width ?? 1,
+  gallery_container_border_color: theme.gallery_container_border_color ?? "#e5e7eb",
+  gallery_container_border_style: theme.gallery_container_border_style ?? "solid",
+  gallery_container_border_radius: theme.gallery_container_border_radius ?? 12,
+
+  // Individual Image Border
+  gallery_image_border_enabled: theme.gallery_image_border_enabled ?? false,
+  gallery_image_border_width: theme.gallery_image_border_width ?? 1,
+  gallery_image_border_color: theme.gallery_image_border_color ?? "#e5e7eb",
+  gallery_image_border_style: theme.gallery_image_border_style ?? "solid",
+  gallery_image_border_radius: theme.gallery_image_border_radius ?? 8,
   
   // Gallery Overlay Settings
   overlay_enabled: theme.overlay_enabled ?? true,
@@ -1318,10 +1367,13 @@ export const generateTheme = (name: string): DesignTheme => {
     gallery_font_family: "Inter",
     gallery_font_size: style.fontSize - 2,
     gallery_columns: 2,
-    gallery_border_enabled: false,
-    gallery_border_color: borderColor,
-    gallery_border_width: 1,
-    gallery_border_style: "solid",
+    gallery_image_border_enabled: false,
+    gallery_container_border_enabled: false,
+    gallery_container_border_width: 1,
+    gallery_container_border_color: "#e5e7eb",
+    gallery_image_border_color: borderColor,
+    gallery_image_border_width: 1,
+    gallery_image_border_style: "solid",
     
     // Overlay styling
     overlay_enabled: true,

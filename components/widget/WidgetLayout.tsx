@@ -1,8 +1,8 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/homepage/theme-provider";
-import { DesignSettings, getPaddingCSS } from "@/types/design";
+import { DesignSettings, getPaddingCSS, getEffectivePadding } from "@/types/design";
 
 interface WidgetLayoutProps {
   config: DesignSettings;
@@ -26,8 +26,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
             style={{
               backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 8}px`,
-              border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`,
-              padding: getPaddingCSS(config),
+              border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`
             }}
           >
             {promptSection}
@@ -38,9 +37,8 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
             className="lg:col-span-7 flex flex-col"
             style={{
               backgroundColor: config.gallery_background_color || 'transparent',
-              borderRadius: `${config.gallery_border_radius || 8}px`,
-              border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
-              padding: getPaddingCSS(config),
+              borderRadius: `${config.gallery_container_border_radius || 12}px`,
+              border: config.gallery_container_border_enabled ? `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 'none'
             }}
           >
             {imagesSection}
@@ -55,8 +53,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="flex-shrink-0 w-full max-w-2xl mx-auto"
             style={{
-              backgroundColor: config.prompt_background_color || 'transparent',
-              padding: getPaddingCSS(config),
+              backgroundColor: config.prompt_background_color || 'transparent'
             }}
           >
             {promptSection}
@@ -67,9 +64,8 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
             className="flex-1 min-h-0 w-full max-w-5xl mx-auto"
             style={{
               backgroundColor: config.gallery_background_color || 'transparent',
-              borderRadius: `${config.gallery_border_radius || 8}px`,
-              border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
-              padding: getPaddingCSS(config),
+              borderRadius: `${config.gallery_container_border_radius || 12}px`,
+              border: config.gallery_container_border_enabled ? `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 'none'
             }}
           >
             {imagesSection}
@@ -85,9 +81,8 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
             className="flex-1 min-h-0 w-full max-w-5xl mx-auto"
             style={{
               backgroundColor: config.gallery_background_color || 'transparent',
-              borderRadius: `${config.gallery_border_radius || 8}px`,
-              border: `1px solid ${config.gallery_border_color || '#e5e7eb'}`,
-              padding: getPaddingCSS(config),
+              borderRadius: `${config.gallery_container_border_radius || 12}px`,
+              border: config.gallery_container_border_enabled ? `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 'none'
             }}
           >
             {imagesSection}
@@ -97,8 +92,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           <div 
             className="flex-shrink-0 w-full max-w-2xl mx-auto"
             style={{
-              backgroundColor: config.prompt_background_color || 'transparent',
-              padding: getPaddingCSS(config),
+              backgroundColor: config.prompt_background_color || 'transparent'
             }}
           >
             {promptSection}
@@ -108,13 +102,9 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
 
     default:
       return (
-        <div className="h-full flex flex-col gap-3">
-          <div className="flex-1 min-h-0 bg-white rounded-lg border border-gray-200 p-5">
-            {imagesSection}
-          </div>
-          <div className="flex-shrink-0 bg-white rounded-lg border border-gray-200 p-4">
-            {promptSection}
-          </div>
+        <div className="h-full flex flex-col gap-4">
+          {promptSection}
+          {imagesSection}
         </div>
       );
   }
@@ -129,41 +119,40 @@ export function WidgetLayout({
   fullPage = false,
   deployment = false,
 }: WidgetLayoutProps) {
-  console.log('WidgetLayout: Current layout mode:', config.layout_mode);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Base container styles - simplified since children now handle their own styling
   const containerStyles = {
     backgroundColor: (fullPage || deployment) ? 'transparent' : (config.background_color || '#ffffff'),
     borderRadius: (fullPage || deployment) ? 0 : `${config.border_radius || 0}px`,
-    height: '100%', // Take full available height from parent (works in iframe and full page)
+    height: '100%',
     width: '100%',
     display: 'flex',
     flexDirection: 'column' as const,
     boxSizing: 'border-box' as const,
+    minHeight: 0,
     boxShadow: (fullPage || deployment) ? 'none' : (
       config.shadow_style === 'subtle' ? '0 1px 3px rgba(0,0,0,0.1)' :
       config.shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
       config.shadow_style === 'large' ? '0 10px 15px rgba(0,0,0,0.1)' :
       config.shadow_style === 'glow' ? '0 0 15px rgba(99, 102, 241, 0.3)' : 'none'
-    ),
-    // Remove padding from here since it's handled at the root level
-    padding: 0
+    )
   };
 
+  if (!isClient) {
+    return null;
+  }
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <div 
-        className={`w-full h-full relative overflow-hidden ${className}`}
-        style={containerStyles}
-      >
-        <div className="absolute inset-0 flex flex-col">
-          {children || (
-            <div className="flex-1 min-h-0 overflow-auto">
-              {getLayoutStructure(config.layout_mode || "prompt-top", promptSection, imagesSection, config)}
-            </div>
-          )}
-        </div>
-      </div>
-    </ThemeProvider>
+    <div 
+      className={`relative h-full w-full flex flex-col ${className}`}
+      style={containerStyles}
+    >
+      {children}
+    </div>
   );
 } 

@@ -101,104 +101,54 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
       </details>
 
       {/* Service Configuration */}
-      <details 
-        className="group" 
-        open={openSections.settings?.['service-config']}
+      <details
+        open={openSections.settings?.service}
+        onToggle={() => toggleSection("settings", "service")}
+        className="group"
       >
-        <summary 
-          className="flex items-center justify-between cursor-pointer text-sm font-medium mb-3 text-foreground hover:text-foreground/80 transition-colors"
-          onClick={(e) => {
-            e.preventDefault();
-            toggleSection('settings', 'service-config');
-          }}
-        >
-          <span>Service Configuration</span>
-          <ChevronDown className={`h-4 w-4 transition-transform text-muted-foreground ${openSections.settings?.['service-config'] ? 'rotate-180' : ''}`} />
+        <summary className="flex cursor-pointer items-center justify-between p-3 hover:bg-gray-100 font-medium">
+          Service Configuration
+          <ChevronDown className="h-5 w-5 transform transition-transform group-open:rotate-180" />
         </summary>
-        <div className="space-y-3 pl-2">
-          <SelectInput
-            label="AI Service Provider"
-            value={instance?.service_provider || ''}
-            onChange={(value) => updateInstance({ service_provider: value })}
-            options={[
-              { value: "", label: "Select service provider" },
-              { value: "openai", label: "OpenAI" },
-              { value: "replicate", label: "Replicate" },
-              { value: "stability", label: "Stability AI" },
-              { value: "midjourney", label: "Midjourney" },
-              { value: "custom", label: "Custom API" }
-            ]}
-          />
+        <div className="p-3 space-y-4">
+          <div className="space-y-3">
+            <SelectInput
+              label="Business Type"
+              value={instance?.business_type || ''}
+              onChange={(value) => updateInstance({ business_type: value })}
+              options={[
+                { value: "", label: "Select business type" },
+                { value: "personal", label: "Personal" },
+                { value: "business", label: "Business" },
+                { value: "agency", label: "Agency" },
+                { value: "other", label: "Other" }
+              ]}
+            />
 
-          {instance?.service_provider && (
-            <>
-              <div className="space-y-1">
-                <Label className="text-xs font-medium">API Key</Label>
-                <Input
-                  type="password"
-                  value={instance?.api_key || ''}
-                  onChange={(e) => updateInstance({ api_key: e.target.value })}
-                  placeholder="Enter your API key"
-                  className="h-8 text-xs"
-                />
-                <p className="text-xs text-muted-foreground">API key is encrypted and stored securely</p>
-              </div>
+            <SelectInput
+              label="Template Style"
+              value={instance?.template_style || ''}
+              onChange={(value) => updateInstance({ template_style: value })}
+              options={[
+                { value: "", label: "Default" },
+                { value: "minimal", label: "Minimal" },
+                { value: "modern", label: "Modern" },
+                { value: "creative", label: "Creative" }
+              ]}
+            />
 
-              {instance?.service_provider === 'custom' && (
-                <div className="space-y-1">
-                  <Label className="text-xs font-medium">Custom API Endpoint</Label>
-                  <Input
-                    value={instance?.api_endpoint || ''}
-                    onChange={(e) => updateInstance({ api_endpoint: e.target.value })}
-                    placeholder="https://api.example.com/generate"
-                    className="h-8 text-xs"
-                  />
-                </div>
-              )}
-
-              <SelectInput
-                label="Default Model"
-                value={instance?.default_model || ''}
-                onChange={(value) => updateInstance({ default_model: value })}
-                options={
-                  instance?.service_provider === 'openai' ? [
-                    { value: "", label: "Select model" },
-                    { value: "dall-e-3", label: "DALL-E 3" },
-                    { value: "dall-e-2", label: "DALL-E 2" }
-                  ] : instance?.service_provider === 'replicate' ? [
-                    { value: "", label: "Select model" },
-                    { value: "sdxl", label: "Stable Diffusion XL" },
-                    { value: "sd-1.5", label: "Stable Diffusion 1.5" },
-                    { value: "kandinsky-2", label: "Kandinsky 2" }
-                  ] : instance?.service_provider === 'stability' ? [
-                    { value: "", label: "Select model" },
-                    { value: "stable-diffusion-xl", label: "Stable Diffusion XL" },
-                    { value: "stable-diffusion-v1-6", label: "Stable Diffusion v1.6" }
-                  ] : [
-                    { value: "", label: "Select model" },
-                    { value: "default", label: "Default Model" }
-                  ]
-                }
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                <NumberInput
-                  label="Max Images Per Request"
-                  value={instance?.max_images || 4}
-                  onChange={(value) => updateInstance({ max_images: value })}
-                  min={1}
-                  max={10}
-                />
-                <NumberInput
-                  label="Request Timeout (seconds)"
-                  value={instance?.request_timeout || 30}
-                  onChange={(value) => updateInstance({ request_timeout: value })}
-                  min={10}
-                  max={120}
-                />
-              </div>
-            </>
-          )}
+            <SelectInput
+              label="Color Scheme"
+              value={instance?.color_scheme || ''}
+              onChange={(value) => updateInstance({ color_scheme: value })}
+              options={[
+                { value: "", label: "Default" },
+                { value: "light", label: "Light" },
+                { value: "dark", label: "Dark" },
+                { value: "auto", label: "Auto" }
+              ]}
+            />
+          </div>
         </div>
       </details>
 

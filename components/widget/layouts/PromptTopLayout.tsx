@@ -49,9 +49,31 @@ export function PromptTopLayout({
   // Calculate scaling factor based on prompt section height for top/bottom layouts
   const heightScaleFactor = isMobile ? 1 : (config.prompt_section_height || 30) / 30; // 30% is the base scale
 
+  // Calculate container padding
+  const containerPadding = {
+    paddingTop: `${effectivePadding.top}px`,
+    paddingRight: `${effectivePadding.right}px`,
+    paddingBottom: `${effectivePadding.bottom}px`,
+    paddingLeft: `${effectivePadding.left}px`,
+  };
+
+  // Get alignment class based on config
+  const getAlignmentClass = () => {
+    switch (config.prompt_section_alignment) {
+      case 'left':
+        return 'mr-auto';
+      case 'right':
+        return 'ml-auto';
+      case 'center':
+      default:
+        return 'mx-auto';
+    }
+  };
+
   return (
     <div 
       className={`${fullPage || deployment ? 'h-screen' : 'h-full'} flex flex-col overflow-hidden`}
+      style={!fullPage ? containerPadding : undefined}
     >
       <div className="flex-shrink-0">
         <BrandHeader config={config} containerWidth={containerWidth} />
@@ -59,11 +81,30 @@ export function PromptTopLayout({
 
       {/* Mobile Layout: Single Column */}
       {isMobile && (
-        <div className="flex-1 flex flex-col min-h-0 relative" style={{ gap: `${Math.max(0.5, Math.min(1.5, containerWidth * 0.003))}rem` }}>
+        <div 
+          className="flex-1 flex flex-col min-h-0 relative w-full" 
+          style={{ 
+            gap: `${config.prompt_gallery_spacing || 24}px`,
+            maxWidth: '100vw',
+            overflowX: 'hidden'
+          }}
+        >
           {/* Mobile content with responsive fonts */}
-          <div className="flex-shrink-0 relative">
+          <div 
+            className="flex-shrink-0 relative w-full"
+            style={{ 
+              backgroundColor: config.prompt_background_color || 'transparent',
+              borderRadius: `${config.prompt_border_radius || 12}px`,
+              border: `${config.prompt_border_width || 1}px ${config.prompt_border_style || 'solid'} ${config.prompt_border_color || '#e5e7eb'}`
+            }}
+          >
             <UserInputSection
-              config={config}
+              config={{
+                ...config,
+                prompt_section_width: 100,
+                prompt_font_size: Math.max(14, config.prompt_font_size ? config.prompt_font_size * 0.9 : 16),
+                suggestion_font_size: Math.max(12, config.suggestion_font_size ? config.suggestion_font_size * 0.9 : 14)
+              }}
               prompt={prompt}
               setPrompt={setPrompt}
               isLoading={isLoading}
@@ -80,11 +121,15 @@ export function PromptTopLayout({
             />
           </div>
 
-          <div className="flex-1 min-h-0 overflow-auto relative">
+          <div className="flex-1 min-h-0 overflow-auto relative w-full">
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}
-              config={config}
+              config={{
+                ...config,
+                gallery_columns: containerWidth < 480 ? 1 : 2,
+                gallery_spacing: Math.max(8, config.gallery_spacing ? config.gallery_spacing * 0.75 : 12)
+              }}
               fullPage={fullPage}
               deployment={deployment}
               layoutContext="vertical"
@@ -96,21 +141,23 @@ export function PromptTopLayout({
 
       {/* Desktop Layout: Prompt Top */}
       {!isMobile && (
-        <div className="flex flex-col flex-1 min-h-0 relative">
+        <div className="flex flex-col flex-1 min-h-0 relative" style={{ gap: `${config.prompt_gallery_spacing || 24}px` }}>
           {/* UserInputSection - Fixed at top */}
           <div 
-            className="flex-shrink-0 mb-6 max-w-2xl mx-auto w-full relative z-20"
+            className={`flex-shrink-0 max-w-2xl w-full relative z-20 ${deployment ? 'sticky top-0' : ''} ${getAlignmentClass()}`}
             style={{ 
               height: `${config.prompt_section_height || 30}%`,
               minHeight: `${180 * heightScaleFactor}px`,
               maxHeight: '70%',
-              backgroundColor: config.background_color || '#ffffff',
-              marginLeft: config.prompt_section_alignment === 'left' ? '0' : 
-                         config.prompt_section_alignment === 'right' ? 'auto' : 'auto',
-              marginRight: config.prompt_section_alignment === 'left' ? 'auto' : 
-                          config.prompt_section_alignment === 'right' ? '0' : 'auto',
+              backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 12}px`,
-              padding: '2px' // Small padding to ensure the border radius is visible
+              border: `${config.prompt_border_width || 1}px ${config.prompt_border_style || 'solid'} ${config.prompt_border_color || '#e5e7eb'}`,
+              ...(deployment ? {
+                paddingTop: `${effectivePadding.top}px`,
+                paddingRight: `${effectivePadding.right}px`,
+                paddingBottom: `${effectivePadding.bottom}px`,
+                paddingLeft: `${effectivePadding.left}px`,
+              } : {})
             }}
           >
             <UserInputSection
@@ -132,22 +179,9 @@ export function PromptTopLayout({
             />
           </div>
 
-          {/* Gallery Section - Extends under UIC */}
-          <div className="flex-1 min-h-0 -mt-48 relative">
-            <div className="absolute inset-0">
-              {/* Fade effect at top of gallery */}
-              <div 
-                className="absolute top-0 left-0 right-0 h-24 pointer-events-none z-10"
-                style={{
-                  background: `linear-gradient(180deg, 
-                    ${config.background_color || '#ffffff'}55 0%,
-                    ${config.background_color || '#ffffff'}30 50%,
-                    ${config.background_color || '#ffffff'}10 85%,
-                    ${config.background_color || '#ffffff'}00 100%
-                  )`,
-                  borderRadius: `${config.prompt_border_radius || 12}px`
-                }}
-              ></div>
+          {/* Gallery Section - Scrollable */}
+          <div className="flex-1 min-h-0 relative">
+            <div className="absolute inset-0 overflow-auto">
               <ImageGallery
                 images={generatedImages}
                 isLoading={isLoading}

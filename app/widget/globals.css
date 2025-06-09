@@ -8,16 +8,13 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  scroll-behavior: smooth;
 }
 
 html, body {
-  height: 100vh;
-  width: 100vw;
-  position: fixed;
   font-family: Inter, sans-serif;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 /* Completely hide any main site elements that might leak in */

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Download, Eye, RotateCcw } from "lucide-react";
+import React, { useState } from "react";
+import Image from "next/image";
 import { DesignSettings } from "@/types/design";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Download, Eye } from "lucide-react";
 
 interface ImageGalleryProps {
   images: Array<{ image: string | null }>;
@@ -12,52 +12,40 @@ interface ImageGalleryProps {
   config: DesignSettings;
   fullPage?: boolean;
   deployment?: boolean;
-  className?: string;
-  layoutContext?: 'horizontal' | 'vertical'; // horizontal = left-right/right-left, vertical = prompt-top/prompt-bottom
-  containerWidth?: number; // Width of the container for responsive behavior
+  layoutContext?: 'vertical' | 'horizontal';
+  containerWidth?: number;
 }
 
-export function ImageGallery({ 
-  images, 
-  isLoading, 
-  config, 
-  fullPage = false, 
+export function ImageGallery({
+  images,
+  isLoading,
+  config,
+  fullPage = false,
   deployment = false,
-  className = "",
-  layoutContext = 'horizontal',
-  containerWidth
+  layoutContext = "vertical",
+  containerWidth = 1024
 }: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Get configuration values with defaults
   const galleryConfig = {
-    columns: config?.gallery_columns || 2,
-    spacing: config?.gallery_spacing ?? 16,
-    maxImages: config?.gallery_max_images || 12,
-    backgroundColor: config?.gallery_background_color || 'transparent',
-    borderEnabled: config?.gallery_border_enabled ?? false,
-    borderWidth: config?.gallery_border_width ?? 0,
-    borderColor: config?.gallery_border_color || '#e5e7eb',
-    containerBorderRadius: config?.gallery_border_radius ?? 12,
-    imageBorderRadius: config?.gallery_image_border_radius ?? 8,
-    shadowStyle: config?.gallery_shadow_style || 'medium',
-    overlayEnabled: config?.overlay_enabled ?? true,
-    fontFamily: config?.gallery_font_family || 'inherit',
-    fontSize: config?.gallery_font_size || 14,
-    overlayBackgroundColor: config?.overlay_background_color || 'rgba(0, 0, 0, 0.5)',
-    overlayIconColor: config?.overlay_icon_color || '#ffffff',
-  };
-
-  // Shadow styles mapping
-  const getShadowClass = (style: string) => {
-    switch (style) {
-      case 'none': return '';
-      case 'subtle': return 'shadow-sm';
-      case 'medium': return 'shadow-md';
-      case 'large': return 'shadow-lg';
-      case 'glow': return 'shadow-lg shadow-blue-500/25';
-      default: return 'shadow-md';
-    }
+    columns: config.gallery_columns || 3,
+    spacing: config.gallery_spacing || 16,
+    maxImages: config.gallery_max_images || 12,
+    backgroundColor: config.gallery_background_color || 'transparent',
+    containerBorderEnabled: config.gallery_container_border_enabled ?? false,
+    containerBorderWidth: config.gallery_container_border_width ?? 1,
+    containerBorderColor: config.gallery_container_border_color || '#e5e7eb',
+    containerBorderStyle: config.gallery_container_border_style || 'solid',
+    containerBorderRadius: config.gallery_container_border_radius ?? 12,
+    imageBorderEnabled: config.gallery_image_border_enabled ?? false,
+    imageBorderWidth: config.gallery_image_border_width ?? 1,
+    imageBorderColor: config.gallery_image_border_color || '#e5e7eb',
+    imageBorderStyle: config.gallery_image_border_style || 'solid',
+    imageBorderRadius: config.gallery_image_border_radius ?? 8,
+    overlayEnabled: deployment && (config.overlay_enabled ?? true),
+    overlayBackgroundColor: config.overlay_background_color || 'rgba(0, 0, 0, 0.5)',
+    overlayIconColor: config.overlay_icon_color || '#ffffff',
   };
 
   // Create array of slots based on max images
@@ -70,107 +58,57 @@ export function ImageGallery({
     };
   });
 
-  // Calculate the number of images that actually have content
-  const imagesWithContent = imageSlots.filter(slot => slot.hasImage).length;
-  
-  // Calculate the number of rows needed based on images with content
-  const rowsNeeded = Math.ceil(imagesWithContent / galleryConfig.columns);
-  
-  // Simplify the approach - use more reliable responsive logic
-  // Instead of complex calculations, use simpler viewport-relative units that scale better
-  const effectiveContainerWidth = containerWidth || 1024;
-  
-  // Use CSS-style responsive breakpoints based on actual container width
-  const isVerySmall = effectiveContainerWidth < 480;
-  const isSmall = effectiveContainerWidth >= 480 && effectiveContainerWidth < 768;
-  const isMedium = effectiveContainerWidth >= 768 && effectiveContainerWidth < 1024;
-  
-  // Calculate image size more conservatively
-  const containerPadding = galleryConfig.spacing * 2;
-  const gridGaps = (galleryConfig.columns - 1) * galleryConfig.spacing;
-  const availableWidth = effectiveContainerWidth - containerPadding - gridGaps;
-  const actualImageWidth = availableWidth / galleryConfig.columns;
-  
-  // Simple, reliable padding calculation based on container size
-  let responsivePadding: number;
-  
-  if (isVerySmall) {
-    // Very small screens - reasonable padding
-    responsivePadding = Math.max(60, actualImageWidth * 0.15);
-  } else if (isSmall) {
-    // Small screens - reasonable padding
-    responsivePadding = Math.max(70, actualImageWidth * 0.18);
-  } else if (isMedium) {
-    // Medium screens - reasonable padding
-    responsivePadding = Math.max(80, actualImageWidth * 0.2);
-  } else {
-    // Large screens - comfortable padding
-    responsivePadding = Math.max(50, actualImageWidth * 0.12);
-  }
-  
-  // Add moderate bonus for vertical layouts on smaller screens
-  if (layoutContext === 'vertical' && (isVerySmall || isSmall)) {
-    responsivePadding += 30;
-  }
-
-  const containerStyle: React.CSSProperties = {
-    backgroundColor: galleryConfig.backgroundColor === 'transparent' ? undefined : galleryConfig.backgroundColor,
+  // Container styles
+  const galleryContainerStyles = {
+    backgroundColor: galleryConfig.backgroundColor,
+    borderRadius: `${galleryConfig.containerBorderRadius}px`,
+    border: galleryConfig.containerBorderEnabled ? `${galleryConfig.containerBorderWidth}px ${galleryConfig.containerBorderStyle} ${galleryConfig.containerBorderColor}` : 'none',
     padding: `${galleryConfig.spacing}px`,
-    width: '100%',
-    height: '100%',
-    overflow: 'auto',
-    fontFamily: galleryConfig.fontFamily,
-    fontSize: `${galleryConfig.fontSize}px`,
-    boxSizing: 'border-box',
-    borderRadius: fullPage && deployment ? '0px' : `${galleryConfig.containerBorderRadius}px`,
-    scrollBehavior: 'smooth',
-    WebkitOverflowScrolling: 'touch',
-    scrollbarWidth: 'thin',
-    scrollbarColor: '#cbd5e1 transparent'
-  };
-
-  const gridStyle: React.CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: `repeat(${galleryConfig.columns}, 1fr)`,
     gap: `${galleryConfig.spacing}px`,
-    width: '100%',
-    paddingBottom: `${responsivePadding}px`, 
-    // Ensure the grid takes up space and can create overflow
-    minHeight: 'fit-content'
   };
 
-  const imageStyle: React.CSSProperties = {
+  // Individual image styles
+  const imageStyles = {
     borderRadius: `${galleryConfig.imageBorderRadius}px`,
-    border: galleryConfig.borderEnabled ? `${galleryConfig.borderWidth}px solid ${galleryConfig.borderColor}` : 'none',
+    border: galleryConfig.imageBorderEnabled ? `${galleryConfig.imageBorderWidth}px ${galleryConfig.imageBorderStyle} ${galleryConfig.imageBorderColor}` : 'none',
+    overflow: 'hidden',
   };
 
   return (
     <div 
-      style={containerStyle} 
-      className={`w-full image-gallery-container ${className}`}
+      className="grid auto-rows-fr gap-4 p-4"
+      style={{
+        ...galleryContainerStyles,
+        gridTemplateColumns: `repeat(${galleryConfig.columns}, 1fr)`
+      }}
     >
-      <div style={gridStyle}>
-        {imageSlots.map((slot) => (
+      {isLoading ? (
+        // Loading placeholders
+        Array.from({ length: galleryConfig.columns }).map((_, index) => (
+          <div
+            key={`placeholder-${index}`}
+            className="aspect-square relative"
+            style={imageStyles}
+          >
+            <Skeleton className="absolute inset-0" />
+          </div>
+        ))
+      ) : imageSlots.length > 0 ? (
+        // Actual images
+        imageSlots.map((slot) => (
           <div
             key={slot.id}
-            className={cn(
-              "relative aspect-square overflow-hidden transition-all duration-300 group cursor-pointer",
-              getShadowClass(galleryConfig.shadowStyle),
-              !slot.hasImage && "hover:scale-105"
-            )}
-            style={imageStyle}
-            onClick={() => slot.hasImage && setSelectedImage(slot.image)}
+            className="relative aspect-square bg-gray-50 group"
+            style={imageStyles}
           >
             {slot.hasImage ? (
               <>
-                {/* Generated Image */}
-                <img
+                <Image
                   src={slot.image!}
-                  alt={`Generated ${slot.id + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  alt={`Generated image ${slot.id + 1}`}
+                  fill
+                  className="object-cover"
                 />
-                
-                {/* Hover Overlay */}
                 {galleryConfig.overlayEnabled && (
                   <div 
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3"
@@ -190,76 +128,32 @@ export function ImageGallery({
                     </button>
                     <button 
                       className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedImage(slot.image);
-                      }}
+                      onClick={() => setSelectedImage(slot.image)}
                     >
                       <Eye 
                         className="w-4 h-4 transition-colors" 
                         style={{ color: galleryConfig.overlayIconColor }}
                       />
                     </button>
-                    <button 
-                      className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // Add use as reference logic here
-                      }}
-                    >
-                      <RotateCcw 
-                        className="w-4 h-4 transition-colors" 
-                        style={{ color: galleryConfig.overlayIconColor }}
-                      />
-                    </button>
                   </div>
                 )}
-                
-                {/* AI Generated badge */}
-                <div className="absolute bottom-2 right-2 rounded-full bg-primary/90 backdrop-blur-sm px-3 py-1.5 text-xs text-white shadow-lg">
-                  <span className="flex items-center gap-1.5">
-                    <span 
-                      className="h-2 w-2 rounded-full bg-white animate-pulse"
-                    ></span>
-                    <span className="font-medium">AI Generated</span>
-                  </span>
-                </div>
               </>
             ) : (
-              /* Placeholder */
-              <div className="w-full h-full relative">
-                {isLoading ? (
-                  <div className="relative w-full h-full">
-                    <Skeleton className="w-full h-full" />
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-indigo-500/20 flex items-center justify-center rounded-lg animate-pulse">
-                      <div className="flex flex-col items-center gap-3 text-white">
-                        <div className="w-10 h-10 border-[3px] border-white/30 border-t-white rounded-full animate-spin" />
-                        <div className="text-center animate-pulse">
-                          <p className="text-sm font-medium">Generating...</p>
-                          <p className="text-xs opacity-80">AI at work</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="w-full h-full bg-muted/10 flex items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                      <div className="w-8 h-8 mx-auto mb-2 opacity-30">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                          <circle cx="9" cy="9" r="2"/>
-                          <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                        </svg>
-                      </div>
-                      <p className="text-xs opacity-70">Image {slot.id + 1}</p>
-                    </div>
-                  </div>
-                )}
+              <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                <p className="text-sm">Image {slot.id + 1}</p>
               </div>
             )}
           </div>
-        ))}
-      </div>
+        ))
+      ) : (
+        // Empty state
+        <div
+          className="col-span-full aspect-[2/1] flex items-center justify-center bg-gray-50 text-gray-400"
+          style={imageStyles}
+        >
+          <p className="text-sm">Generated images will appear here</p>
+        </div>
+      )}
 
       {/* Full Screen Image Modal */}
       {selectedImage && (
@@ -268,10 +162,11 @@ export function ImageGallery({
           onClick={() => setSelectedImage(null)}
         >
           <div className="relative max-w-[90vw] max-h-[90vh]">
-            <img
+            <Image
               src={selectedImage}
               alt="Generated image full view"
-              className="max-w-full max-h-full object-contain rounded-lg"
+              fill
+              className="object-contain"
               onClick={(e) => e.stopPropagation()}
             />
             <button

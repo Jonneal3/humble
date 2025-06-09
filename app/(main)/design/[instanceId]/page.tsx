@@ -1,5 +1,16 @@
+import { Metadata } from "next";
 import Designer from "@/components/designer/Designer";
 
-export default function DesignPage({ params }: { params: { instanceId: string } }) {
-  return <Designer instanceId={params.instanceId} />;
+interface Props {
+  params: {
+    instanceId: string;
+  };
+}
+
+export default function DesignPage({ params }: Props) {
+  return (
+    <div className="absolute inset-0">
+      <Designer instanceId={params.instanceId} />
+    </div>
+  );
 } 

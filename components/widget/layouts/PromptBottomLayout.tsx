@@ -5,6 +5,7 @@ import { Suggestion } from "@/lib/suggestions";
 import { BrandHeader } from "../BrandHeader";
 import { ImageGallery } from "../ImageGallery";
 import { UserInputSection } from "../UserInputSection";
+import { PromptTopLayout } from "./PromptTopLayout";
 
 interface PromptBottomLayoutProps {
   config: DesignSettings;
@@ -43,25 +44,56 @@ export function PromptBottomLayout({
 }: PromptBottomLayoutProps) {
   const isMobile = containerWidth < 768; // Use 768px as mobile breakpoint
 
+  // For mobile, use PromptTopLayout
+  if (isMobile) {
+    return (
+      <PromptTopLayout
+        config={config}
+        prompt={prompt}
+        setPrompt={setPrompt}
+        isLoading={isLoading}
+        suggestions={suggestions}
+        referenceImages={referenceImages}
+        generatedImages={generatedImages}
+        fullPage={fullPage}
+        deployment={deployment}
+        containerWidth={containerWidth}
+        onPromptSubmit={onPromptSubmit}
+        onSuggestionClick={onSuggestionClick}
+        onImageUpload={onImageUpload}
+        onImageRemove={onImageRemove}
+        onRefreshSuggestions={onRefreshSuggestions}
+      />
+    );
+  }
+
   // Get configured container padding instead of hardcoded responsive padding
   const effectivePadding = getEffectivePadding(config);
   
   // Calculate scaling factor based on prompt section height for top/bottom layouts
-  const heightScaleFactor = isMobile ? 1 : (config.prompt_section_height || 30) / 30; // 30% is the base scale
+  const heightScaleFactor = (config.prompt_section_height || 30) / 30; // 30% is the base scale
+
+  // Calculate container padding
+  const containerPadding = {
+    paddingTop: `${effectivePadding.top}px`,
+    paddingRight: `${effectivePadding.right}px`,
+    paddingBottom: `${effectivePadding.bottom}px`,
+    paddingLeft: `${effectivePadding.left}px`,
+  };
 
   return (
     <div 
       className={`${fullPage || deployment ? 'h-screen' : 'h-full'} flex flex-col overflow-hidden`}
+      style={!fullPage ? containerPadding : undefined}
     >
       <div className="flex-shrink-0">
         <BrandHeader config={config} containerWidth={containerWidth} />
       </div>
 
-      {/* Mobile Layout: Single Column */}
-      {isMobile && (
-        <div className="flex-1 flex flex-col min-h-0 relative" style={{ gap: `${Math.max(0.5, Math.min(1.5, containerWidth * 0.003))}rem` }}>
-          {/* Mobile: Images Gallery */}
-          <div className="flex-1 min-h-0 overflow-auto relative">
+      <div className="flex flex-col flex-1 min-h-0 relative" style={{ gap: `${config.prompt_gallery_spacing || 24}px` }}>
+        {/* Gallery Section - Scrollable */}
+        <div className="flex-1 min-h-0 relative">
+          <div className="absolute inset-0 overflow-auto">
             <ImageGallery
               images={generatedImages}
               isLoading={isLoading}
@@ -72,74 +104,31 @@ export function PromptBottomLayout({
               containerWidth={containerWidth}
             />
           </div>
-
-          {/* Mobile: Compact Prompt Input */}
-          <div className="flex-shrink-0 relative">
-            <UserInputSection
-              config={config}
-              prompt={prompt}
-              setPrompt={setPrompt}
-              isLoading={isLoading}
-              suggestions={suggestions}
-              referenceImages={referenceImages}
-              onPromptSubmit={onPromptSubmit}
-              onSuggestionClick={onSuggestionClick}
-              onImageUpload={onImageUpload}
-              onImageRemove={onImageRemove}
-              onRefreshSuggestions={onRefreshSuggestions}
-              variant="mobile"
-              heightScaleFactor={heightScaleFactor}
-              containerWidth={containerWidth}
-            />
-          </div>
         </div>
-      )}
 
-      {/* Desktop Layout: Prompt Bottom */}
-      {!isMobile && (
-        <div className="flex flex-col flex-1 min-h-0 relative">
-          {/* Gallery Section - Extends under UIC */}
-          <div className="flex-1 min-h-0 -mb-48 relative">
-            <div className="absolute inset-0">
-              {/* Fade effect at bottom of gallery */}
-              <div 
-                className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none z-10"
-                style={{
-                  background: `linear-gradient(0deg, 
-                    ${config.background_color || '#ffffff'}55 0%,
-                    ${config.background_color || '#ffffff'}30 50%,
-                    ${config.background_color || '#ffffff'}10 85%,
-                    ${config.background_color || '#ffffff'}00 100%
-                  )`,
-                  borderRadius: `${config.prompt_border_radius || 12}px`
-                }}
-              ></div>
-              <ImageGallery
-                images={generatedImages}
-                isLoading={isLoading}
-                config={config}
-                fullPage={fullPage}
-                deployment={deployment}
-                layoutContext="vertical"
-                containerWidth={containerWidth}
-              />
-            </div>
-          </div>
-
-          {/* UserInputSection - Fixed at bottom */}
+        {/* UserInputSection - Fixed at bottom */}
+        <div 
+          className={`flex-shrink-0 w-full relative z-20 ${deployment ? 'sticky bottom-0 bg-white/95 backdrop-blur-sm shadow-lg' : ''}`}
+          style={{ 
+            height: `${config.prompt_section_height || 30}%`,
+            minHeight: `${180 * heightScaleFactor}px`,
+            maxHeight: '70%',
+            backgroundColor: deployment ? 'transparent' : (config.background_color || '#ffffff'),
+            borderRadius: deployment ? '0' : `${config.prompt_border_radius || 12}px`,
+            ...(deployment ? {
+              paddingTop: `${effectivePadding.top}px`,
+              paddingRight: `${effectivePadding.right}px`,
+              paddingBottom: `${effectivePadding.bottom}px`,
+              paddingLeft: `${effectivePadding.left}px`,
+            } : {})
+          }}
+        >
           <div 
-            className="flex-shrink-0 mt-6 max-w-2xl mx-auto w-full relative z-20"
+            className="max-w-2xl mx-auto w-full h-full"
             style={{ 
-              height: `${config.prompt_section_height || 30}%`,
-              minHeight: `${180 * heightScaleFactor}px`,
-              maxHeight: '70%',
-              backgroundColor: config.background_color || '#ffffff',
-              marginLeft: config.prompt_section_alignment === 'left' ? '0' : 
-                         config.prompt_section_alignment === 'right' ? 'auto' : 'auto',
-              marginRight: config.prompt_section_alignment === 'left' ? 'auto' : 
-                          config.prompt_section_alignment === 'right' ? '0' : 'auto',
+              backgroundColor: config.prompt_background_color || 'transparent',
               borderRadius: `${config.prompt_border_radius || 12}px`,
-              padding: '2px' // Small padding to ensure the border radius is visible
+              border: `${config.prompt_border_width || 1}px ${config.prompt_border_style || 'solid'} ${config.prompt_border_color || '#e5e7eb'}`
             }}
           >
             <UserInputSection
@@ -161,7 +150,7 @@ export function PromptBottomLayout({
             />
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 } 

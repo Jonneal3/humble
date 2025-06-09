@@ -46,7 +46,7 @@ export default function RootLayout({
             >
               <NavbarWrapper />
             </Suspense>
-            <main className="flex-1">
+            <main className="flex-1 relative">
               {children}
             </main>
             <Footer />

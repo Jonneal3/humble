@@ -5,6 +5,7 @@ import { Suggestion } from "@/lib/suggestions";
 import { BrandHeader } from "../BrandHeader";
 import { ImageGallery } from "../ImageGallery";
 import { UserInputSection } from "../UserInputSection";
+import { PromptTopLayout } from "./PromptTopLayout";
 
 interface LeftRightLayoutProps {
   config: DesignSettings;
@@ -41,123 +42,94 @@ export function LeftRightLayout({
   onImageRemove,
   onRefreshSuggestions
 }: LeftRightLayoutProps) {
-  const leftColumnWidth = config.prompt_section_width || 40;
-  const isMobile = containerWidth < 768; // Use 768px as mobile breakpoint
-  
-  // Get configured container padding instead of hardcoded responsive padding
+  const isMobile = containerWidth < 768;
+
+  // For mobile, use PromptTopLayout
+  if (isMobile) {
+    return (
+      <PromptTopLayout
+        config={config}
+        prompt={prompt}
+        setPrompt={setPrompt}
+        isLoading={isLoading}
+        suggestions={suggestions}
+        referenceImages={referenceImages}
+        generatedImages={generatedImages}
+        fullPage={fullPage}
+        deployment={deployment}
+        containerWidth={containerWidth}
+        onPromptSubmit={onPromptSubmit}
+        onSuggestionClick={onSuggestionClick}
+        onImageUpload={onImageUpload}
+        onImageRemove={onImageRemove}
+        onRefreshSuggestions={onRefreshSuggestions}
+      />
+    );
+  }
+
+  // Get configured container padding
   const effectivePadding = getEffectivePadding(config);
   
-  // Calculate scaling factor for responsive element sizing based on container width
-  const heightScaleFactor = isMobile ? 1 : Math.max(0.7, Math.min(1.3, containerWidth / 1024));
-  
-  // Adjust prompt section width based on container size for better proportions
-  const responsivePromptWidth = isMobile 
-    ? Math.min(leftColumnWidth, 35) // Cap at 35% for mobile
-    : containerWidth < 900 
-      ? Math.min(leftColumnWidth, 38) // Cap at 38% for small containers
-      : leftColumnWidth; // Use configured width for larger containers
+  // Calculate container padding
+  const containerPadding = {
+    paddingTop: `${effectivePadding.top}px`,
+    paddingRight: `${effectivePadding.right}px`,
+    paddingBottom: `${effectivePadding.bottom}px`,
+    paddingLeft: `${effectivePadding.left}px`,
+  };
 
   return (
     <div 
       className={`${fullPage || deployment ? 'h-screen' : 'h-full'} flex flex-col overflow-hidden`}
+      style={!fullPage ? containerPadding : undefined}
     >
-      <div className="h-full flex flex-col">
-        <div className="flex-shrink-0">
-          <BrandHeader config={config} containerWidth={containerWidth} />
+      <div className="flex-shrink-0">
+        <BrandHeader config={config} containerWidth={containerWidth} />
+      </div>
+
+      <div className="flex-1 flex min-h-0">
+        {/* Left Side - Prompt Section */}
+        <div 
+          className="flex-shrink-0 flex flex-col relative"
+          style={{ 
+            width: `${config.prompt_section_width || 40}%`,
+            backgroundColor: config.prompt_background_color || 'transparent',
+            borderRadius: `${config.prompt_border_radius || 12}px`,
+            border: `${config.prompt_border_width || 1}px ${config.prompt_border_style || 'solid'} ${config.prompt_border_color || '#e5e7eb'}`
+          }}
+        >
+          <UserInputSection
+            config={config}
+            prompt={prompt}
+            setPrompt={setPrompt}
+            isLoading={isLoading}
+            suggestions={suggestions}
+            referenceImages={referenceImages}
+            onPromptSubmit={onPromptSubmit}
+            onSuggestionClick={onSuggestionClick}
+            onImageUpload={onImageUpload}
+            onImageRemove={onImageRemove}
+            onRefreshSuggestions={onRefreshSuggestions}
+            variant="desktop"
+            containerWidth={containerWidth}
+            style={{ height: '100%' }}
+          />
         </div>
-        
-        {/* Mobile Layout: Single Column */}
-        {isMobile && (
-          <div 
-            className="flex-1 flex flex-col min-h-0 relative"
-            style={{ gap: `${Math.max(8, Math.min(24, containerWidth * 0.012))}px` }}
-          >
-            {/* Mobile: Compact Prompt Input */}
-            <div className="flex-shrink-0 relative">
-              <UserInputSection
-                config={config}
-                prompt={prompt}
-                setPrompt={setPrompt}
-                isLoading={isLoading}
-                suggestions={suggestions}
-                referenceImages={referenceImages}
-                onPromptSubmit={onPromptSubmit}
-                onSuggestionClick={onSuggestionClick}
-                onImageUpload={onImageUpload}
-                onImageRemove={onImageRemove}
-                onRefreshSuggestions={onRefreshSuggestions}
-                variant="mobile"
-                heightScaleFactor={heightScaleFactor}
-                containerWidth={containerWidth}
-              />
-            </div>
 
-            {/* Mobile: Images Gallery */}
-            <div className="flex-1 min-h-0 relative">
-              <ImageGallery
-                images={generatedImages}
-                isLoading={isLoading}
-                config={config}
-                fullPage={fullPage}
-                deployment={deployment}
-                layoutContext="horizontal"
-                containerWidth={containerWidth}
-              />
-            </div>
+        {/* Right Side - Gallery */}
+        <div className="flex-1 min-h-0 relative" style={{ marginLeft: `${config.prompt_gallery_spacing || 24}px` }}>
+          <div className="absolute inset-0 overflow-auto">
+            <ImageGallery
+              images={generatedImages}
+              isLoading={isLoading}
+              config={config}
+              fullPage={fullPage}
+              deployment={deployment}
+              layoutContext="vertical"
+              containerWidth={containerWidth * 0.6} // Adjust for side-by-side layout
+            />
           </div>
-        )}
-
-        {/* Desktop Layout: Left-Right */}
-        {!isMobile && (
-          <div 
-            className="flex-1 flex flex-row min-h-0 relative"
-            style={{ gap: `${Math.max(8, Math.min(24, containerWidth * 0.012))}px` }}
-          >
-            {/* Left Side: Prompt with inline upload - Configurable width */}
-            <div 
-              className="flex flex-col min-w-0 h-full relative"
-              style={{ width: `${responsivePromptWidth}%` }}
-            >
-              <div className="h-full flex flex-col">
-                <div className="flex-1 min-h-0 flex flex-col relative">
-                  <UserInputSection
-                    config={config}
-                    prompt={prompt}
-                    setPrompt={setPrompt}
-                    isLoading={isLoading}
-                    suggestions={suggestions}
-                    referenceImages={referenceImages}
-                    onPromptSubmit={onPromptSubmit}
-                    onSuggestionClick={onSuggestionClick}
-                    onImageUpload={onImageUpload}
-                    onImageRemove={onImageRemove}
-                    onRefreshSuggestions={onRefreshSuggestions}
-                    variant="desktop"
-                    heightScaleFactor={heightScaleFactor}
-                    containerWidth={containerWidth}
-                    className="flex-1"
-                    style={{ 
-                      minHeight: `${Math.max(120, Math.min(200, containerWidth * 0.15)) * heightScaleFactor}px`
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side: Generated Images - Takes remaining space */}
-            <div className="flex-1 min-w-0 min-h-0 relative">
-              <ImageGallery
-                images={generatedImages}
-                isLoading={isLoading}
-                config={config}
-                fullPage={fullPage}
-                deployment={deployment}
-                layoutContext="horizontal"
-                containerWidth={containerWidth}
-              />
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

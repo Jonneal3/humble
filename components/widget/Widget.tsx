@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { getRandomSuggestions, Suggestion } from "@/lib/suggestions";
 import { DesignSettings, defaultDesignSettings, WidgetStyle, stylePresets, loadGoogleFont } from "@/types/design";
 import { WidgetLayout } from "./WidgetLayout";
 import { Spinner } from "../ui/spinner";
+import { AutoDemoOverlay, DemoConfig } from "./AutoDemoOverlay";
 
 // Import layout components
 import { LeftRightLayout } from "./layouts/LeftRightLayout";
@@ -20,6 +21,7 @@ interface WidgetProps {
   className?: string;
   fullPage?: boolean;
   deployment?: boolean;
+  containerWidth?: number;
 }
 
 export function Widget({ 
@@ -28,7 +30,8 @@ export function Widget({
   designConfig, 
   className, 
   fullPage = false, 
-  deployment = false 
+  deployment = false,
+  containerWidth: providedContainerWidth
 }: WidgetProps) {
   // Sample images to display by default
   const sampleImages = [
@@ -47,29 +50,45 @@ export function Widget({
   const [isLoading, setIsLoading] = useState(false);
   const [referenceImages, setReferenceImages] = useState<string[]>([]);
   const [generatedImages, setGeneratedImages] = useState<Array<{ image: string | null }>>(sampleImages);
-  const [suggestions, setSuggestions] = useState<Suggestion[]>(getRandomSuggestions(6));
+  const [suggestions, setSuggestions] = useState<Suggestion[]>(getRandomSuggestions(4));
   const [prompt, setPrompt] = useState("");
   const [configLoaded, setConfigLoaded] = useState(!!designConfig);
-  const [containerWidth, setContainerWidth] = useState<number>(1024); // Default to desktop width
+  const [containerWidth, setContainerWidth] = useState(1024);
+  const [showDemo, setShowDemo] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [viewportHeight, setViewportHeight] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const supabase = createClientComponentClient();
   const componentId = React.useMemo(() => `widget-${instanceId}`, [instanceId]);
-  const containerRef = React.useRef<HTMLDivElement>(null);
 
-  // Monitor container width for responsive behavior
   useEffect(() => {
-    if (!containerRef.current) return;
+    setIsClient(true);
+    // Set initial viewport height
+    setViewportHeight(window.innerHeight);
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
-
-    resizeObserver.observe(containerRef.current);
-
-    return () => resizeObserver.disconnect();
+    // Listen for viewport height changes
+    const handleResize = () => {
+      setViewportHeight(window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    if (providedContainerWidth) {
+      setContainerWidth(providedContainerWidth);
+    } else if (containerRef.current) {
+      const observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          setContainerWidth(entry.contentRect.width);
+        }
+      });
+
+      observer.observe(containerRef.current);
+      return () => observer.disconnect();
+    }
+  }, [providedContainerWidth]);
 
   // Load configuration from database if not provided
   useEffect(() => {
@@ -138,9 +157,33 @@ export function Widget({
     });
   }, [config, configLoaded]);
 
+  // Check if demo should be shown - only run on client
+  useEffect(() => {
+    if (!isClient || !deployment) return;
+    if (config.demo_enabled === false) {
+      setShowDemo(false);
+      return;
+    }
+    
+    const hasSeenDemo = localStorage.getItem(`widget-demo-${instanceId}`);
+    if (!hasSeenDemo) {
+      setShowDemo(true);
+    }
+  }, [instanceId, deployment, config.demo_enabled, isClient]);
+
+  const handleDemoDismiss = () => {
+    setShowDemo(false);
+    localStorage.setItem(`widget-demo-${instanceId}`, 'true');
+  };
+
+  const demoConfig: DemoConfig = {
+    uploadMessage: config.demo_upload_message || "Upload your reference images to guide the AI",
+    generationMessage: config.demo_generation_message || "Your AI-generated images will appear here"
+  };
+
   // Event handlers
   const refreshSuggestions = () => {
-    setSuggestions(getRandomSuggestions(config.suggestions_count || 6));
+    setSuggestions(getRandomSuggestions(config.suggestions_count || 4));
   };
 
   const handlePromptSubmit = async (promptText: string) => {
@@ -262,6 +305,13 @@ export function Widget({
       onRefreshSuggestions: refreshSuggestions
     };
 
+    // Always use prompt-top layout on mobile screens (< 768px)
+    const isMobileWidth = containerWidth < 768;
+    if (isMobileWidth) {
+      return <PromptTopLayout {...layoutProps} />;
+    }
+
+    // Use configured layout for desktop/tablet screens
     switch (config.layout_mode) {
       case "left-right":
         return <LeftRightLayout {...layoutProps} />;
@@ -276,47 +326,54 @@ export function Widget({
     }
   };
 
-  // Show loading state until config is ready
-  if (!configLoaded && !designConfig) {
+  // Full widget with layout
+  if (!isClient || !configLoaded) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-gray-100">
-        <div className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/80 backdrop-blur-sm border border-white shadow-lg">
-          <div className="relative">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 flex items-center justify-center shadow-sm">
-              <Spinner className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-semibold text-slate-800 tracking-tight">Loading your widget...</p>
-            <p className="text-xs text-slate-500 font-medium mt-1">Getting everything ready</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center h-full">
+        <Spinner className="w-8 h-8 text-blue-600" />
       </div>
     );
   }
 
-  // Full widget with layout
   return (
     <div 
-      className={componentId} 
-      ref={containerRef} 
+      ref={containerRef}
+      className="flex items-center justify-center w-full" 
       style={{ 
-        height: '100%', 
-        width: '100%',
-        padding: !fullPage ? `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px` : '0',
-        boxSizing: 'border-box'
+        backgroundColor: config.background_color || '#ffffff',
+        height: fullPage ? `${viewportHeight}px` : '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden'
       }}
     >
-      <WidgetLayout
-        config={config}
-        promptSection={<div />} // Not used anymore
-        imagesSection={<div />} // Not used anymore  
-        className={className}
-        fullPage={true} // Always true so WidgetLayout doesn't add its own padding
-        deployment={deployment}
+      <div 
+        className="relative w-full"
+        style={{ 
+          height: fullPage ? `${viewportHeight}px` : '100%',
+          padding: containerWidth < 768 ? '12px' : `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px`,
+          boxSizing: 'border-box',
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          maxWidth: '100%'
+        }}
       >
-        {getLayoutComponent()}
-      </WidgetLayout>
+        <div className="absolute inset-0 flex flex-col" style={{ 
+          padding: containerWidth < 768 ? '12px' : `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px`,
+          maxWidth: '100%',
+          overflowX: 'hidden'
+        }}>
+          {isClient && showDemo && <AutoDemoOverlay onDismiss={handleDemoDismiss} config={demoConfig} />}
+          <WidgetLayout
+            config={config}
+            className={className}
+            fullPage={fullPage}
+            deployment={deployment}
+          >
+            {getLayoutComponent()}
+          </WidgetLayout>
+        </div>
+      </div>
     </div>
   );
 }

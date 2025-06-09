@@ -8,9 +8,16 @@ import { DesignSettings } from "@/types/design";
 interface LaunchTabProps {
   instanceId: string;
   config: DesignSettings;
+  openSections: Record<string, Record<string, boolean>>;
+  toggleSection: (tab: string, section: string) => void;
 }
 
-export const LaunchTab: React.FC<LaunchTabProps> = ({ instanceId, config }) => {
+export const LaunchTab: React.FC<LaunchTabProps> = ({ 
+  instanceId, 
+  config,
+  openSections,
+  toggleSection 
+}) => {
   const { toast } = useToast();
   const [embedCode, setEmbedCode] = useState<string | null>(null);
 

@@ -1,11 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    esmExternals: "loose",
-  },
   // Optimize client-side navigation
-  swcMinify: true,
-  // Enable static optimization for better performance
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
