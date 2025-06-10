@@ -6,27 +6,28 @@ import { DesignSettings, getPaddingCSS, getEffectivePadding } from "@/types/desi
 
 interface WidgetLayoutProps {
   config: DesignSettings;
-  promptSection?: ReactNode; // Keep for backwards compatibility but optional
-  imagesSection?: ReactNode; // Keep for backwards compatibility but optional
+  promptSection?: ReactNode;
+  imagesSection?: ReactNode;
   className?: string;
-  children?: ReactNode; // New: accept complete layout as children
-  fullPage?: boolean; // When true, removes container padding for full page view
-  deployment?: boolean; // When true, indicates actual deployment vs design preview
+  children?: ReactNode;
+  fullPage?: boolean;
+  deployment?: boolean;
 }
 
 // Simple layout switcher with clean minimal styling
-const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, imagesSection: ReactNode, config: DesignSettings) => {
+const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, imagesSection: ReactNode, config: DesignSettings, fullPage: boolean = false) => {
   switch (layoutMode) {
     case "left-right":
       return (
-        <div className="h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="h-full flex flex-1 min-h-0 overflow-hidden">
           {/* Left: Prompt Section */}
           <div 
-            className="lg:col-span-5 flex flex-col"
+            className="flex flex-col overflow-hidden"
             style={{
+              width: `${config.prompt_section_width || 40}%`,
               backgroundColor: config.prompt_background_color || 'transparent',
-              borderRadius: `${config.prompt_border_radius || 8}px`,
-              border: `1px solid ${config.prompt_border_color || '#e5e7eb'}`
+              borderRadius: fullPage ? 0 : `${config.prompt_border_radius || 8}px`,
+              border: fullPage ? 'none' : `1px solid ${config.prompt_border_color || '#e5e7eb'}`
             }}
           >
             {promptSection}
@@ -34,11 +35,14 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           
           {/* Right: Images Section */}
           <div 
-            className="lg:col-span-7 flex flex-col"
+            className="flex-1 flex flex-col min-h-0 overflow-hidden"
             style={{
+              marginLeft: `${config.prompt_gallery_spacing || 24}px`,
               backgroundColor: config.gallery_background_color || 'transparent',
-              borderRadius: `${config.gallery_container_border_radius || 12}px`,
-              border: config.gallery_container_border_enabled ? `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 'none'
+              borderRadius: fullPage ? 0 : `${config.gallery_container_border_radius || 12}px`,
+              border: !fullPage && config.gallery_container_border_enabled ? 
+                `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 
+                'none'
             }}
           >
             {imagesSection}
@@ -48,10 +52,10 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
 
     case "prompt-top":
       return (
-        <div className="h-full flex flex-col gap-4 items-center">
+        <div className="h-full flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Top: Compact Prompt */}
           <div 
-            className="flex-shrink-0 w-full max-w-2xl mx-auto"
+            className="flex-shrink-0 w-full overflow-hidden"
             style={{
               backgroundColor: config.prompt_background_color || 'transparent'
             }}
@@ -61,11 +65,14 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           
           {/* Bottom: Images Area */}
           <div 
-            className="flex-1 min-h-0 w-full max-w-5xl mx-auto"
+            className="flex-1 min-h-0 w-full overflow-hidden"
             style={{
+              marginTop: `${config.prompt_gallery_spacing || 24}px`,
               backgroundColor: config.gallery_background_color || 'transparent',
-              borderRadius: `${config.gallery_container_border_radius || 12}px`,
-              border: config.gallery_container_border_enabled ? `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 'none'
+              borderRadius: fullPage ? 0 : `${config.gallery_container_border_radius || 12}px`,
+              border: !fullPage && config.gallery_container_border_enabled ? 
+                `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 
+                'none'
             }}
           >
             {imagesSection}
@@ -75,14 +82,16 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
 
     case "prompt-bottom":
       return (
-        <div className="h-full flex flex-col gap-3 items-center">
+        <div className="h-full flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Top: Images Area */}
           <div 
-            className="flex-1 min-h-0 w-full max-w-5xl mx-auto"
+            className="flex-1 min-h-0 w-full overflow-hidden"
             style={{
               backgroundColor: config.gallery_background_color || 'transparent',
-              borderRadius: `${config.gallery_container_border_radius || 12}px`,
-              border: config.gallery_container_border_enabled ? `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 'none'
+              borderRadius: fullPage ? 0 : `${config.gallery_container_border_radius || 12}px`,
+              border: !fullPage && config.gallery_container_border_enabled ? 
+                `${config.gallery_container_border_width}px ${config.gallery_container_border_style} ${config.gallery_container_border_color}` : 
+                'none'
             }}
           >
             {imagesSection}
@@ -90,8 +99,9 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
           
           {/* Bottom: Input Bar */}
           <div 
-            className="flex-shrink-0 w-full max-w-2xl mx-auto"
+            className="flex-shrink-0 w-full overflow-hidden"
             style={{
+              marginTop: `${config.prompt_gallery_spacing || 24}px`,
               backgroundColor: config.prompt_background_color || 'transparent'
             }}
           >
@@ -102,7 +112,7 @@ const getLayoutStructure = (layoutMode: string, promptSection: ReactNode, images
 
     default:
       return (
-        <div className="h-full flex flex-col gap-4">
+        <div className="h-full flex flex-col flex-1 min-h-0 overflow-hidden">
           {promptSection}
           {imagesSection}
         </div>
@@ -125,7 +135,6 @@ export function WidgetLayout({
     setIsClient(true);
   }, []);
 
-  // Base container styles - simplified since children now handle their own styling
   const containerStyles = {
     backgroundColor: (fullPage || deployment) ? 'transparent' : (config.background_color || '#ffffff'),
     borderRadius: (fullPage || deployment) ? 0 : `${config.border_radius || 0}px`,
@@ -149,10 +158,14 @@ export function WidgetLayout({
 
   return (
     <div 
-      className={`relative h-full w-full flex flex-col ${className}`}
-      style={containerStyles}
+      className={`relative h-full w-full flex flex-col min-h-0 overflow-hidden ${className}`}
+      style={{
+        ...containerStyles,
+        maxHeight: '100%',
+        maxWidth: '100%'
+      }}
     >
-      {children}
+      {children || getLayoutStructure(config.layout_mode || 'left-right', promptSection, imagesSection, config, fullPage)}
     </div>
   );
 } 

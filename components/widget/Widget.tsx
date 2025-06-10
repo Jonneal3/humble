@@ -22,6 +22,7 @@ interface WidgetProps {
   fullPage?: boolean;
   deployment?: boolean;
   containerWidth?: number;
+  containerHeight?: number;
 }
 
 export function Widget({ 
@@ -31,7 +32,8 @@ export function Widget({
   className, 
   fullPage = false, 
   deployment = false,
-  containerWidth: providedContainerWidth
+  containerWidth: providedContainerWidth,
+  containerHeight: providedContainerHeight
 }: WidgetProps) {
   // Sample images to display by default
   const sampleImages = [
@@ -338,41 +340,34 @@ export function Widget({
   return (
     <div 
       ref={containerRef}
-      className="flex items-center justify-center w-full" 
+      className="flex items-center justify-center w-full overflow-hidden" 
       style={{ 
         backgroundColor: config.background_color || '#ffffff',
         height: fullPage ? `${viewportHeight}px` : '100%',
-        maxWidth: '100vw',
-        overflowX: 'hidden'
+        maxWidth: config.max_width ? `${config.max_width}px` : '100vw',
+        maxHeight: config.max_height ? `${config.max_height}px` : (fullPage ? `${viewportHeight}px` : '100%')
       }}
     >
       <div 
-        className="relative w-full"
+        className="relative w-full h-full overflow-hidden"
         style={{ 
-          height: fullPage ? `${viewportHeight}px` : '100%',
           padding: containerWidth < 768 ? '12px' : `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px`,
           boxSizing: 'border-box',
-          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          maxWidth: '100%'
+          transform: config.scale_factor ? `scale(${config.scale_factor})` : undefined,
+          transformOrigin: 'center center'
         }}
       >
-        <div className="absolute inset-0 flex flex-col" style={{ 
-          padding: containerWidth < 768 ? '12px' : `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px`,
-          maxWidth: '100%',
-          overflowX: 'hidden'
-        }}>
-          {isClient && showDemo && <AutoDemoOverlay onDismiss={handleDemoDismiss} config={demoConfig} />}
-          <WidgetLayout
-            config={config}
-            className={className}
-            fullPage={fullPage}
-            deployment={deployment}
-          >
-            {getLayoutComponent()}
-          </WidgetLayout>
-        </div>
+        {isClient && showDemo && <AutoDemoOverlay onDismiss={handleDemoDismiss} config={demoConfig} />}
+        <WidgetLayout
+          config={config}
+          className={className}
+          fullPage={fullPage}
+          deployment={deployment}
+        >
+          {getLayoutComponent()}
+        </WidgetLayout>
       </div>
     </div>
   );

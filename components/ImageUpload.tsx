@@ -15,6 +15,12 @@ interface ImageUploadProps {
   };
   children?: React.ReactNode;
   variant?: "default" | "chatgpt" | "minimal"; // Different styles
+  textSettings?: {
+    secondaryText?: string;
+    textColor?: string;
+    fontFamily?: string;
+    fontSize?: number;
+  };
 }
 
 export function ImageUpload({
@@ -24,7 +30,8 @@ export function ImageUpload({
   maxImages = 6,
   customStyles,
   children,
-  variant = "default"
+  variant = "default",
+  textSettings
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -147,9 +154,9 @@ export function ImageUpload({
               onClick={() => fileInputRef.current?.click()}
               className="w-8 h-8 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white hover:bg-zinc-50 flex items-center justify-center transition-all duration-200"
               style={customStyles?.button}
-              title="Add reference image"
+              title={textSettings?.secondaryText || "Drag & drop or click to upload"}
             >
-              {children || <ImageIcon className="w-4 h-4 text-zinc-500" />}
+              {children || <ImageIcon className="w-4 h-4" style={{ color: textSettings?.textColor || '#64748b' }} />}
             </button>
           </div>
         )}
@@ -304,7 +311,11 @@ export function ImageUpload({
                 >
                   <div className="text-center">
                     <ImageIcon className="w-6 h-6 mx-auto text-zinc-400 mb-1" />
-                    <p className="text-xs text-zinc-500">Add</p>
+                    <p className="text-xs" style={{
+                      color: textSettings?.textColor || '#64748b',
+                      fontFamily: textSettings?.fontFamily || 'inherit',
+                      fontSize: textSettings?.fontSize ? `${textSettings.fontSize}px` : '12px'
+                    }}>Add</p>
                   </div>
                 </div>
               )}
@@ -313,7 +324,11 @@ export function ImageUpload({
           
           {/* Bottom controls */}
           <div className="flex-shrink-0 mt-3 flex items-center justify-between">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs" style={{
+              color: textSettings?.textColor || '#64748b',
+              fontFamily: textSettings?.fontFamily || 'inherit',
+              fontSize: textSettings?.fontSize ? `${textSettings.fontSize}px` : '12px'
+            }}>
               {currentImages.length} of {maxImages} images
             </p>
             {currentImages.length < maxImages && (
@@ -341,7 +356,7 @@ export function ImageUpload({
         // No images - show upload area
         <div
           className={cn(
-            "relative w-full h-full rounded-lg transition-all duration-200",
+            "relative w-full h-full rounded-lg transition-all duration-200 flex flex-col items-center justify-center p-6",
             isDragging && "ring-2 ring-primary ring-offset-2"
           )}
           style={customStyles?.container}
@@ -359,11 +374,22 @@ export function ImageUpload({
           />
           <button
             type="button"
-            className="w-full h-full"
+            className="w-full h-full flex flex-col items-center justify-center gap-2"
             onClick={() => fileInputRef.current?.click()}
             style={customStyles?.button}
           >
-            {children}
+            {children || (
+              <>
+                <ImageIcon className="w-8 h-8 text-zinc-400 mb-2" />
+                <p className="text-sm font-medium text-center" style={{
+                  color: textSettings?.textColor || '#64748b',
+                  fontFamily: textSettings?.fontFamily || 'inherit',
+                  fontSize: textSettings?.fontSize ? `${textSettings.fontSize}px` : '14px'
+                }}>
+                  {textSettings?.secondaryText || "Drag & drop or click to upload"}
+                </p>
+              </>
+            )}
           </button>
         </div>
       )}

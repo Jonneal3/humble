@@ -59,9 +59,13 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
     updateConfig({
       // Overall style
       background_color: theme.background_color,
+      background_opacity: theme.background_opacity,
+      background_gradient: theme.background_gradient,
+      background_image: theme.background_image,
       container_padding: theme.container_padding,
       border_radius: theme.border_radius,
       shadow_style: theme.shadow_style,
+      sidebar_background_color: theme.sidebar_background_color,
       
       // Prompt section
       prompt_background_color: theme.prompt_background_color,
@@ -71,27 +75,61 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
       prompt_border_style: theme.prompt_border_style,
       prompt_border_width: theme.prompt_border_width,
       prompt_border_radius: theme.prompt_border_radius,
+      prompt_font_family: theme.prompt_font_family,
+      prompt_font_size: theme.prompt_font_size,
       
       // Submit button
       submit_button_background_color: theme.submit_button_background_color,
       submit_button_text_color: theme.submit_button_text_color,
       submit_button_hover_background_color: theme.submit_button_hover_background_color,
       
-      // Suggestions
+      // Suggestions styling
       suggestion_background_color: theme.suggestion_background_color,
       suggestion_text_color: theme.suggestion_text_color,
-      suggestion_border_color: theme.suggestion_border_color,
       suggestion_border_style: theme.suggestion_border_style,
+      suggestion_border_color: theme.suggestion_border_color,
       suggestion_border_width: theme.suggestion_border_width,
       suggestion_border_radius: theme.suggestion_border_radius,
+      suggestion_font_family: theme.suggestion_font_family,
+      suggestion_font_size: theme.suggestion_font_size,
+      suggestion_shadow_style: theme.suggestion_shadow_style,
       
-      // Uploader
+      // Uploader styling
       uploader_background_color: theme.uploader_background_color,
       uploader_border_color: theme.uploader_border_color,
       uploader_text_color: theme.uploader_text_color,
       uploader_border_style: theme.uploader_border_style,
       uploader_border_width: theme.uploader_border_width,
-      uploader_border_radius: theme.uploader_border_radius
+      uploader_border_radius: theme.uploader_border_radius,
+      uploader_font_family: theme.uploader_font_family,
+      uploader_font_size: theme.uploader_font_size,
+      
+      // Gallery styling only (no structural settings)
+      gallery_background_color: theme.gallery_background_color,
+      gallery_border_radius: theme.gallery_border_radius,
+      gallery_shadow_style: theme.gallery_shadow_style,
+      gallery_font_family: theme.gallery_font_family,
+      gallery_font_size: theme.gallery_font_size,
+      
+      // Gallery Container Border
+      gallery_container_border_enabled: theme.gallery_container_border_enabled,
+      gallery_container_border_width: theme.gallery_container_border_width,
+      gallery_container_border_color: theme.gallery_container_border_color,
+      gallery_container_border_style: theme.gallery_container_border_style,
+      gallery_container_border_radius: theme.gallery_container_border_radius,
+      
+      // Individual Image Border
+      gallery_image_border_enabled: theme.gallery_image_border_enabled,
+      gallery_image_border_width: theme.gallery_image_border_width,
+      gallery_image_border_color: theme.gallery_image_border_color,
+      gallery_image_border_style: theme.gallery_image_border_style,
+      gallery_image_border_radius: theme.gallery_image_border_radius,
+      
+      // Gallery Overlay
+      overlay_background_color: theme.overlay_background_color,
+      overlay_icon_color: theme.overlay_icon_color,
+      overlay_font_family: theme.overlay_font_family,
+      overlay_font_size: theme.overlay_font_size
     });
   }, [updateConfig]);
 
@@ -315,53 +353,53 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                 <Button
                   variant={config.layout_mode === "left-right" ? "default" : "outline"}
                   size="sm"
-                  className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 transition-all"
+                  className="relative h-auto p-4 flex flex-col items-center gap-3 hover:border-border data-[state=default]:border-primary data-[state=default]:bg-primary/5 transition-all group"
                   onClick={() => handleLayoutChange("left-right", config.prompt_section_width)}
                 >
                   <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-6 bg-current opacity-70 rounded"></div>
-                    <div className="w-6 h-6 bg-current opacity-40 rounded"></div>
+                    <div className="w-4 h-6 bg-foreground/80 dark:bg-foreground/90 border border-border rounded-sm"></div>
+                    <div className="w-6 h-6 bg-muted border border-border rounded-sm"></div>
                   </div>
-                  <span className="text-xs font-medium">Left-Right</span>
+                  <span className="text-xs font-medium text-foreground/90">Left-Right</span>
                 </Button>
                 
                 <Button
                   variant={config.layout_mode === "right-left" ? "default" : "outline"}
                   size="sm"
-                  className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 transition-all"
+                  className="relative h-auto p-4 flex flex-col items-center gap-3 hover:border-border data-[state=default]:border-primary data-[state=default]:bg-primary/5 transition-all group"
                   onClick={() => handleLayoutChange("right-left", config.prompt_section_width)}
                 >
                   <div className="flex items-center gap-1.5">
-                    <div className="w-6 h-6 bg-current opacity-40 rounded"></div>
-                    <div className="w-4 h-6 bg-current opacity-70 rounded"></div>
+                    <div className="w-6 h-6 bg-muted border border-border rounded-sm"></div>
+                    <div className="w-4 h-6 bg-foreground/80 dark:bg-foreground/90 border border-border rounded-sm"></div>
                   </div>
-                  <span className="text-xs font-medium">Right-Left</span>
+                  <span className="text-xs font-medium text-foreground/90">Right-Left</span>
                 </Button>
                 
                 <Button
                   variant={config.layout_mode === "prompt-top" ? "default" : "outline"}
                   size="sm"
-                  className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 transition-all"
+                  className="relative h-auto p-4 flex flex-col items-center gap-3 hover:border-border data-[state=default]:border-primary data-[state=default]:bg-primary/5 transition-all group"
                   onClick={() => handleLayoutChange("prompt-top")}
                 >
                   <div className="flex flex-col gap-1.5">
-                    <div className="w-8 h-3 bg-current opacity-70 rounded"></div>
-                    <div className="w-8 h-4 bg-current opacity-40 rounded"></div>
+                    <div className="w-8 h-3 bg-foreground/80 dark:bg-foreground/90 border border-border rounded-sm"></div>
+                    <div className="w-8 h-4 bg-muted border border-border rounded-sm"></div>
                   </div>
-                  <span className="text-xs font-medium">Prompt Top</span>
+                  <span className="text-xs font-medium text-foreground/90">Prompt Top</span>
                 </Button>
                 
                 <Button
                   variant={config.layout_mode === "prompt-bottom" ? "default" : "outline"}
                   size="sm"
-                  className="h-auto p-4 flex flex-col items-center gap-3 hover:bg-muted/50 transition-all"
+                  className="relative h-auto p-4 flex flex-col items-center gap-3 hover:border-border data-[state=default]:border-primary data-[state=default]:bg-primary/5 transition-all group"
                   onClick={() => handleLayoutChange("prompt-bottom")}
                 >
                   <div className="flex flex-col gap-1.5">
-                    <div className="w-8 h-4 bg-current opacity-40 rounded"></div>
-                    <div className="w-8 h-3 bg-current opacity-70 rounded"></div>
+                    <div className="w-8 h-4 bg-muted border border-border rounded-sm"></div>
+                    <div className="w-8 h-3 bg-foreground/80 dark:bg-foreground/90 border border-border rounded-sm"></div>
                   </div>
-                  <span className="text-xs font-medium">Prompt Bottom</span>
+                  <span className="text-xs font-medium text-foreground/90">Prompt Bottom</span>
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
@@ -479,14 +517,6 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
               <div className="space-y-2">
                 <Label className="text-xs font-medium">Common Sizes</Label>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-7 text-xs justify-start"
-                    onClick={() => updateConfig({ iframe_width: "600px", iframe_height: "400px" })}
-                  >
-                    Small (600×400)
-                  </Button>
                   <Button
                     variant="outline"
                     size="sm"
@@ -664,8 +694,8 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                 />
               </div>
 
-              <div className="space-y-1.5 bg-background/50 rounded-md p-3">
-                <Label className="text-xs font-medium">Prompt Section Position</Label>
+              {/* Prompt Section Alignment */}
+              {(config.layout_mode === "prompt-top" || config.layout_mode === "prompt-bottom") && (
                 <SelectInput
                   value={config.prompt_section_alignment || 'center'}
                   onChange={(value) => updateConfig({ prompt_section_alignment: value as 'left' | 'center' | 'right' })}
@@ -674,9 +704,9 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                     { value: 'center', label: 'Center' },
                     { value: 'right', label: 'Right' }
                   ]}
-                  label="Alignment"
+                  label={`Prompt Section Alignment (${config.layout_mode === "prompt-top" ? "Top" : "Bottom"})`}
                 />
-              </div>
+              )}
             </div>
 
             {/* Image Uploader Subsection */}
@@ -1056,18 +1086,18 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
               
               <div className="grid grid-cols-2 gap-3">
                 <NumberInput
+                  label="Columns"
+                  value={config.gallery_columns ?? 2}
+                  onChange={(value) => updateConfig({ gallery_columns: value })}
+                  min={1}
+                  max={4}
+                />
+                <NumberInput
                   label="Spacing"
                   value={config.gallery_spacing ?? 16}
                   onChange={(value) => updateConfig({ gallery_spacing: value })}
                   min={0}
-                  max={120}
-                />
-                <NumberInput
-                  label="Columns"
-                  value={config.gallery_columns || 2}
-                  onChange={(value) => updateConfig({ gallery_columns: value })}
-                  min={1}
-                  max={4}
+                  max={50}
                 />
               </div>
               
@@ -1102,16 +1132,6 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-3">
-                <NumberInput
-                  label="Radius"
-                  value={config.gallery_border_radius ?? 12}
-                  onChange={(value) => updateConfig({ gallery_border_radius: value })}
-                  min={0}
-                  max={50}
-                />
-              </div>
-
               {/* Gallery Container Border */}
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-medium">Gallery Container Border</Label>

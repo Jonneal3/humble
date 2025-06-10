@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { DesignSettings, getEffectivePadding } from "@/types/design";
+import React from "react";
+import { DesignSettings } from "@/types/design";
 import { Widget } from "@/components/widget/Widget";
 
 interface WidgetPageViewProps {
@@ -13,75 +13,51 @@ interface WidgetPageViewProps {
   deployment?: boolean;
 }
 
-// Pure, optimized component for real-time widget preview that mirrors the actual widget structure
 export const WidgetPageView = React.memo<WidgetPageViewProps>(({ 
   instanceId, 
-  liveConfig, 
-  className, 
-  style, 
+  liveConfig,
+  className,
+  style,
   fullPage = false,
   deployment = true
 }) => {
-  const [isClient, setIsClient] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const safeConfig: DesignSettings | undefined = liveConfig || undefined;
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Add resize observer to track container width
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setContainerWidth(entry.contentRect.width);
-      }
-    });
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  // Calculate container padding exactly like the widget page does
-  const effectivePadding = getEffectivePadding(liveConfig || {});
-  const paddingStyle = {
-    paddingTop: `${effectivePadding.top}px`,
-    paddingRight: `${effectivePadding.right}px`,
-    paddingBottom: `${effectivePadding.bottom}px`,
-    paddingLeft: `${effectivePadding.left}px`,
-  };
-
-  if (!isClient) {
-    return null;
+  if (fullPage) {
+    return (
+      <div className="w-full h-[calc(100vh-24px)] bg-white">
+        <Widget
+          instanceId={instanceId}
+          designConfig={safeConfig}
+          fullPage={true}
+          deployment={deployment}
+          className="w-full h-full"
+        />
+      </div>
+    );
   }
 
   return (
-    <div 
-      ref={containerRef}
-      className={`relative w-full flex items-center justify-center overflow-hidden ${className || ""}`}
-      style={{ 
-        margin: 0, 
-        backgroundColor: fullPage ? 'transparent' : (liveConfig?.background_color || '#ffffff'),
-        boxSizing: 'border-box',
-        height: fullPage ? '100vh' : '100%',
-        ...style
-      }}
-    >
+    <div className="flex flex-col h-full">
       <div 
-        className="w-full relative overflow-hidden"
-        style={{ 
-          height: fullPage ? '100vh' : '100%'
-        }}
+        className={`flex-1 min-h-0 flex items-center justify-center bg-gray-100 overflow-auto p-6 ${className || ""}`}
+        style={style}
       >
-        <div className="absolute inset-0 overflow-hidden">
+        <div
+          className="bg-white rounded-lg shadow-lg overflow-hidden"
+          style={{
+            width: '400px',
+            height: '600px',
+            maxWidth: '100%',
+            maxHeight: 'calc(100vh - 48px)'
+          }}
+        >
           <Widget
             instanceId={instanceId}
-            designConfig={liveConfig || undefined}
-            fullPage={fullPage}
+            designConfig={safeConfig}
+            fullPage={false}
             deployment={deployment}
-            containerWidth={containerWidth}
+            className="w-full h-full"
           />
         </div>
       </div>

@@ -6,6 +6,7 @@ import { Suggestion } from "@/lib/suggestions";
 import { ImageUpload } from "../ImageUpload";
 import { RefreshCw, ArrowUp, ArrowUpRight } from "lucide-react";
 import { Spinner } from "../ui/spinner";
+import { cn } from "@/lib/utils";
 
 interface UserInputSectionProps {
   config: DesignSettings;
@@ -46,40 +47,51 @@ export function UserInputSection({
 }: UserInputSectionProps) {
   const isMobile = variant === 'mobile';
 
-  // Base container styles with fixed padding
+  // Base container styles with responsive padding
   const containerStyles = {
     display: 'flex',
     flexDirection: 'column' as const,
-    padding: variant === "desktop" ? `${24 * heightScaleFactor}px` : `${12 * heightScaleFactor}px`,
+    padding: variant === "desktop" 
+      ? `${Math.min(Math.max(8, 12 * heightScaleFactor), 16)}px ${Math.min(Math.max(12, 16 * (containerWidth / 1200)), 20)}px`
+      : `${Math.min(Math.max(4, 6 * heightScaleFactor), 8)}px ${Math.min(Math.max(6, 8 * (containerWidth / 768)), 10)}px`,
     backgroundColor: config.prompt_background_color || 'transparent',
-    borderRadius: `${(config.prompt_border_radius || 8) * heightScaleFactor}px`,
+    borderRadius: `${Math.min((config.prompt_border_radius || 8) * heightScaleFactor, 12)}px`,
     height: '100%',
     minHeight: 'min-content',
+    maxHeight: '100%',
     width: '100%',
     maxWidth: '100%',
     overflow: 'hidden',
+    boxSizing: 'border-box' as const,
+    flex: '1 1 auto',
     ...style
   };
+
+  // Inside the component, before the return:
+  const placeholderStyle = {
+    '--placeholder-color': config.prompt_placeholder_color || '#9ca3af'
+  } as React.CSSProperties;
 
   // Mobile version
   if (isMobile) {
     return (
-      <div className={`relative flex flex-col ${className}`} style={containerStyles}>
-        <div className="flex-1 min-h-0 flex flex-col">
+      <div className={`relative flex flex-col overflow-hidden ${className}`} style={containerStyles}>
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
           {/* Mobile Upload Section */}
           {config.uploader_enabled && (
-            <div className="flex-shrink-0 mb-3">
+            <div className="flex-shrink-0 mb-3 overflow-hidden" style={{ maxHeight: '30%' }}>
               <div 
-                className="flex items-center p-3 rounded-lg min-h-[60px] cursor-pointer hover:opacity-90 transition-opacity" 
+                className="flex items-center p-3 rounded-lg min-h-[60px] cursor-pointer hover:opacity-90 transition-opacity overflow-hidden" 
                 style={{
                   backgroundColor: config.uploader_background_color || '#f8fafc',
                   borderStyle: config.uploader_border_style || 'dashed',
                   borderColor: config.uploader_border_color || '#cbd5e1',
-                  borderWidth: `${config.uploader_border_width ?? 2}px`,
-                  borderRadius: `${config.uploader_border_radius ?? 12}px`
+                  borderWidth: `${Math.min(config.uploader_border_width ?? 2, 2)}px`,
+                  borderRadius: `${Math.min(config.uploader_border_radius ?? 12, 12)}px`,
+                  maxHeight: '100%'
                 }}
               >
-                <div className="flex items-center w-full">
+                <div className="flex items-center w-full overflow-hidden">
                   <ImageUpload
                     onImageUpload={onImageUpload}
                     onImageRemove={onImageRemove}
@@ -90,31 +102,47 @@ export function UserInputSection({
                       container: {
                         backgroundColor: 'transparent',
                         borderStyle: 'none' as const,
-                        flex: '0 0 auto'
+                        flex: '0 0 auto',
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        overflow: 'hidden'
                       },
                       button: {
                         backgroundColor: 'transparent',
-                        borderStyle: 'none' as const
+                        borderStyle: 'none' as const,
+                        maxHeight: '100%'
                       }
                     }}
+                    textSettings={{
+                      secondaryText: config.uploader_secondary_text,
+                      textColor: config.uploader_text_color,
+                      fontFamily: config.uploader_font_family,
+                      fontSize: config.uploader_font_size
+                    }}
                   />
-                  {referenceImages.length === 0 && (
-                    <p className="text-sm font-medium flex-1 truncate" style={{
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{
                       color: config.uploader_text_color || '#64748b',
                       fontFamily: config.uploader_font_family || 'inherit',
-                      fontSize: `${config.uploader_font_size || 14}px`
+                      fontSize: `${Math.min((config.uploader_font_size || 14), 14)}px`
                     }}>
-                      {config.uploader_primary_text || "Add reference images to guide the AI generation"}
+                      {config.uploader_primary_text}
                     </p>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>
           )}
           
           {/* Mobile Prompt Input */}
-          <div className="flex gap-2 items-end">
-            <div className="flex-1">
+          <div className="flex gap-2 items-end overflow-hidden" style={{ 
+            maxHeight: `${70 * heightScaleFactor}%`,
+            minHeight: `${40 * heightScaleFactor}%`,
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div className="flex-1 overflow-hidden flex flex-col">
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -128,12 +156,17 @@ export function UserInputSection({
                 }}
                 placeholder="Describe what you want to create..."
                 rows={2}
-                className="bg-transparent border-none p-2 resize-none outline-none leading-relaxed w-full"
+                className={cn(
+                  "bg-transparent border-none resize-none outline-none leading-relaxed w-full overflow-auto flex-1 placeholder-color",
+                  "placeholder:text-[var(--placeholder-color)]"
+                )}
                 style={{
-                  color: config.prompt_text_color || '#374151',
-                  fontFamily: config.prompt_font_family || 'inherit',
-                  fontWeight: '500',
-                  fontSize: `${(config.prompt_font_size || 16) * heightScaleFactor}px`
+                  ...placeholderStyle,
+                  fontSize: `${Math.min((config.prompt_font_size || 16) * heightScaleFactor, 16)}px`,
+                  padding: `${Math.min(Math.max(4, 6 * heightScaleFactor), 8)}px`,
+                  boxSizing: 'border-box',
+                  height: '100%',
+                  minHeight: '100%',
                 }}
                 disabled={isLoading}
               />
@@ -209,8 +242,8 @@ export function UserInputSection({
 
   // Desktop version
   return (
-    <div className={`relative flex flex-col ${className}`} style={containerStyles}>
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+    <div className={`relative flex flex-col flex-1 h-full ${className}`} style={containerStyles}>
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden h-full">
         {/* Desktop Upload Section */}
         {config.uploader_enabled && (
           <div className="flex-shrink-0 min-w-0">
@@ -229,8 +262,8 @@ export function UserInputSection({
                       borderColor: config.uploader_border_color || '#cbd5e1',
                       borderWidth: `${(config.uploader_border_width ?? 2) * heightScaleFactor}px`,
                       borderRadius: `${(config.uploader_border_radius ?? 12) * heightScaleFactor}px`,
-                      padding: `${8 * heightScaleFactor}px`,
-                      maxHeight: `${60 * heightScaleFactor}px`,
+                      padding: `${6 * heightScaleFactor}px`,
+                      maxHeight: `${50 * heightScaleFactor}px`,
                       overflow: 'hidden',
                       width: 'auto',
                       minWidth: '40px'
@@ -241,31 +274,39 @@ export function UserInputSection({
                       borderColor: config.uploader_border_color || '#cbd5e1',
                       borderWidth: `${(config.uploader_border_width ?? 2) * heightScaleFactor}px`,
                       borderRadius: `${(config.uploader_border_radius ?? 12) * heightScaleFactor}px`,
-                      padding: `${8 * heightScaleFactor}px`,
-                      maxHeight: `${60 * heightScaleFactor}px`,
+                      padding: `${6 * heightScaleFactor}px`,
+                      maxHeight: `${50 * heightScaleFactor}px`,
                       overflow: 'hidden',
                       width: 'auto',
                       minWidth: '40px'
                     }
                   }}
+                  textSettings={{
+                    secondaryText: config.uploader_secondary_text,
+                    textColor: config.uploader_text_color,
+                    fontFamily: config.uploader_font_family,
+                    fontSize: config.uploader_font_size
+                  }}
                 />
               </div>
               <p 
-                className="text-slate-500 font-medium flex-1 min-w-[150px]"
+                className="font-medium flex-1 min-w-[150px]"
                 style={{ 
-                  fontSize: `${12 * heightScaleFactor}px`
+                  fontSize: `${12 * heightScaleFactor}px`,
+                  color: config.uploader_text_color || '#64748b',
+                  fontFamily: config.uploader_font_family || 'inherit'
                 }}
               >
-                Add reference images to guide the AI generation
+                {config.uploader_primary_text}
               </p>
             </div>
           </div>
         )}
         
         {/* Desktop Prompt Input */}
-        <div className="flex-1 flex flex-col mt-4 min-w-0 overflow-hidden">
-          <div className="relative flex items-start gap-2 min-w-0">
-            <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col mt-4 min-h-0 flex-grow overflow-hidden">
+          <div className="relative flex items-start gap-2 min-h-0 flex-grow h-full">
+            <div className="flex-1 flex flex-col min-h-0 w-full h-full">
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -278,15 +319,21 @@ export function UserInputSection({
                   }
                 }}
                 placeholder="Describe what you want to create..."
-                className="bg-transparent border-none p-2 resize-none outline-none leading-relaxed w-full"
+                className={cn(
+                  "bg-transparent border-none resize-none outline-none leading-relaxed w-full h-full placeholder-color",
+                  "placeholder:text-[var(--placeholder-color)]"
+                )}
                 style={{
-                  fontSize: `${(config.prompt_font_size || 16) * heightScaleFactor}px`,
+                  ...placeholderStyle,
+                  fontSize: `${Math.min(Math.max(14, (config.prompt_font_size || 16) * heightScaleFactor), 18)}px`,
                   color: config.prompt_text_color || '#374151',
                   fontFamily: config.prompt_font_family || 'inherit',
                   fontWeight: '500',
-                  minHeight: `${60 * heightScaleFactor}px`,
-                  maxHeight: `${120 * heightScaleFactor}px`,
-                  overflow: 'auto'
+                  overflow: 'auto',
+                  lineHeight: '1.5',
+                  padding: `${Math.min(Math.max(4, 6 * heightScaleFactor), 8)}px ${Math.min(Math.max(6, 8 * heightScaleFactor), 10)}px`,
+                  boxSizing: 'border-box',
+                  flex: '1 1 auto'
                 }}
                 disabled={isLoading}
               />
@@ -300,12 +347,14 @@ export function UserInputSection({
                 style={{
                   backgroundColor: config.submit_button_background_color || "#3b82f6",
                   color: config.submit_button_text_color || "#ffffff",
-                  width: `${40 * heightScaleFactor}px`,
-                  height: `${40 * heightScaleFactor}px`,
-                  minWidth: `${40 * heightScaleFactor}px`,
-                  minHeight: `${40 * heightScaleFactor}px`,
-                  maxWidth: `${40 * heightScaleFactor}px`,
-                  maxHeight: `${40 * heightScaleFactor}px`
+                  width: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
+                  height: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
+                  minWidth: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
+                  minHeight: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
+                  maxWidth: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
+                  maxHeight: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
+                  borderRadius: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px`,
+                  padding: `${Math.min(Math.max(6, 8 * heightScaleFactor), 10)}px`
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
@@ -315,11 +364,20 @@ export function UserInputSection({
                 }}
               >
                 {isLoading ? (
-                  <div style={{ width: `${16 * heightScaleFactor}px`, height: `${16 * heightScaleFactor}px` }}>
+                  <div style={{ 
+                    width: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px`, 
+                    height: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px` 
+                  }}>
                     <Spinner className="w-full h-full" />
                   </div>
                 ) : (
-                  <ArrowUp style={{ width: `${16 * heightScaleFactor}px`, height: `${16 * heightScaleFactor}px` }} strokeWidth={2.5} />
+                  <ArrowUp 
+                    style={{ 
+                      width: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px`, 
+                      height: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px` 
+                    }} 
+                    strokeWidth={2.5} 
+                  />
                 )}
               </button>
             </div>
@@ -328,12 +386,12 @@ export function UserInputSection({
         
         {/* Desktop Suggestions */}
         {(config.suggestions_enabled ?? true) && (
-          <div className="flex-shrink-0 mt-auto pt-3 min-w-0 overflow-hidden">
+          <div className="flex-shrink-0 mt-3 min-w-0 overflow-hidden">
             <div 
               className="flex flex-wrap items-center border-t border-zinc-200/50 pt-3 gap-1.5"
               style={{ 
-                gap: `${6 * heightScaleFactor}px`,
-                minHeight: `${40 * heightScaleFactor}px`
+                gap: `${4 * heightScaleFactor}px`,
+                minHeight: `${32 * heightScaleFactor}px`
               }}
             >
               <button
@@ -345,11 +403,11 @@ export function UserInputSection({
                   backgroundColor: config.suggestion_background_color || '#ffffff',
                   borderColor: config.suggestion_border_color || '#e5e7eb',
                   color: config.suggestion_text_color || '#374151',
-                  padding: `${10 * heightScaleFactor}px`,
-                  minWidth: `${36 * heightScaleFactor}px`,
-                  minHeight: `${36 * heightScaleFactor}px`,
-                  maxWidth: `${36 * heightScaleFactor}px`,
-                  maxHeight: `${36 * heightScaleFactor}px`
+                  padding: `${8 * heightScaleFactor}px`,
+                  minWidth: `${32 * heightScaleFactor}px`,
+                  minHeight: `${32 * heightScaleFactor}px`,
+                  maxWidth: `${32 * heightScaleFactor}px`,
+                  maxHeight: `${32 * heightScaleFactor}px`
                 }}
               >
                 <RefreshCw style={{ width: `${12 * heightScaleFactor}px`, height: `${12 * heightScaleFactor}px` }} className="transition-colors" />
@@ -365,15 +423,15 @@ export function UserInputSection({
                     style={{
                       backgroundColor: config.suggestion_background_color || '#ffffff',
                       borderColor: config.suggestion_border_color || '#e5e7eb',
-                      borderWidth: `${(config.suggestion_border_width || 1) * heightScaleFactor}px`,
+                      borderWidth: `${Math.min((config.suggestion_border_width || 1) * heightScaleFactor, 2)}px`,
                       borderStyle: config.suggestion_border_style || 'solid',
-                      borderRadius: `${(config.suggestion_border_radius || 8) * heightScaleFactor}px`,
+                      borderRadius: `${Math.min((config.suggestion_border_radius || 8) * heightScaleFactor, 12)}px`,
                       fontFamily: config.suggestion_font_family || 'inherit',
-                      fontSize: `${(config.suggestion_font_size || 12) * heightScaleFactor}px`,
-                      padding: `${8 * heightScaleFactor}px ${12 * heightScaleFactor}px`,
-                      gap: `${6 * heightScaleFactor}px`,
-                      minHeight: `${36 * heightScaleFactor}px`,
-                      maxWidth: 'calc(50% - 0.375rem)',
+                      fontSize: `${Math.min(Math.max(10, (config.suggestion_font_size || 12) * heightScaleFactor), 14)}px`,
+                      padding: `${Math.min(Math.max(4, 6 * heightScaleFactor), 8)}px ${Math.min(Math.max(6, 8 * heightScaleFactor), 10)}px`,
+                      gap: `${Math.min(4 * heightScaleFactor, 6)}px`,
+                      minHeight: `${Math.min(Math.max(24, 28 * heightScaleFactor), 32)}px`,
+                      maxWidth: containerWidth < 500 ? 'calc(100% - 0.375rem)' : 'calc(50% - 0.375rem)',
                       boxShadow: config.suggestion_shadow_style === 'none' ? 'none' :
                                 config.suggestion_shadow_style === 'subtle' ? '0 1px 2px rgba(0,0,0,0.05)' :
                                 config.suggestion_shadow_style === 'medium' ? '0 4px 6px rgba(0,0,0,0.1)' :
@@ -384,7 +442,10 @@ export function UserInputSection({
                   >
                     <span 
                       className="group-hover:opacity-90 transition-opacity truncate"
-                      style={{ color: config.suggestion_text_color || '#374151' }}
+                      style={{ 
+                        color: config.suggestion_text_color || '#374151',
+                        maxWidth: '100%'
+                      }}
                     >
                       {suggestion.text}
                     </span>
@@ -393,8 +454,8 @@ export function UserInputSection({
                         className="flex-shrink-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                         style={{ 
                           color: config.suggestion_text_color || '#6b7280',
-                          width: `${12 * heightScaleFactor}px`,
-                          height: `${12 * heightScaleFactor}px`
+                          width: `${Math.min(Math.max(10, 12 * heightScaleFactor), 14)}px`,
+                          height: `${Math.min(Math.max(10, 12 * heightScaleFactor), 14)}px`
                         }}
                       />
                     )}

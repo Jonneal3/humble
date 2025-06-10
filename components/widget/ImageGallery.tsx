@@ -30,7 +30,7 @@ export function ImageGallery({
   // Get configuration values with defaults
   const galleryConfig = {
     columns: config.gallery_columns || 3,
-    spacing: config.gallery_spacing || 16,
+    spacing: config.gallery_spacing ?? 0, // Allow zero spacing
     maxImages: config.gallery_max_images || 12,
     backgroundColor: config.gallery_background_color || 'transparent',
     containerBorderEnabled: config.gallery_container_border_enabled ?? false,
@@ -61,8 +61,11 @@ export function ImageGallery({
   // Container styles
   const galleryContainerStyles = {
     backgroundColor: galleryConfig.backgroundColor,
-    borderRadius: `${galleryConfig.containerBorderRadius}px`,
-    border: galleryConfig.containerBorderEnabled ? `${galleryConfig.containerBorderWidth}px ${galleryConfig.containerBorderStyle} ${galleryConfig.containerBorderColor}` : 'none',
+    // Only use border radius if container border is enabled
+    ...(galleryConfig.containerBorderEnabled && {
+      borderRadius: `${galleryConfig.containerBorderRadius}px`,
+      border: `${galleryConfig.containerBorderWidth}px ${galleryConfig.containerBorderStyle} ${galleryConfig.containerBorderColor}`
+    }),
     padding: `${galleryConfig.spacing}px`,
     gap: `${galleryConfig.spacing}px`,
   };
@@ -76,7 +79,7 @@ export function ImageGallery({
 
   return (
     <div 
-      className="grid auto-rows-fr gap-4 p-4"
+      className="grid auto-rows-fr"
       style={{
         ...galleryContainerStyles,
         gridTemplateColumns: `repeat(${galleryConfig.columns}, 1fr)`

@@ -204,9 +204,9 @@ export default function Designer({ instanceId }: DesignerProps) {
   }
 
   return (
-    <div className="w-full h-full flex bg-background">
+    <div className="h-screen flex bg-background">
       {/* Sidebar */}
-      <div className={`${isSidebarExpanded ? 'w-80' : 'w-12'} h-full flex-shrink-0 transition-all duration-300 border-r border-border bg-card flex flex-col`}>
+      <div className={`flex flex-col border-r border-border bg-card transition-all duration-300 ${isSidebarExpanded ? 'w-[400px]' : 'w-12'}`}>
         {/* Header */}
         <div className={`${isSidebarExpanded ? 'p-4' : 'p-2'} border-b border-border flex items-center justify-between flex-shrink-0 transition-all duration-300`}>
           {isSidebarExpanded && (
@@ -236,69 +236,71 @@ export default function Designer({ instanceId }: DesignerProps) {
 
         {/* Design Controls */}
         {isSidebarExpanded && (
-          <div className="flex-1 overflow-y-auto">
-            <div className="h-full px-4 py-4">
-              <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full h-8 mb-4 bg-muted p-1 rounded-lg">
-                  <TabsTrigger value="settings" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Settings
-                  </TabsTrigger>
-                  <TabsTrigger value="branding" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Branding
-                  </TabsTrigger>
-                  <TabsTrigger value="design" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Design
-                  </TabsTrigger>
-                  <TabsTrigger value="launch" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
-                    Launch
-                  </TabsTrigger>
-                </TabsList>
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="h-full overflow-y-auto">
+              <div className="px-4 py-4 pb-24">
+                <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="w-full h-8 mb-4 bg-muted p-1 rounded-lg">
+                    <TabsTrigger value="settings" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                      Settings
+                    </TabsTrigger>
+                    <TabsTrigger value="branding" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                      Branding
+                    </TabsTrigger>
+                    <TabsTrigger value="design" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                      Design
+                    </TabsTrigger>
+                    <TabsTrigger value="launch" className="flex-1 text-xs px-2 h-6 data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-md">
+                      Launch
+                    </TabsTrigger>
+                  </TabsList>
 
-                <div className="space-y-0">
-                  <TabsContent value="settings" className="mt-0">
-                    <SettingsTab
-                      instance={instance}
-                      updateInstance={updateInstance}
-                      openSections={openSections}
-                      toggleSection={toggleSection}
-                    />
-                  </TabsContent>
+                  <div className="space-y-0">
+                    <TabsContent value="settings" className="mt-0">
+                      <SettingsTab
+                        instance={instance}
+                        updateInstance={updateInstance}
+                        openSections={openSections}
+                        toggleSection={toggleSection}
+                      />
+                    </TabsContent>
 
-                  <TabsContent value="branding" className="mt-0">
-                    <BrandingTab
-                      config={config}
-                      updateConfig={updateConfig}
-                      openSections={openSections}
-                      toggleSection={toggleSection}
-                    />
-                  </TabsContent>
+                    <TabsContent value="branding" className="mt-0">
+                      <BrandingTab
+                        config={config}
+                        updateConfig={updateConfig}
+                        openSections={openSections}
+                        toggleSection={toggleSection}
+                      />
+                    </TabsContent>
 
-                  <TabsContent value="design" className="mt-0">
-                    <DesignTab
-                      config={config}
-                      updateConfig={updateConfig}
-                      openSections={openSections}
-                      toggleSection={toggleSection}
-                    />
-                  </TabsContent>
+                    <TabsContent value="design" className="mt-0">
+                      <DesignTab
+                        config={config}
+                        updateConfig={updateConfig}
+                        openSections={openSections}
+                        toggleSection={toggleSection}
+                      />
+                    </TabsContent>
 
-                  <TabsContent value="launch" className="mt-0">
-                    <LaunchTab
-                      instanceId={instanceId}
-                      config={config}
-                      openSections={openSections}
-                      toggleSection={toggleSection}
-                    />
-                  </TabsContent>
-                </div>
-              </Tabs>
+                    <TabsContent value="launch" className="mt-0">
+                      <LaunchTab
+                        instanceId={instanceId}
+                        config={config}
+                        openSections={openSections}
+                        toggleSection={toggleSection}
+                      />
+                    </TabsContent>
+                  </div>
+                </Tabs>
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col min-h-0">
         {/* Preview Header */}
         <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4 flex-shrink-0">
           <div className="flex items-center gap-2">
@@ -342,8 +344,8 @@ export default function Designer({ instanceId }: DesignerProps) {
         </div>
 
         {/* Preview Content */}
-        <div className="flex-1 bg-background">
-          <div className="h-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="flex-1 min-h-0 relative bg-background">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
             {previewMode === 'iframe' ? (
               <div className="relative">
                 {/* Preview Label */}
@@ -359,20 +361,24 @@ export default function Designer({ instanceId }: DesignerProps) {
                     width: config.iframe_width || '100%',
                     maxWidth: '1000px',
                     height: config.iframe_height || '600px',
+                    maxHeight: 'calc(100vh - 200px)',
                     borderRadius: `${config.iframe_border_radius ?? 12}px`,
                     border: config.iframe_border ? `${config.iframe_border_width ?? 1}px solid ${config.iframe_border_color || '#e5e7eb'}` : 'none',
                     boxShadow: config.iframe_shadow === 'none' ? "0 0 0 1px rgba(0,0,0,0.05)" :
                               config.iframe_shadow === 'subtle' ? "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 0 0 1px rgba(0,0,0,0.05)" :
                               config.iframe_shadow === 'medium' ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06)" :
                               config.iframe_shadow === 'large' ? "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)" :
-                              "0 0 25px rgba(99, 102, 241, 0.4), 0 8px 32px rgba(99, 102, 241, 0.15)"
+                              "0 0 25px rgba(99, 102, 241, 0.4), 0 8px 32px rgba(99, 102, 241, 0.15)",
+                    overflow: 'hidden'
                   }}
                 >
-                  <WidgetPageView
-                    instanceId={instanceId}
-                    liveConfig={config}
-                    fullPage={false}
-                  />
+                  <div className="w-full h-full overflow-auto">
+                    <WidgetPageView
+                      instanceId={instanceId}
+                      liveConfig={config}
+                      fullPage={false}
+                    />
+                  </div>
                 </div>
               </div>
             ) : previewMode === 'mobile' ? (
@@ -390,13 +396,16 @@ export default function Designer({ instanceId }: DesignerProps) {
                   className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700"
                   style={{ 
                     width: '400px',
-                    height: '600px'
+                    height: '600px',
+                    maxWidth: '100%',
+                    maxHeight: 'calc(100vh - 200px)', // Account for labels and margins
+                    overflow: 'hidden'
                   }}
                 >
                   {/* Mobile device frame styling */}
                   <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gray-300 dark:bg-gray-600 rounded-full z-10"></div>
                   
-                  <div className="h-full w-full pt-8 pb-4 px-2">
+                  <div className="h-full w-full pt-8 pb-4 px-2 overflow-auto">
                     <WidgetPageView
                       instanceId={instanceId}
                       liveConfig={{
@@ -420,14 +429,13 @@ export default function Designer({ instanceId }: DesignerProps) {
                 </div>
               </div>
             ) : (
-              <div className="relative h-full w-full">
-                <div className="h-full w-full absolute inset-0">
-                  <WidgetPageView
-                    instanceId={instanceId}
-                    liveConfig={config}
-                    fullPage={true}
-                  />
-                </div>
+              <div className="w-full h-full overflow-hidden">
+                <WidgetPageView
+                  instanceId={instanceId}
+                  liveConfig={config}
+                  fullPage={true}
+                  className="h-full"
+                />
               </div>
             )}
           </div>
