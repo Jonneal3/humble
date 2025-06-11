@@ -25,6 +25,9 @@ interface UserInputSectionProps {
   containerWidth?: number;
   className?: string;
   style?: React.CSSProperties;
+  isSubmissionLimitReached?: boolean;
+  submissionCount?: number;
+  maxSubmissions?: number;
 }
 
 export function UserInputSection({
@@ -43,7 +46,10 @@ export function UserInputSection({
   heightScaleFactor = 1,
   containerWidth = 1024,
   className = '',
-  style = {}
+  style = {},
+  isSubmissionLimitReached = false,
+  submissionCount = 0,
+  maxSubmissions = 10
 }: UserInputSectionProps) {
   const isMobile = variant === 'mobile';
 
@@ -69,7 +75,8 @@ export function UserInputSection({
 
   // Inside the component, before the return:
   const placeholderStyle = {
-    '--placeholder-color': config.prompt_placeholder_color || '#9ca3af'
+    '--placeholder-color': config.prompt_placeholder_color || '#9ca3af',
+    color: config.prompt_text_color || '#000000'
   } as React.CSSProperties;
 
   // Mobile version
@@ -81,6 +88,7 @@ export function UserInputSection({
           {config.uploader_enabled && (
             <div className="flex-shrink-0 mb-3 overflow-hidden" style={{ maxHeight: '30%' }}>
               <div 
+                data-tour="upload-area"
                 className="flex items-center p-3 rounded-lg min-h-[60px] cursor-pointer hover:opacity-90 transition-opacity overflow-hidden" 
                 style={{
                   backgroundColor: config.uploader_background_color || '#f8fafc',
@@ -144,6 +152,7 @@ export function UserInputSection({
           }}>
             <div className="flex-1 overflow-hidden flex flex-col">
               <textarea
+                data-tour="prompt-input"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
@@ -174,20 +183,24 @@ export function UserInputSection({
             
             <div className="flex-shrink-0">
               <button
+                data-tour="submit-button"
                 onClick={() => onPromptSubmit(prompt)}
-                disabled={isLoading || !prompt.trim()}
+                disabled={isLoading || !prompt.trim() || isSubmissionLimitReached}
                 className="flex items-center justify-center rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
                 style={{
-                  backgroundColor: config.submit_button_background_color || "#3b82f6",
+                  backgroundColor: isSubmissionLimitReached ? "#dc2626" : (config.submit_button_background_color || "#3b82f6"),
                   color: config.submit_button_text_color || "#ffffff",
                   width: `${32 * heightScaleFactor}px`,
                   height: `${32 * heightScaleFactor}px`
                 }}
+                title={isSubmissionLimitReached ? `Limit reached: ${submissionCount}/${maxSubmissions} submissions` : undefined}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
+                  if (!isSubmissionLimitReached) {
+                    e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = config.submit_button_background_color || "#3b82f6";
+                  e.currentTarget.style.backgroundColor = isSubmissionLimitReached ? "#dc2626" : (config.submit_button_background_color || "#3b82f6");
                 }}
               >
                 {isLoading ? (
@@ -249,45 +262,47 @@ export function UserInputSection({
           <div className="flex-shrink-0 min-w-0">
             <div className="flex flex-wrap items-center max-w-full gap-2">
               <div className="flex-shrink-0 min-w-[40px]" style={{ maxWidth: '70%' }}>
-                <ImageUpload
-                  onImageUpload={onImageUpload}
-                  onImageRemove={onImageRemove}
-                  currentImages={referenceImages}
-                  maxImages={config.uploader_max_images || 6}
-                  variant="chatgpt"
-                  customStyles={{
-                    container: {
-                      backgroundColor: config.uploader_background_color || '#f8fafc',
-                      borderStyle: config.uploader_border_style || 'dashed',
-                      borderColor: config.uploader_border_color || '#cbd5e1',
-                      borderWidth: `${(config.uploader_border_width ?? 2) * heightScaleFactor}px`,
-                      borderRadius: `${(config.uploader_border_radius ?? 12) * heightScaleFactor}px`,
-                      padding: `${6 * heightScaleFactor}px`,
-                      maxHeight: `${50 * heightScaleFactor}px`,
-                      overflow: 'hidden',
-                      width: 'auto',
-                      minWidth: '40px'
-                    },
-                    button: {
-                      backgroundColor: config.uploader_background_color || '#f8fafc',
-                      borderStyle: config.uploader_border_style || 'dashed',
-                      borderColor: config.uploader_border_color || '#cbd5e1',
-                      borderWidth: `${(config.uploader_border_width ?? 2) * heightScaleFactor}px`,
-                      borderRadius: `${(config.uploader_border_radius ?? 12) * heightScaleFactor}px`,
-                      padding: `${6 * heightScaleFactor}px`,
-                      maxHeight: `${50 * heightScaleFactor}px`,
-                      overflow: 'hidden',
-                      width: 'auto',
-                      minWidth: '40px'
-                    }
-                  }}
-                  textSettings={{
-                    secondaryText: config.uploader_secondary_text,
-                    textColor: config.uploader_text_color,
-                    fontFamily: config.uploader_font_family,
-                    fontSize: config.uploader_font_size
-                  }}
-                />
+                <div data-tour="upload-area">
+                  <ImageUpload
+                    onImageUpload={onImageUpload}
+                    onImageRemove={onImageRemove}
+                    currentImages={referenceImages}
+                    maxImages={config.uploader_max_images || 6}
+                    variant="chatgpt"
+                    customStyles={{
+                      container: {
+                        backgroundColor: config.uploader_background_color || '#f8fafc',
+                        borderStyle: config.uploader_border_style || 'dashed',
+                        borderColor: config.uploader_border_color || '#cbd5e1',
+                        borderWidth: `${(config.uploader_border_width ?? 2) * heightScaleFactor}px`,
+                        borderRadius: `${(config.uploader_border_radius ?? 12) * heightScaleFactor}px`,
+                        padding: `${6 * heightScaleFactor}px`,
+                        maxHeight: `${50 * heightScaleFactor}px`,
+                        overflow: 'hidden',
+                        width: 'auto',
+                        minWidth: '40px'
+                      },
+                      button: {
+                        backgroundColor: config.uploader_background_color || '#f8fafc',
+                        borderStyle: config.uploader_border_style || 'dashed',
+                        borderColor: config.uploader_border_color || '#cbd5e1',
+                        borderWidth: `${(config.uploader_border_width ?? 2) * heightScaleFactor}px`,
+                        borderRadius: `${(config.uploader_border_radius ?? 12) * heightScaleFactor}px`,
+                        padding: `${6 * heightScaleFactor}px`,
+                        maxHeight: `${50 * heightScaleFactor}px`,
+                        overflow: 'hidden',
+                        width: 'auto',
+                        minWidth: '40px'
+                      }
+                    }}
+                    textSettings={{
+                      secondaryText: config.uploader_secondary_text,
+                      textColor: config.uploader_text_color,
+                      fontFamily: config.uploader_font_family,
+                      fontSize: config.uploader_font_size
+                    }}
+                  />
+                </div>
               </div>
               <p 
                 className="font-medium flex-1 min-w-[150px]"
@@ -305,83 +320,87 @@ export function UserInputSection({
         
         {/* Desktop Prompt Input */}
         <div className="flex-1 flex flex-col mt-4 min-h-0 flex-grow overflow-hidden">
-          <div className="relative flex items-start gap-2 min-h-0 flex-grow h-full">
-            <div className="flex-1 flex flex-col min-h-0 w-full h-full">
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    if (!isLoading && prompt.trim()) {
-                      onPromptSubmit(prompt);
+          <div className="flex-1 flex flex-col min-h-0 w-full h-full">
+            {/* Main Prompt Input - Responsive to container */}
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden w-full">
+              <div className="relative flex-1 min-h-0 flex items-stretch gap-3 overflow-hidden">
+                <textarea
+                  data-tour="prompt-input"
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (!isLoading && prompt.trim()) {
+                        onPromptSubmit(prompt);
+                      }
                     }
-                  }
-                }}
-                placeholder="Describe what you want to create..."
-                className={cn(
-                  "bg-transparent border-none resize-none outline-none leading-relaxed w-full h-full placeholder-color",
-                  "placeholder:text-[var(--placeholder-color)]"
-                )}
-                style={{
-                  ...placeholderStyle,
-                  fontSize: `${Math.min(Math.max(14, (config.prompt_font_size || 16) * heightScaleFactor), 18)}px`,
-                  color: config.prompt_text_color || '#374151',
-                  fontFamily: config.prompt_font_family || 'inherit',
-                  fontWeight: '500',
-                  overflow: 'auto',
-                  lineHeight: '1.5',
-                  padding: `${Math.min(Math.max(4, 6 * heightScaleFactor), 8)}px ${Math.min(Math.max(6, 8 * heightScaleFactor), 10)}px`,
-                  boxSizing: 'border-box',
-                  flex: '1 1 auto'
-                }}
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div className="flex-shrink-0">
-              <button
-                onClick={() => onPromptSubmit(prompt)}
-                disabled={isLoading || !prompt.trim()}
-                className="flex items-center justify-center rounded-2xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
-                style={{
-                  backgroundColor: config.submit_button_background_color || "#3b82f6",
-                  color: config.submit_button_text_color || "#ffffff",
-                  width: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
-                  height: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
-                  minWidth: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
-                  minHeight: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
-                  maxWidth: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
-                  maxHeight: `${Math.min(Math.max(32, 40 * heightScaleFactor), 48)}px`,
-                  borderRadius: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px`,
-                  padding: `${Math.min(Math.max(6, 8 * heightScaleFactor), 10)}px`
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = config.submit_button_background_color || "#3b82f6";
-                }}
-              >
-                {isLoading ? (
-                  <div style={{ 
-                    width: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px`, 
-                    height: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px` 
-                  }}>
-                    <Spinner className="w-full h-full" />
-                  </div>
-                ) : (
-                  <ArrowUp 
-                    style={{ 
-                      width: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px`, 
-                      height: `${Math.min(Math.max(12, 16 * heightScaleFactor), 20)}px` 
-                    }} 
-                    strokeWidth={2.5} 
-                  />
-                )}
-              </button>
+                  }}
+                  placeholder="Describe what you want to create..."
+                  rows={1}
+                  className={cn(
+                    "bg-transparent border-none resize-none outline-none leading-relaxed flex-1 placeholder-color overflow-auto",
+                    "placeholder:text-[var(--placeholder-color)]"
+                  )}
+                  style={{
+                    ...placeholderStyle,
+                    fontSize: `${Math.min((config.prompt_font_size || 16) * heightScaleFactor, 18)}px`,
+                    padding: `${8 * heightScaleFactor}px`,
+                    height: '100%',
+                    minHeight: `${Math.max(30, 40 * heightScaleFactor)}px`,
+                    maxHeight: `${Math.min(120, 150 * heightScaleFactor)}px`,
+                    boxSizing: 'border-box'
+                  }}
+                  disabled={isLoading}
+                />
+                <div className="flex-shrink-0 flex items-end">
+                  <button
+                    data-tour="submit-button"
+                    onClick={() => onPromptSubmit(prompt)}
+                    disabled={isLoading || !prompt.trim() || isSubmissionLimitReached}
+                    className="flex items-center justify-center rounded-xl text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+                    style={{
+                      backgroundColor: isSubmissionLimitReached ? "#dc2626" : (config.submit_button_background_color || "#3b82f6"),
+                      color: config.submit_button_text_color || "#ffffff",
+                      width: `${Math.min(48, 50 * heightScaleFactor)}px`,
+                      height: `${Math.min(48, 50 * heightScaleFactor)}px`
+                    }}
+                    title={isSubmissionLimitReached ? `Limit reached: ${submissionCount}/${maxSubmissions} submissions` : undefined}
+                    onMouseEnter={(e) => {
+                      if (!isSubmissionLimitReached) {
+                        e.currentTarget.style.backgroundColor = config.submit_button_hover_background_color || "#2563eb";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = isSubmissionLimitReached ? "#dc2626" : (config.submit_button_background_color || "#3b82f6");
+                    }}
+                  >
+                    {isLoading ? (
+                      <Spinner className="w-4 h-4" />
+                    ) : (
+                      <ArrowUp className="w-4 h-4" strokeWidth={2.5} />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+          
+          {/* Submission Counter - Desktop */}
+          {submissionCount > 0 && (
+            <div className="flex justify-end mt-1">
+              <span 
+                className="text-xs px-2 py-1 rounded"
+                style={{
+                  color: isSubmissionLimitReached ? '#dc2626' : '#6b7280',
+                  backgroundColor: isSubmissionLimitReached ? '#fef2f2' : '#f9fafb',
+                  fontSize: `${10 * heightScaleFactor}px`
+                }}
+              >
+                {submissionCount}/{maxSubmissions} submissions
+              </span>
+            </div>
+          )}
         </div>
         
         {/* Desktop Suggestions */}

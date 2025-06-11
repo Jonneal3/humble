@@ -9,7 +9,7 @@ interface Props {
 
 export default function DesignPage({ params }: Props) {
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 overflow-hidden">
       <Designer instanceId={params.instanceId} />
     </div>
   );

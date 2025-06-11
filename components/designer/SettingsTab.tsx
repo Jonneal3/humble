@@ -5,6 +5,7 @@ import { Separator } from "../ui/separator";
 import { Switch } from "../ui/switch";
 import { ChevronDown } from "lucide-react";
 import { NumberInput, SelectInput } from "./FormComponents";
+import { Button } from "../ui/button";
 
 interface SettingsTabProps {
   instance: any;
@@ -19,6 +20,37 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
   openSections,
   toggleSection,
 }) => {
+  // Debug function to safely update instance
+  const safeUpdateInstance = (updates: any) => {
+    console.log('Current instance state:', instance);
+    console.log('Attempting update with:', updates);
+    
+    try {
+      // Validate the updates
+      if (typeof updates !== 'object') {
+        throw new Error('Updates must be an object');
+      }
+      
+      // Check if instance is valid
+      if (!instance) {
+        throw new Error('Instance is not initialized');
+      }
+
+      // If we're enabling submission limits, ensure max_submissions_per_session is set
+      if (updates.submission_limit_enabled === true && !updates.max_submissions_per_session) {
+        updates.max_submissions_per_session = instance.max_submissions_per_session || 5;
+      }
+      
+      // Log the update attempt
+      console.log('Calling updateInstance with:', updates);
+      updateInstance(updates);
+      console.log('Update completed successfully');
+    } catch (error) {
+      console.error('Error in safeUpdateInstance:', error);
+      throw error; // Re-throw to let the caller handle it
+    }
+  };
+
   return (
     <div className="space-y-4 mt-2">
       {/* Instance Information */}
@@ -169,29 +201,47 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
         </summary>
         <div className="space-y-3 pl-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs font-medium">Enable Rate Limiting</Label>
+            <Label className="text-xs font-medium">Enable Submission Limit</Label>
             <Switch
-              checked={instance?.rate_limiting_enabled ?? true}
-              onCheckedChange={(checked) => updateInstance({ rate_limiting_enabled: checked })}
+              checked={instance?.submission_limit_enabled ?? false}
+              onCheckedChange={(checked) => {
+                console.log('Toggle clicked:', {
+                  currentState: instance?.submission_limit_enabled,
+                  newState: checked,
+                  currentMaxSubmissions: instance?.max_submissions_per_session
+                });
+                
+                // Update both fields at once
+                safeUpdateInstance({
+                  submission_limit_enabled: checked,
+                  max_submissions_per_session: checked ? (instance?.max_submissions_per_session || 5) : 5,
+                  current_submissions: 0 // Reset current submissions when toggling
+                });
+              }}
             />
           </div>
 
-          {instance?.rate_limiting_enabled && (
-            <div className="grid grid-cols-2 gap-3">
+          {instance?.submission_limit_enabled && (
+            <div className="space-y-2">
               <NumberInput
-                label="Requests per Hour"
-                value={instance?.requests_per_hour || 60}
-                onChange={(value) => updateInstance({ requests_per_hour: value })}
+                label="Max Submissions per Session"
+                value={instance?.max_submissions_per_session || 5}
+                onChange={(value) => {
+                  console.log('Max submissions changed:', {
+                    oldValue: instance?.max_submissions_per_session,
+                    newValue: value
+                  });
+                  safeUpdateInstance({ 
+                    max_submissions_per_session: value,
+                    current_submissions: Math.min(instance?.current_submissions || 0, value) // Ensure current doesn't exceed new max
+                  });
+                }}
                 min={1}
-                max={1000}
+                max={100}
               />
-              <NumberInput
-                label="Requests per Day"
-                value={instance?.requests_per_day || 500}
-                onChange={(value) => updateInstance({ requests_per_day: value })}
-                min={1}
-                max={10000}
-              />
+              <p className="text-xs text-muted-foreground">
+                Maximum number of times a user can submit/generate images in one session
+              </p>
             </div>
           )}
 
@@ -199,7 +249,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             <Label className="text-xs font-medium">Require User Authentication</Label>
             <Switch
               checked={instance?.require_auth ?? false}
-              onCheckedChange={(checked) => updateInstance({ require_auth: checked })}
+              onCheckedChange={(checked) => safeUpdateInstance({ require_auth: checked })}
             />
           </div>
 
@@ -207,14 +257,14 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({
             <Label className="text-xs font-medium">Enable Content Moderation</Label>
             <Switch
               checked={instance?.content_moderation ?? true}
-              onCheckedChange={(checked) => updateInstance({ content_moderation: checked })}
+              onCheckedChange={(checked) => safeUpdateInstance({ content_moderation: checked })}
             />
           </div>
 
           <SelectInput
             label="Content Filter Level"
             value={instance?.content_filter_level || 'moderate'}
-            onChange={(value) => updateInstance({ content_filter_level: value })}
+            onChange={(value) => safeUpdateInstance({ content_filter_level: value })}
             options={[
               { value: "strict", label: "Strict" },
               { value: "moderate", label: "Moderate" },

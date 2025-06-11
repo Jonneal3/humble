@@ -14,6 +14,11 @@ const PROTECTED_ROUTES = [
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient<Database>({ req, res })
+
+  // Add pathname to headers for server components
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set('x-pathname', req.nextUrl.pathname)
+
   const { data: { session } } = await supabase.auth.getSession()
 
   const isProtectedRoute = PROTECTED_ROUTES.some(route => 
@@ -30,9 +35,24 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/designer-instances', req.url))
   }
 
-  return res
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
+
+  return response
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
 }

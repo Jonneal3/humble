@@ -6,13 +6,35 @@ import { getRandomSuggestions, Suggestion } from "@/lib/suggestions";
 import { DesignSettings, defaultDesignSettings, WidgetStyle, stylePresets, loadGoogleFont } from "@/types/design";
 import { WidgetLayout } from "./WidgetLayout";
 import { Spinner } from "../ui/spinner";
-import { AutoDemoOverlay, DemoConfig } from "./AutoDemoOverlay";
+import { AutoDemoOverlay } from "./AutoDemoOverlay";
+import { cn } from "@/lib/utils";
 
 // Import layout components
 import { LeftRightLayout } from "./layouts/LeftRightLayout";
 import { RightLeftLayout } from "./layouts/RightLeftLayout";
 import { PromptBottomLayout } from "./layouts/PromptBottomLayout";
 import { PromptTopLayout } from "./layouts/PromptTopLayout";
+import { MobileLayout } from "./layouts/MobileLayout";
+
+interface DatabaseInstance {
+  id: string;
+  submission_limit_enabled: boolean;
+  max_submissions_per_session: number;
+  current_submissions: number;
+  last_submission_at: string | null;
+  config?: DesignSettings;
+  [key: string]: any;
+}
+
+interface InstanceData {
+  id: string;
+  submission_limit_enabled: boolean;
+  max_submissions_per_session: number;
+  current_submissions: number;
+  last_submission_at: string | null;
+  config?: DesignSettings;
+  [key: string]: any;
+}
 
 interface WidgetProps {
   instanceId: string;
@@ -23,6 +45,7 @@ interface WidgetProps {
   deployment?: boolean;
   containerWidth?: number;
   containerHeight?: number;
+  instanceData?: InstanceData;
 }
 
 export function Widget({ 
@@ -33,7 +56,8 @@ export function Widget({
   fullPage = false, 
   deployment = false,
   containerWidth: providedContainerWidth,
-  containerHeight: providedContainerHeight
+  containerHeight: providedContainerHeight,
+  instanceData: providedInstanceData
 }: WidgetProps) {
   // Sample images to display by default
   const sampleImages = [
@@ -59,10 +83,27 @@ export function Widget({
   const [showDemo, setShowDemo] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [viewportHeight, setViewportHeight] = useState(0);
+  const [instanceData, setInstanceData] = useState<InstanceData | null>(providedInstanceData || null);
+  const [submissionCount, setSubmissionCount] = useState(0);
+  const [isSubmissionLimitReached, setIsSubmissionLimitReached] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const supabase = createClientComponentClient();
   const componentId = React.useMemo(() => `widget-${instanceId}`, [instanceId]);
+
+  // Initialize submission count from session storage
+  useEffect(() => {
+    if (!isClient) return;
+    const count = sessionStorage.getItem(`submission_count_${instanceId}`);
+    const initialCount = count ? parseInt(count, 10) : 0;
+    console.log('Initializing submission count:', initialCount);
+    setSubmissionCount(initialCount);
+  }, [isClient, instanceId]);
+
+  // Initialize client-side state
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     setIsClient(true);
@@ -79,11 +120,15 @@ export function Widget({
 
   useEffect(() => {
     if (providedContainerWidth) {
+      console.log('Using provided container width:', providedContainerWidth);
       setContainerWidth(providedContainerWidth);
     } else if (containerRef.current) {
+      console.log('Setting up container width observer');
       const observer = new ResizeObserver((entries) => {
         for (const entry of entries) {
-          setContainerWidth(entry.contentRect.width);
+          const width = entry.contentRect.width;
+          console.log('Container width changed:', width);
+          setContainerWidth(width);
         }
       });
 
@@ -94,14 +139,9 @@ export function Widget({
 
   // Load configuration from database if not provided
   useEffect(() => {
-    if (designConfig) {
-      setConfig(designConfig);
-      setConfigLoaded(true);
-      return;
-    }
-
     const loadInstanceData = async () => {
       try {
+        console.log('Loading instance data for:', instanceId);
         const { data: instance, error } = await supabase
           .from("instances")
           .select("*")
@@ -110,36 +150,131 @@ export function Widget({
 
         if (error) {
           console.error('Error loading instance:', error);
-          setConfig(defaultDesignSettings);
+          // Even on error, merge with defaults
+          const mergedConfig = {
+            ...defaultDesignSettings,
+            ...(designConfig || {})
+          };
+          console.log('Using merged config after error:', mergedConfig);
+          setConfig(mergedConfig);
           setConfigLoaded(true);
           return;
         }
 
-        if (instance?.config) {
-          const widgetStyle = (instance.config.widget_style || "modern") as WidgetStyle;
-          const stylePreset = stylePresets[widgetStyle];
-          
-          const mergedConfig = {
-            ...defaultDesignSettings,
-            ...stylePreset,
-            ...instance.config,
-          };
-          
-          setConfig(mergedConfig as DesignSettings);
-          setConfigLoaded(true);
+        console.log('Loaded instance data:', instance);
+        // Store instance data for rate limiting
+        const typedInstance: InstanceData = {
+          id: (instance as DatabaseInstance).id,
+          submission_limit_enabled: Boolean((instance as DatabaseInstance).submission_limit_enabled),
+          max_submissions_per_session: Number((instance as DatabaseInstance).max_submissions_per_session) || 5,
+          current_submissions: 0, // We don't use this anymore
+          last_submission_at: null, // We don't use this anymore
+          config: (instance as DatabaseInstance).config
+        };
+        
+        setInstanceData(typedInstance);
+
+        // Always merge with default settings to ensure all properties are set
+        const mergedConfig = {
+          ...defaultDesignSettings,
+          ...(instance?.config || {}),
+          ...(designConfig || {}) // Allow provided config to override instance config
+        };
+        console.log('Final merged design config:', mergedConfig);
+        setConfig(mergedConfig);
+        setConfigLoaded(true);
+
+        // Initialize submission count from session storage
+        const initialCount = getSubmissionCount();
+        console.log('Initial submission count from session storage:', initialCount);
+        setSubmissionCount(initialCount);
+
+        // Update submission limit state
+        if (typedInstance.submission_limit_enabled) {
+          const maxSubmissions = typedInstance.max_submissions_per_session;
+          console.log('Initial submission limit state:', {
+            enabled: true,
+            max: maxSubmissions,
+            current: initialCount
+          });
+          setIsSubmissionLimitReached(initialCount >= maxSubmissions);
         } else {
-          setConfig(defaultDesignSettings);
-          setConfigLoaded(true);
+          setIsSubmissionLimitReached(false);
         }
-      } catch (err) {
-        console.error("Error loading widget config:", err);
-        setConfig(defaultDesignSettings);
+      } catch (error) {
+        console.error('Error in loadInstanceData:', error);
+        // Even on error, merge with defaults
+        const mergedConfig = {
+          ...defaultDesignSettings,
+          ...(designConfig || {})
+        };
+        console.log('Using merged config after error:', mergedConfig);
+        setConfig(mergedConfig);
         setConfigLoaded(true);
       }
     };
 
+    // Always load instance data to get the latest config
     loadInstanceData();
-  }, [instanceId, designConfig, supabase]);
+  }, [instanceId, supabase, designConfig]);
+
+  // Set up real-time subscription for instance updates
+  useEffect(() => {
+    if (!instanceId) return;
+
+    console.log('Setting up instance subscription for:', instanceId);
+    const channel = supabase
+      .channel(`instance-${instanceId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'instances',
+          filter: `id=eq.${instanceId}`
+        },
+        (payload) => {
+          console.log('Instance updated via subscription:', payload);
+          const typedInstance: InstanceData = {
+            id: (payload.new as DatabaseInstance).id,
+            submission_limit_enabled: Boolean((payload.new as DatabaseInstance).submission_limit_enabled),
+            max_submissions_per_session: Number((payload.new as DatabaseInstance).max_submissions_per_session) || 5,
+            current_submissions: 0, // We don't use this anymore
+            last_submission_at: null, // We don't use this anymore
+            config: (payload.new as DatabaseInstance).config
+          };
+          
+          // Update instance data
+          setInstanceData(typedInstance);
+          
+          // Update submission limit state
+          if (typedInstance.submission_limit_enabled) {
+            const maxSubmissions = typedInstance.max_submissions_per_session;
+            const currentCount = getSubmissionCount();
+            console.log('Updating submission limit state:', {
+              enabled: true,
+              max: maxSubmissions,
+              current: currentCount
+            });
+            // Only set limit reached if we're actually at the limit
+            setIsSubmissionLimitReached(currentCount >= maxSubmissions);
+          } else {
+            // Reset local storage and state if limits are disabled
+            sessionStorage.removeItem(`submission_count_${instanceId}`);
+            setIsSubmissionLimitReached(false);
+            setSubmissionCount(0);
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up instance subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [instanceId, supabase]);
 
   // Load Google Fonts when config changes
   useEffect(() => {
@@ -162,15 +297,24 @@ export function Widget({
   // Check if demo should be shown - only run on client
   useEffect(() => {
     if (!isClient || !deployment) return;
+    
+    // Handle explicit toggle off
     if (config.demo_enabled === false) {
       setShowDemo(false);
+      localStorage.setItem(`widget-demo-${instanceId}`, 'true');
       return;
     }
     
-    const hasSeenDemo = localStorage.getItem(`widget-demo-${instanceId}`);
-    if (!hasSeenDemo) {
+    // When demo is explicitly enabled, reset the localStorage to ensure it shows
+    if (config.demo_enabled === true) {
+      localStorage.removeItem(`widget-demo-${instanceId}`);
       setShowDemo(true);
+      return;
     }
+    
+    // Default behavior: only show if never seen before
+    const hasSeenDemo = localStorage.getItem(`widget-demo-${instanceId}`);
+    setShowDemo(!hasSeenDemo);
   }, [instanceId, deployment, config.demo_enabled, isClient]);
 
   const handleDemoDismiss = () => {
@@ -178,19 +322,56 @@ export function Widget({
     localStorage.setItem(`widget-demo-${instanceId}`, 'true');
   };
 
-  const demoConfig: DemoConfig = {
-    uploadMessage: config.demo_upload_message || "Upload your reference images to guide the AI",
-    generationMessage: config.demo_generation_message || "Your AI-generated images will appear here"
+  const getSubmissionCount = () => {
+    if (!isClient) return 0;
+    const count = sessionStorage.getItem(`submission_count_${instanceId}`);
+    const parsedCount = count ? parseInt(count, 10) : 0;
+    console.log('Getting submission count:', { count, parsedCount });
+    return parsedCount;
   };
 
-  // Event handlers
-  const refreshSuggestions = () => {
-    setSuggestions(getRandomSuggestions(config.suggestions_count || 4));
+  const incrementSubmissionCount = () => {
+    const currentCount = getSubmissionCount();
+    const newCount = currentCount + 1;
+    console.log('Incrementing submission count:', { current: currentCount, new: newCount });
+    sessionStorage.setItem(`submission_count_${instanceId}`, newCount.toString());
+    setSubmissionCount(newCount);
   };
 
   const handlePromptSubmit = async (promptText: string) => {
     if (!promptText.trim()) return;
     
+    // Check submission limit - only if submission limit is enabled
+    if (instanceData?.submission_limit_enabled) {
+      const maxSubmissions = instanceData?.max_submissions_per_session || 5;
+      const currentCount = getSubmissionCount();
+      console.log('Checking submission limit:', { 
+        current: currentCount, 
+        max: maxSubmissions, 
+        enabled: instanceData.submission_limit_enabled 
+      });
+      
+      if (currentCount >= maxSubmissions) {
+        console.log('Submission limit reached, blocking submission');
+        setIsSubmissionLimitReached(true);
+        alert(`You've reached the submission limit (${maxSubmissions} submissions per session). Please refresh the page to start a new session.`);
+        return;
+      }
+    }
+    
+    // Increment submission count BEFORE attempting generation
+    incrementSubmissionCount();
+    
+    // Check if limit is reached after incrementing
+    if (instanceData?.submission_limit_enabled) {
+      const maxSubmissions = instanceData?.max_submissions_per_session || 5;
+      const newCount = getSubmissionCount();
+      console.log('After increment, checking limit:', { newCount, max: maxSubmissions });
+      if (newCount >= maxSubmissions) {
+        setIsSubmissionLimitReached(true);
+      }
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch('/api/generate', {
@@ -199,24 +380,35 @@ export function Widget({
         body: JSON.stringify({
           prompt: promptText,
           instanceId,
-          referenceImages,
-        }),
+          referenceImages
+        })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const newImages = data.images || [];
-        setGeneratedImages(prev => [...newImages, ...prev].slice(0, 12));
+      if (!response.ok) {
+        throw new Error('Generation failed');
       }
+
+      const data = await response.json();
+      setGeneratedImages(data.images.map((url: string) => ({ image: url })));
+      setPrompt('');
     } catch (error) {
-      console.error('Generation failed:', error);
+      console.error('Error generating images:', error);
+      // If generation fails, decrement the submission count
+      const currentCount = getSubmissionCount();
+      if (currentCount > 0) {
+        const newCount = currentCount - 1;
+        console.log('Decrementing submission count after error:', { current: currentCount, new: newCount });
+        sessionStorage.setItem(`submission_count_${instanceId}`, newCount.toString());
+        setSubmissionCount(newCount);
+        setIsSubmissionLimitReached(false);
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleImageUpload = (imageData: string | null) => {
-    if (imageData && referenceImages.length < (config.uploader_max_images || 6)) {
+    if (imageData) {
       setReferenceImages(prev => [...prev, imageData]);
     }
   };
@@ -227,13 +419,22 @@ export function Widget({
 
   const handleSuggestionClick = (suggestion: Suggestion) => {
     setPrompt(suggestion.prompt);
-    handlePromptSubmit(suggestion.prompt);
+  };
+
+  const refreshSuggestions = () => {
+    setSuggestions(getRandomSuggestions(config.suggestions_count || 4));
   };
 
   // Layout component selector
   const getLayoutComponent = () => {
+    console.log('Getting layout component with config:', config);
+    console.log('Container width:', containerWidth);
+    console.log('Is client:', isClient);
+    console.log('Is config loaded:', configLoaded);
+
     // Smart responsive scaling - creates scaled design settings based on container width
     const getResponsiveConfig = (originalConfig: DesignSettings, containerWidth: number): DesignSettings => {
+      console.log('Getting responsive config for width:', containerWidth);
       // Calculate scale factor based on container width
       // 1.0 at 1200px+, scales down to 0.5 at 300px (more aggressive)
       const minWidth = 300;
@@ -244,6 +445,8 @@ export function Widget({
       const scaleFactor = Math.max(minScale, Math.min(maxScale, 
         minScale + (maxScale - minScale) * (containerWidth - minWidth) / (maxWidth - minWidth)
       ));
+
+      console.log('Scale factor:', scaleFactor);
 
       // For very small elements, use even more aggressive scaling
       const smallElementScale = Math.max(0.4, scaleFactor * 0.8); // Extra aggressive for small text
@@ -284,13 +487,14 @@ export function Widget({
         scaledConfig.gallery_columns = Math.min(originalConfig.gallery_columns, containerWidth < 350 ? 1 : 2);
       }
       
+      console.log('Scaled config:', scaledConfig);
       return scaledConfig;
     };
 
     const responsiveConfig = getResponsiveConfig(config, containerWidth);
 
     const layoutProps = {
-      config: responsiveConfig, // Use scaled config instead of original
+      config: responsiveConfig,
       prompt,
       setPrompt,
       isLoading,
@@ -300,20 +504,33 @@ export function Widget({
       fullPage,
       deployment,
       containerWidth,
-      onPromptSubmit: handlePromptSubmit,
+      onPromptSubmit: () => handlePromptSubmit(prompt),
       onSuggestionClick: handleSuggestionClick,
       onImageUpload: handleImageUpload,
       onImageRemove: handleImageRemove,
-      onRefreshSuggestions: refreshSuggestions
+      onRefreshSuggestions: refreshSuggestions,
+      isSubmissionLimitReached,
+      submissionCount,
+      maxSubmissions: instanceData?.max_submissions_per_session || 5
     };
 
-    // Always use prompt-top layout on mobile screens (< 768px)
-    const isMobileWidth = containerWidth < 768;
-    if (isMobileWidth) {
-      return <PromptTopLayout {...layoutProps} />;
+    // Use mobile layout for tablet and smaller screens (< 1024px)
+    const isTabletOrSmaller = containerWidth < 1024;
+    console.log('Layout decision:', {
+      containerWidth,
+      isTabletOrSmaller,
+      configLayoutMode: config.layout_mode,
+      isClient,
+      configLoaded
+    });
+
+    if (isTabletOrSmaller) {
+      console.log('Using mobile layout');
+      return <MobileLayout {...layoutProps} />;
     }
 
-    // Use configured layout for desktop/tablet screens
+    // Use configured layout for larger screens
+    console.log('Using configured layout:', config.layout_mode);
     switch (config.layout_mode) {
       case "left-right":
         return <LeftRightLayout {...layoutProps} />;
@@ -323,7 +540,10 @@ export function Widget({
         return <RightLeftLayout {...layoutProps} />;
       case "prompt-top":
         return <PromptTopLayout {...layoutProps} />;
+      case "mobile-optimized":
+        return <MobileLayout {...layoutProps} />;
       default:
+        console.log('Using default prompt-bottom layout');
         return <PromptBottomLayout {...layoutProps} />;
     }
   };
@@ -337,38 +557,40 @@ export function Widget({
     );
   }
 
+  const style = {
+    backgroundColor: config.background_color || '#ffffff',
+    height: fullPage ? '100%' : '100%',
+    maxWidth: config.max_width ? `${config.max_width}px` : '100vw',
+    maxHeight: config.max_height ? `${config.max_height}px` : '100%'
+  };
+
   return (
     <div 
       ref={containerRef}
-      className="flex items-center justify-center w-full overflow-hidden" 
-      style={{ 
-        backgroundColor: config.background_color || '#ffffff',
-        height: fullPage ? `${viewportHeight}px` : '100%',
-        maxWidth: config.max_width ? `${config.max_width}px` : '100vw',
-        maxHeight: config.max_height ? `${config.max_height}px` : (fullPage ? `${viewportHeight}px` : '100%')
-      }}
+      className={cn(
+        "relative w-full h-full overflow-hidden",
+        className
+      )}
+      style={style}
     >
-      <div 
-        className="relative w-full h-full overflow-hidden"
-        style={{ 
-          padding: containerWidth < 768 ? '12px' : `${config.container_padding_top || 24}px ${config.container_padding_right || 24}px ${config.container_padding_bottom || 24}px ${config.container_padding_left || 24}px`,
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          transform: config.scale_factor ? `scale(${config.scale_factor})` : undefined,
-          transformOrigin: 'center center'
-        }}
-      >
-        {isClient && showDemo && <AutoDemoOverlay onDismiss={handleDemoDismiss} config={demoConfig} />}
-        <WidgetLayout
-          config={config}
-          className={className}
-          fullPage={fullPage}
-          deployment={deployment}
-        >
-          {getLayoutComponent()}
-        </WidgetLayout>
+      {/* Debug Counter - Temporary */}
+      <div className="fixed top-4 right-4 bg-black/80 text-white px-3 py-2 rounded-lg z-50 text-sm">
+        <div>Submit Button Clicks: {submissionCount}/{instanceData?.max_submissions_per_session || 5}</div>
+        <div>Limit Enabled: {instanceData?.submission_limit_enabled ? 'Yes' : 'No'}</div>
+        <div>Limit Reached: {isSubmissionLimitReached ? 'Yes' : 'No'}</div>
+        <div>Max Submissions: {instanceData?.max_submissions_per_session || 5}</div>
       </div>
+
+      {/* Demo Overlay */}
+      {showDemo && (
+        <AutoDemoOverlay
+          onDismiss={handleDemoDismiss}
+          config={config}
+        />
+      )}
+
+      {/* Main Widget Content */}
+      {getLayoutComponent()}
     </div>
   );
 }

@@ -62,6 +62,8 @@ export default function NewInstancePage() {
           slug: slug,
           template_id: null,
           is_public: false,
+          submission_limit_enabled: false,
+          max_submissions_per_session: 5,
           config: {
             brand_name: name.trim(),
             brand_color: "#000000",

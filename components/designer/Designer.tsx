@@ -13,6 +13,7 @@ import { SettingsTab } from "./SettingsTab";
 import { BrandingTab } from "./BrandingTab";
 import { DesignTab } from "./DesignTab";
 import { LaunchTab } from "./LaunchTab";
+import Link from "next/link";
 
 interface DesignerProps {
   instanceId: string;
@@ -21,11 +22,12 @@ interface DesignerProps {
 export default function Designer({ instanceId }: DesignerProps) {
   const supabase = createClientComponentClient();
   const { toast } = useToast();
+  const previewContainerRef = React.useRef<HTMLDivElement>(null);
 
   const [config, setConfig] = useState<DesignSettings>(defaultDesignSettings);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [previewMode, setPreviewMode] = useState<'iframe' | 'full' | 'mobile'>('full');
+  const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile' | 'iframe'>('desktop');
   const [instance, setInstance] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('settings');
   const [isMobileView, setIsMobileView] = useState(false);
@@ -153,6 +155,70 @@ export default function Designer({ instanceId }: DesignerProps) {
     }
   }, 1000);
 
+  // Debounced instance save function
+  const debouncedInstanceSave = debounce(async (updates: any) => {
+    setSaveStatus('saving');
+    try {
+      // First update the instance data
+      const { data: updateData, error: updateError } = await supabase
+        .from('instances')
+        .update(updates)
+        .eq('id', instanceId)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error('Error updating instance:', updateError);
+        throw updateError;
+      }
+
+      // If we got data back from the update, use it directly
+      if (updateData) {
+        console.log('Successfully updated instance:', updateData);
+        setInstance(updateData);
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+        return;
+      }
+
+      // If no data returned from update, fetch the latest
+      const { data: fetchData, error: fetchError } = await supabase
+        .from('instances')
+        .select('*')
+        .eq('id', instanceId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching updated instance:', fetchError);
+        throw fetchError;
+      }
+
+      if (fetchData) {
+        console.log('Fetched updated instance:', fetchData);
+        setInstance(fetchData);
+      }
+
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
+    } catch (error) {
+      console.error('Error in debouncedInstanceSave:', error);
+      setSaveStatus('error');
+      
+      // Only show toast for actual errors, not for successful updates
+      if (error instanceof Error && error.message !== 'No rows found') {
+        toast({
+          title: "Error saving settings",
+          description: error.message || "Failed to save your changes. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        // If it was a successful update but no data returned, just set to saved
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+      }
+    }
+  }, 1000);
+
   // Update config helper with validation
   const updateConfig = (updates: Partial<DesignSettings>) => {
     if (!updates || typeof updates !== 'object') {
@@ -170,25 +236,19 @@ export default function Designer({ instanceId }: DesignerProps) {
       console.error('Invalid instance updates:', updates);
       return;
     }
-    try {
-      const { error } = await supabase
-        .from('instances')
-        .update(updates)
-        .eq('id', instanceId);
-      
-      if (error) {
-        throw error;
-      }
 
-      setInstance({ ...instance, ...updates });
-    } catch (error) {
-      console.error('Error updating instance:', error);
-      toast({
-        title: "Error updating settings",
-        description: "Failed to update instance settings. Please try again.",
-        variant: "destructive",
-      });
-    }
+    console.log('Updating instance with:', updates);
+
+    // Optimistically update the local state
+    setInstance((prev: any) => {
+      if (!prev) return prev;
+      const newInstance = { ...prev, ...updates };
+      console.log('New instance state:', newInstance);
+      return newInstance;
+    });
+
+    // Trigger the debounced save
+    debouncedInstanceSave(updates);
   };
 
   // Prevent any rendering until we're initialized
@@ -204,34 +264,81 @@ export default function Designer({ instanceId }: DesignerProps) {
   }
 
   return (
-    <div className="h-screen flex bg-background">
+    <div className="h-full w-full flex bg-background">
       {/* Sidebar */}
       <div className={`flex flex-col border-r border-border bg-card transition-all duration-300 ${isSidebarExpanded ? 'w-[400px]' : 'w-12'}`}>
         {/* Header */}
-        <div className={`${isSidebarExpanded ? 'p-4' : 'p-2'} border-b border-border flex items-center justify-between flex-shrink-0 transition-all duration-300`}>
-          {isSidebarExpanded && (
-            <div>
-              <h1 className="text-lg font-semibold">Design Studio</h1>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <div className={`w-2 h-2 rounded-full ${
-                  saveStatus === 'saving' ? 'bg-yellow-500' :
-                  saveStatus === 'saved' ? 'bg-green-500' :
-                  saveStatus === 'error' ? 'bg-red-500' : 'bg-gray-400'
-                }`} />
-                {saveStatus === 'saving' ? 'Saving...' :
-                 saveStatus === 'saved' ? 'Saved' :
-                 saveStatus === 'error' ? 'Error' : 'Ready'}
+        <div className={`${isSidebarExpanded ? 'p-4' : 'p-2'} border-b border-border flex-shrink-0 transition-all duration-300`}>
+          {isSidebarExpanded ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Link href="/designer-instances" className="text-sm text-muted-foreground hover:text-foreground transition-colors mb-1 flex items-center gap-1">
+                    <ChevronLeft className="h-3 w-3" />
+                    Back to Home
+                  </Link>
+                  <h1 className="text-lg font-semibold">Design Studio</h1>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div className={`w-2 h-2 rounded-full ${
+                      saveStatus === 'saving' ? 'bg-yellow-500' :
+                      saveStatus === 'saved' ? 'bg-green-500' :
+                      saveStatus === 'error' ? 'bg-red-500' : 'bg-gray-400'
+                    }`} />
+                    {saveStatus === 'saving' ? 'Saving...' :
+                     saveStatus === 'saved' ? 'Saved' :
+                     saveStatus === 'error' ? 'Error' : 'Ready'}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    size="sm"
+                    variant={previewMode === 'desktop' ? 'default' : 'outline'}
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setPreviewMode('desktop')}
+                  >
+                    <Maximize2 className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={previewMode === 'mobile' ? 'default' : 'outline'}
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setPreviewMode('mobile')}
+                  >
+                    <Smartphone className="w-3 h-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={previewMode === 'iframe' ? 'default' : 'outline'}
+                    className="h-6 px-2 text-xs"
+                    onClick={() => setPreviewMode('iframe')}
+                    title="Iframe Embed Preview"
+                  >
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                      <line x1="8" y1="21" x2="16" y2="21"/>
+                      <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
+              className="w-8 h-8 p-0"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSidebarExpanded(!isSidebarExpanded)}
-            className={`${!isSidebarExpanded ? 'w-8 h-8 p-0' : ''} transition-all duration-300`}
-          >
-            {isSidebarExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-          </Button>
         </div>
 
         {/* Design Controls */}
@@ -301,143 +408,15 @@ export default function Designer({ instanceId }: DesignerProps) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-h-0">
-        {/* Preview Header */}
-        <div className="h-12 border-b border-border bg-card flex items-center justify-between px-4 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-medium">Preview</h2>
-            {previewMode === 'mobile' && (
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md px-2 py-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                Mobile: All layouts use prompt-top style
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Button
-              variant={previewMode === 'iframe' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setPreviewMode('iframe')}
-              className="h-7 text-xs"
-            >
-              <Minimize2 className="h-3 w-3 mr-1" />
-              Iframe
-            </Button>
-            <Button
-              variant={previewMode === 'mobile' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setPreviewMode('mobile')}
-              className="h-7 text-xs"
-            >
-              <Smartphone className="h-3 w-3 mr-1" />
-              Mobile
-            </Button>
-            <Button
-              variant={previewMode === 'full' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setPreviewMode('full')}
-              className="h-7 text-xs"
-            >
-              <Maximize2 className="h-3 w-3 mr-1" />
-              Full Page
-            </Button>
-          </div>
-        </div>
-
         {/* Preview Content */}
-        <div className="flex-1 min-h-0 relative bg-background">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
-            {previewMode === 'iframe' ? (
-              <div className="relative">
-                {/* Preview Label */}
-                <div className="absolute -top-8 left-0 text-xs text-muted-foreground flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  Iframe Preview - This is how your widget will appear when embedded
-                </div>
-                
-                {/* Iframe Container with Visual Context */}
-                <div 
-                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl"
-                  style={{ 
-                    width: config.iframe_width || '100%',
-                    maxWidth: '1000px',
-                    height: config.iframe_height || '600px',
-                    maxHeight: 'calc(100vh - 200px)',
-                    borderRadius: `${config.iframe_border_radius ?? 12}px`,
-                    border: config.iframe_border ? `${config.iframe_border_width ?? 1}px solid ${config.iframe_border_color || '#e5e7eb'}` : 'none',
-                    boxShadow: config.iframe_shadow === 'none' ? "0 0 0 1px rgba(0,0,0,0.05)" :
-                              config.iframe_shadow === 'subtle' ? "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 0 0 1px rgba(0,0,0,0.05)" :
-                              config.iframe_shadow === 'medium' ? "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -1px rgb(0 0 0 / 0.06)" :
-                              config.iframe_shadow === 'large' ? "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.05)" :
-                              "0 0 25px rgba(99, 102, 241, 0.4), 0 8px 32px rgba(99, 102, 241, 0.15)",
-                    overflow: 'hidden'
-                  }}
-                >
-                  <div className="w-full h-full overflow-auto">
-                    <WidgetPageView
-                      instanceId={instanceId}
-                      liveConfig={config}
-                      fullPage={false}
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : previewMode === 'mobile' ? (
-              <div className="relative">
-                {/* Preview Label */}
-                <div className="absolute -top-12 left-0 right-0 text-center">
-                  <div className="inline-flex items-center gap-2 text-xs text-muted-foreground bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg px-3 py-2">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                    Mobile Preview - All layouts automatically use prompt-top style on mobile
-                  </div>
-                </div>
-                
-                {/* Mobile Container */}
-                <div 
-                  className="relative shadow-2xl transition-all duration-300 hover:shadow-3xl bg-white dark:bg-gray-900 rounded-3xl border border-gray-200 dark:border-gray-700"
-                  style={{ 
-                    width: '400px',
-                    height: '600px',
-                    maxWidth: '100%',
-                    maxHeight: 'calc(100vh - 200px)', // Account for labels and margins
-                    overflow: 'hidden'
-                  }}
-                >
-                  {/* Mobile device frame styling */}
-                  <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-20 h-1 bg-gray-300 dark:bg-gray-600 rounded-full z-10"></div>
-                  
-                  <div className="h-full w-full pt-8 pb-4 px-2 overflow-auto">
-                    <WidgetPageView
-                      instanceId={instanceId}
-                      liveConfig={{
-                        ...config,
-                        // Force prompt-top layout for mobile preview to show accurate mobile behavior
-                        layout_mode: 'prompt-top'
-                      }}
-                      fullPage={false}
-                      deployment={true}
-                    />
-                  </div>
-                </div>
-                
-                {/* Mobile Info Panel */}
-                <div className="absolute -bottom-16 left-0 right-0 text-center">
-                  <div className="inline-flex items-center gap-4 text-xs text-muted-foreground bg-background/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
-                    <span>Width: 400px (Mobile)</span>
-                    <span>Layout: Prompt-Top (Auto-Applied)</span>
-                    <span>Responsive: ✓</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="w-full h-full overflow-hidden">
-                <WidgetPageView
-                  instanceId={instanceId}
-                  liveConfig={config}
-                  fullPage={true}
-                  className="h-full"
-                />
-              </div>
-            )}
+        <div className="flex-1 min-h-0 relative bg-background overflow-hidden" ref={previewContainerRef}>
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center overflow-auto">
+            <WidgetPageView
+              instanceId={instanceId}
+              liveConfig={config}
+              previewMode={previewMode}
+              deployment={true}
+            />
           </div>
         </div>
       </div>

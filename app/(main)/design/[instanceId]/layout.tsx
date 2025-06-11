@@ -21,8 +21,8 @@ export default async function DesignLayout({
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <div className="flex flex-col w-full h-screen bg-background">
-        <main className="flex-1 relative">
+      <div className="flex flex-col w-full h-screen overflow-hidden bg-background">
+        <main className="flex-1 relative min-h-0">
           {children}
         </main>
         <Toaster />

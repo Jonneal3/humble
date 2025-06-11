@@ -79,6 +79,7 @@ export function ImageGallery({
 
   return (
     <div 
+      data-tour="gallery-area"
       className="grid auto-rows-fr"
       style={{
         ...galleryContainerStyles,

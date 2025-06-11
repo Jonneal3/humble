@@ -1,8 +1,6 @@
 import Footer from "@/components/Footer";
-import NavbarWrapper from "@/components/NavbarWrapper";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-import { Suspense } from "react";
 import AnnouncementBar from "@/components/homepage/announcement-bar"
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/homepage/theme-provider"
@@ -37,15 +35,6 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="min-h-screen bg-background dark:bg-gradient-to-br dark:from-background dark:via-background dark:to-slate-900/20">
             <AnnouncementBar />
-            <Suspense
-              fallback={
-                <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:bg-background/80 dark:backdrop-blur-xl">
-                  <div className="container h-16" />
-                </div>
-              }
-            >
-              <NavbarWrapper />
-            </Suspense>
             <main className="flex-1 relative">
               {children}
             </main>

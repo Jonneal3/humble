@@ -4,7 +4,6 @@ import { Database } from "@/types/supabase";
 import Navbar from "./Navbar";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
 export default async function NavbarWrapper() {
   const supabase = createServerComponentClient<Database>({ cookies });

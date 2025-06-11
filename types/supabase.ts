@@ -134,40 +134,37 @@ export type Database = {
       }
       instances: {
         Row: {
-          config: Json | null
-          created_at: string | null
-          description: string | null
           id: string
-          is_public: boolean | null
           name: string
-          slug: string
-          template_id: string | null
-          updated_at: string | null
-          user_id: string | null
+          description: string | null
+          created_at: string
+          updated_at: string
+          user_id: string
+          config: Json | null
+          submission_limit_enabled: boolean
+          max_submissions_per_session: number
         }
         Insert: {
-          config?: Json | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_public?: boolean | null
+          id: string
           name: string
-          slug: string
-          template_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          config?: Json | null
+          submission_limit_enabled?: boolean
+          max_submissions_per_session?: number
         }
         Update: {
-          config?: Json | null
-          created_at?: string | null
-          description?: string | null
           id?: string
-          is_public?: boolean | null
           name?: string
-          slug?: string
-          template_id?: string | null
-          updated_at?: string | null
-          user_id?: string | null
+          description?: string | null
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          config?: Json | null
+          submission_limit_enabled?: boolean
+          max_submissions_per_session?: number
         }
         Relationships: [
           {

@@ -2,7 +2,7 @@
 
 import { Widget } from "@/components/widget/Widget";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { defaultDesignSettings, LayoutMode } from "@/types/design";
+import { defaultDesignSettings, LayoutMode, DesignSettings } from "@/types/design";
 import { notFound } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 
@@ -20,42 +20,77 @@ export default function WidgetPage({ params }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
-  const originalLayoutRef = useRef<LayoutMode>(defaultDesignSettings.layout_mode || "prompt-bottom");
+  const [instanceData, setInstanceData] = useState<any>(null);
 
   // Set mounted state
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Load instance config
+  // Load instance data
   useEffect(() => {
     const loadInstanceData = async () => {
+      console.log('Starting to load instance data for:', instanceId);
       try {
         const { data: instance, error } = await supabase
           .from("instances")
-          .select("config")
+          .select("*")
           .eq("id", instanceId)
           .single();
 
         if (error) {
           // If instance doesn't exist, show 404
           if (error.code === 'PGRST116') {
+            console.error('Instance not found:', instanceId);
             notFound();
           }
-          console.error("Error loading instance config:", error);
+          console.error("Error loading instance:", error);
+          // Even on error, ensure we have a valid config
+          const mergedConfig: DesignSettings = {
+            ...defaultDesignSettings,
+            title_enabled: false, // Ensure title is disabled by default
+            layout_mode: "prompt-bottom" as LayoutMode // Ensure we have a default layout
+          };
+          console.log('Using default config after error:', mergedConfig);
+          setDesignConfig(mergedConfig);
+          setInstanceData(null);
         } else {
+          console.log('Successfully loaded instance:', instance);
+          // Store the full instance data
+          setInstanceData(instance);
+
           if (instance?.config) {
-            // Store the original layout mode
-            originalLayoutRef.current = instance.config.layout_mode || defaultDesignSettings.layout_mode || "prompt-bottom";
+            console.log('Instance has config:', instance.config);
             // Merge default settings with instance config
-            setDesignConfig({
+            const mergedConfig: DesignSettings = {
               ...defaultDesignSettings,
+              title_enabled: false, // Ensure title is disabled by default
+              layout_mode: "prompt-bottom" as LayoutMode, // Ensure we have a default layout
               ...instance.config,
-            });
+            };
+            console.log('Merged config:', mergedConfig);
+            setDesignConfig(mergedConfig);
+          } else {
+            console.log('No config found in instance, using defaults');
+            const defaultConfig: DesignSettings = {
+              ...defaultDesignSettings,
+              title_enabled: false, // Ensure title is disabled by default
+              layout_mode: "prompt-bottom" as LayoutMode // Ensure we have a default layout
+            };
+            setDesignConfig(defaultConfig);
           }
         }
       } catch (error) {
-        console.error("Error loading instance config:", error);
+        console.error("Error loading instance:", error);
+        // Even on error, ensure we have a valid config
+        const mergedConfig: DesignSettings = {
+          ...defaultDesignSettings,
+          title_enabled: false, // Ensure title is disabled by default
+          layout_mode: "prompt-bottom" as LayoutMode // Ensure we have a default layout
+        };
+        console.log('Using default config after error:', mergedConfig);
+        setDesignConfig(mergedConfig);
+        setInstanceData(null);
       } finally {
         setIsLoading(false);
       }
@@ -72,21 +107,6 @@ export default function WidgetPage({ params }: Props) {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;
         setContainerWidth(width);
-        
-        // Switch to mobile layout if width is below threshold
-        if (width < 768 && designConfig.layout_mode !== "prompt-top") {
-          setDesignConfig(prev => ({
-            ...prev,
-            layout_mode: "prompt-top" as LayoutMode
-          }));
-        }
-        // Restore original layout if width is above threshold and currently in mobile layout
-        else if (width >= 768 && designConfig.layout_mode === "prompt-top") {
-          setDesignConfig(prev => ({
-            ...prev,
-            layout_mode: originalLayoutRef.current
-          }));
-        }
       }
     };
 
@@ -98,21 +118,6 @@ export default function WidgetPage({ params }: Props) {
       for (const entry of entries) {
         const width = entry.contentRect.width;
         setContainerWidth(width);
-        
-        // Switch to mobile layout if width is below threshold
-        if (width < 768 && designConfig.layout_mode !== "prompt-top") {
-          setDesignConfig(prev => ({
-            ...prev,
-            layout_mode: "prompt-top" as LayoutMode
-          }));
-        }
-        // Restore original layout if width is above threshold and currently in mobile layout
-        else if (width >= 768 && designConfig.layout_mode === "prompt-top") {
-          setDesignConfig(prev => ({
-            ...prev,
-            layout_mode: originalLayoutRef.current
-          }));
-        }
       }
     });
     
@@ -126,7 +131,7 @@ export default function WidgetPage({ params }: Props) {
       observer.disconnect();
       window.removeEventListener('resize', updateWidth);
     };
-  }, [isMounted, designConfig.layout_mode]);
+  }, [isMounted]);
 
   if (isLoading || !isMounted) {
     return (
@@ -136,6 +141,7 @@ export default function WidgetPage({ params }: Props) {
     );
   }
 
+  console.log('Rendering widget with config:', designConfig);
   return (
     <main ref={containerRef} className="fixed inset-0 w-screen h-screen overflow-hidden">
       <Widget 
@@ -145,6 +151,7 @@ export default function WidgetPage({ params }: Props) {
         fullPage={false}
         deployment={true}
         containerWidth={containerWidth}
+        instanceData={instanceData}
       />
     </main>
   );

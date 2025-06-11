@@ -22,6 +22,9 @@ interface PromptTopLayoutProps {
   onImageUpload: (imageData: string | null) => void;
   onImageRemove: (index: number) => void;
   onRefreshSuggestions: () => void;
+  isSubmissionLimitReached?: boolean;
+  submissionCount?: number;
+  maxSubmissions?: number;
 }
 
 export function PromptTopLayout({
@@ -39,7 +42,10 @@ export function PromptTopLayout({
   onSuggestionClick,
   onImageUpload,
   onImageRemove,
-  onRefreshSuggestions
+  onRefreshSuggestions,
+  isSubmissionLimitReached,
+  submissionCount,
+  maxSubmissions
 }: PromptTopLayoutProps) {
   const isMobile = containerWidth < 768;
   const effectivePadding = getEffectivePadding(config);
@@ -107,6 +113,9 @@ export function PromptTopLayout({
             variant={isMobile ? "mobile" : "desktop"}
             heightScaleFactor={heightScaleFactor}
             containerWidth={containerWidth}
+            isSubmissionLimitReached={isSubmissionLimitReached}
+            submissionCount={submissionCount}
+            maxSubmissions={maxSubmissions}
           />
         </div>
       </div>

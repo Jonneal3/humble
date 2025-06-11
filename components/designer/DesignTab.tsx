@@ -521,23 +521,31 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                     variant="outline"
                     size="sm"
                     className="h-7 text-xs justify-start"
-                    onClick={() => updateConfig({ iframe_width: "800px", iframe_height: "600px" })}
+                    onClick={() => updateConfig({ iframe_width: "400px", iframe_height: "500px" })}
                   >
-                    Medium (800×600)
+                    Compact (400×500)
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     className="h-7 text-xs justify-start"
-                    onClick={() => updateConfig({ iframe_width: "1200px", iframe_height: "800px" })}
+                    onClick={() => updateConfig({ iframe_width: "500px", iframe_height: "600px" })}
                   >
-                    Large (1200×800)
+                    Standard (500×600)
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     className="h-7 text-xs justify-start"
-                    onClick={() => updateConfig({ iframe_width: "100%", iframe_height: "600px" })}
+                    onClick={() => updateConfig({ iframe_width: "600px", iframe_height: "700px" })}
+                  >
+                    Large (600×700)
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 text-xs justify-start"
+                    onClick={() => updateConfig({ iframe_width: "100%", iframe_height: "500px" })}
                   >
                     Full Width
                   </Button>
@@ -550,7 +558,7 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                   <Label className="text-xs font-medium">Width</Label>
                   <div className="flex gap-1">
                     <Input
-                      value={config.iframe_width?.replace('px', '') || "800"}
+                      value={config.iframe_width?.replace('px', '') || "500"}
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value === "100") {
@@ -560,7 +568,7 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                         }
                       }}
                       className="h-8 text-xs flex-1"
-                      placeholder="800"
+                      placeholder="500"
                     />
                     <div className="text-xs text-muted-foreground self-center">px</div>
                   </div>
@@ -1325,23 +1333,16 @@ export const DesignTab: React.FC<DesignTabProps> = React.memo(({
                 </div>
                 <p className="text-[11px] text-muted-foreground mb-2">Show a helpful overlay to guide new users</p>
 
-                <Label className="text-xs font-medium">Upload Area Message</Label>
-                <Input
-                  placeholder="Enter message for upload area"
-                  value={config.demo_upload_message || ''}
-                  onChange={(e) => updateConfig({ demo_upload_message: e.target.value })}
-                  className="h-8 text-xs"
+                <Label className="text-xs font-medium">Loop Count</Label>
+                <NumberInput
+                  label=""
+                  value={config.demo_loop_count ?? 3}
+                  onChange={(value) => updateConfig({ demo_loop_count: Math.max(1, Math.min(10, value)) })}
+                  min={1}
+                  max={10}
+                  placeholder="3"
                 />
-                <p className="text-[11px] text-muted-foreground">Message shown in the demo overlay for the upload area</p>
-
-                <Label className="text-xs font-medium mt-3">Generation Area Message</Label>
-                <Input
-                  placeholder="Enter message for generation area"
-                  value={config.demo_generation_message || ''}
-                  onChange={(e) => updateConfig({ demo_generation_message: e.target.value })}
-                  className="h-8 text-xs"
-                />
-                <p className="text-[11px] text-muted-foreground">Message shown in the demo overlay for the generation area</p>
+                <p className="text-[11px] text-muted-foreground">Number of times to repeat the demo (1-10)</p>
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 // Streamlined Design Types - Minimal and Essential Only
-export type LayoutMode = "left-right" | "right-left" | "prompt-top" | "prompt-bottom";
+export type LayoutMode = "left-right" | "right-left" | "prompt-top" | "prompt-bottom" | "mobile-optimized";
 export type BorderStyle = "solid" | "dashed" | "dotted" | "none";
 export type ShadowStyle = "none" | "subtle" | "medium" | "large" | "glow";
 export type TextAlign = "left" | "center" | "right";
@@ -185,6 +185,7 @@ export interface DesignSettings {
   demo_enabled?: boolean;
   demo_upload_message?: string;
   demo_generation_message?: string;
+  demo_loop_count?: number; // Number of times to loop the demo (1-10)
 }
 
 // Default settings - much cleaner
@@ -252,7 +253,7 @@ export const defaultDesignSettings: DesignSettings = {
   cta_color: "#374151",
   
   // Iframe Settings
-  iframe_width: "100%",
+  iframe_width: "500px",
   iframe_height: "600px",
   iframe_border: true,
   iframe_border_width: 1,
@@ -334,7 +335,8 @@ export const defaultDesignSettings: DesignSettings = {
   // Demo Overlay
   demo_enabled: true,
   demo_upload_message: "Upload your reference images to guide the AI",
-  demo_generation_message: "Your AI-generated images will appear here"
+  demo_generation_message: "Your AI-generated images will appear here",
+  demo_loop_count: 3
 };
 
 // Theme Presets - Comprehensive Design Themes
@@ -520,6 +522,7 @@ export interface DesignTheme {
   demo_enabled?: boolean;
   demo_upload_message?: string;
   demo_generation_message?: string;
+  demo_loop_count?: number; // Number of times to loop the demo (1-10)
 
   // Legacy/Compatibility - keeping accent_color for easy theming
   accent_color?: string;
@@ -593,7 +596,7 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   cta_color: theme.cta_color ?? "#374151",
   
   // Iframe Settings
-  iframe_width: theme.iframe_width ?? "100%",
+  iframe_width: theme.iframe_width ?? "500px",
   iframe_height: theme.iframe_height ?? "600px",
   iframe_border: theme.iframe_border ?? true,
   iframe_border_width: theme.iframe_border_width ?? 1,
@@ -671,7 +674,13 @@ export const getCompleteTheme = (theme: DesignTheme): DesignSettings => ({
   // Responsive Settings
   mobile_layout_mode: theme.mobile_layout_mode ?? "prompt-top",
   mobile_gallery_columns: theme.mobile_gallery_columns ?? 1,
-  mobile_font_scale: theme.mobile_font_scale ?? 0.9
+  mobile_font_scale: theme.mobile_font_scale ?? 0.9,
+  
+  // Demo Overlay
+  demo_enabled: theme.demo_enabled ?? true,
+  demo_upload_message: theme.demo_upload_message ?? "Upload your reference images to guide the AI",
+  demo_generation_message: theme.demo_generation_message ?? "Your AI-generated images will appear here",
+  demo_loop_count: theme.demo_loop_count ?? 3
 });
 
 export const designThemes: DesignTheme[] = [
@@ -785,7 +794,8 @@ export const designThemes: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   },
   {
     name: "Soft Pearl",
@@ -925,7 +935,8 @@ export const designThemes: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   },
   {
     name: "Arctic White",
@@ -983,7 +994,8 @@ export const designThemes: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   },
   {
     name: "Forest Green",
@@ -1061,7 +1073,8 @@ export const designThemes: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   },
   {
     name: "Royal Purple",
@@ -1140,7 +1153,8 @@ export const designThemes: DesignTheme[] = [
     overlay_background_color: "rgba(0, 0, 0, 0.5)",
     overlay_icon_color: "#ffffff",
     overlay_font_family: "Inter",
-    overlay_font_size: 14
+    overlay_font_size: 14,
+    demo_loop_count: 3
   },
   {
     name: "Ocean Blue",
@@ -1162,7 +1176,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#0369a1",
     container_padding: 24,
     border_radius: 12,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   },
   {
     name: "Sunset Orange",
@@ -1184,7 +1199,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#c2410c",
     container_padding: 28,
     border_radius: 14,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   },
   {
     name: "Cherry Blossom",
@@ -1206,7 +1222,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#be185d",
     container_padding: 24,
     border_radius: 16,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   },
   {
     name: "Midnight Blue",
@@ -1228,7 +1245,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#1e40af",
     container_padding: 24,
     border_radius: 10,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   },
   {
     name: "Golden Sand",
@@ -1250,7 +1268,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#92400e",
     container_padding: 32,
     border_radius: 14,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   },
   {
     name: "Emerald Green",
@@ -1272,7 +1291,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#047857",
     container_padding: 28,
     border_radius: 12,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   },
   {
     name: "Lavender Dream",
@@ -1294,7 +1314,8 @@ export const designThemes: DesignTheme[] = [
     uploader_text_color: "#6d28d9",
     container_padding: 26,
     border_radius: 14,
-    shadow_style: "medium"
+    shadow_style: "medium",
+    demo_loop_count: 3
   }
 ];
 
@@ -1614,7 +1635,8 @@ export const DEFAULT_THEMES: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   },
   {
     name: "Warm Earth",
@@ -1756,7 +1778,8 @@ export const DEFAULT_THEMES: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   },
   {
     name: "Ocean Blue",
@@ -1898,7 +1921,8 @@ export const DEFAULT_THEMES: DesignTheme[] = [
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   }
 ];
 
@@ -2150,6 +2174,7 @@ export const generateTheme = (name: string): DesignTheme => {
     // Demo Overlay
     demo_enabled: true,
     demo_upload_message: "Upload your reference images to guide the AI",
-    demo_generation_message: "Your AI-generated images will appear here"
+    demo_generation_message: "Your AI-generated images will appear here",
+    demo_loop_count: 3
   };
 };
